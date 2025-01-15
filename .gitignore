@@ -1,0 +1,6 @@
+開発フェーズ.md
+traefik-logs/access.log
+backend/tmp
+
+# backend
+backend/.env

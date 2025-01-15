@@ -1,0 +1,48 @@
+http:
+  middlewares:
+    cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        accessControlAllowOriginList:
+          - "http://localhost:3000"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: 100
+        addVaryHeader: true
+        accessControlAllowHeaders:
+          - "Content-Type"
+          - "Authorization"
+
+  routers:
+    markdown-blog-api:
+      rule: "Host(`localhost`)"
+      service: markdown-blog-api
+      entryPoints:
+        - web
+      middlewares:
+        - cors
+    dashboard:
+      rule: "Host(`traefik.localhost`)"
+      service: api@internal # Traefikの内部サービスを使用
+      entryPoints:
+        - web
+
+  services:
+    markdown-blog-api:
+      loadBalancer:
+        servers:
+          - url: "http://api:8088" # APIサービスのURL
+        passHostHeader: true
+
+log:
+  level: INFO
+
+accessLog:
+  filePath: "/var/log/traefik/access.log"
+  format: json
+# TODO: HTTPS化する.
+# https://zenn.dev/pitekusu/books/traefik-pitekusu/viewer/https

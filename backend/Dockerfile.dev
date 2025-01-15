@@ -1,0 +1,23 @@
+# 軽量なベースイメージを使用
+FROM golang:1.23.4-alpine
+
+# 必要なパッケージをインストール
+RUN apk update && apk add --no-cache git make
+
+# 作業ディレクトリを設定
+WORKDIR /usr/src/app
+
+# ホストのファイルをコンテナにコピー
+COPY go.mod go.sum ./
+
+# Airをグローバルにインストール
+RUN go install github.com/cosmtrek/air@v1.42.0
+
+# 依存関係をインストール
+RUN go mod download
+
+# ソースコードをコピー
+COPY . .
+
+# Airでアプリケーションを起動
+CMD ["air", "-c", ".air.toml"] 

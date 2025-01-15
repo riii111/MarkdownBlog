@@ -1,0 +1,106 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    image: markdown-blog-api:latest
+    expose:
+      - 8088
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/target
+    networks:
+      - mynet
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      # - minio
+    deploy:
+      replicas: 1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-api.entrypoints=web"
+      - "traefik.http.routers.backend-api.rule=Host(`api.localhost`)"
+      - "traefik.http.routers.backend-api.middlewares=cors@file"
+      - "traefik.http.services.backend-api.loadbalancer.server.port=8088"
+
+  db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./backend/.env
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=markdown-blog
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    networks:
+      - mynet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d markdown-blog"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  reverse-proxy:
+    image: traefik:3.1.2
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true" # 開発環境用、本番ではfalse.
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.dashboard.address=:8081"
+      - "--providers.docker.network=mynet"
+      # Traefikのダッシュボード
+      - "--api.dashboard=true"
+      # アクセスログ
+      - "--accesslog=true"
+      - "--accesslog.filePath=/logs/access.log"
+      - "--accesslog.format=json"
+      # ミドルウェア用
+      - "--providers.file.filename=/etc/traefik.yml"
+      - "--providers.file.watch=true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik-logs:/logs
+      - ./backend/traefik/traefik.yml:/etc/traefik.yml
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - 80:80
+      - 8081:8081 # Traefikのダッシュボード用
+    networks:
+      - mynet
+
+  # minio:
+  #   image: minio/minio
+  #   ports:
+  #     - "9000:9000"
+  #     - "9001:9001"
+  #   volumes:
+  #     - minio_storage:/data
+  #   env_file:
+  #     - backend/.env
+  #   environment:
+  #     MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+  #     MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+  #     MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+  #   command: server --console-address ":9001" /data
+  #   networks:
+  #     - mynet
+
+networks:
+  mynet:
+    driver: "bridge"
+    attachable: true
+
+volumes:
+  postgresql_data:
+  traefik-logs:
+  # minio_storage: {}
