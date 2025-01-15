@@ -3,7 +3,7 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  cmd = "go build -o ./tmp/main ."
+  cmd = "go build -o ./tmp/main ./cmd/api"
   bin = "./tmp/main"
   full_bin = "APP_ENV=dev ./tmp/main"
   include_ext = ["go", "tpl", "tmpl", "html"]

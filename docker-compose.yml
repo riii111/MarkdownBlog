@@ -7,8 +7,9 @@ services:
     expose:
       - 8088
     volumes:
-      - ./backend:/usr/src/app
+      - ./backend:/usr/src/app/backend
       - /usr/src/app/target
+    working_dir: /usr/src/app/backend
     networks:
       - mynet
     env_file:

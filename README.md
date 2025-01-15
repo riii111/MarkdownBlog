@@ -1,8 +1,10 @@
 # MarkdownBlog
+
 MarkDown + Writer。
 技術検証
 
 ## アプリケーション構成
+
 [![Qwik](https://img.shields.io/badge/Qwik-4336FF?style=for-the-badge&logo=qwik&logoColor=white)](https://qwik.builder.io/)
 [![Qwik City](https://img.shields.io/badge/Qwik_City-4336FF?style=for-the-badge&logo=qwik&logoColor=white)](https://qwik.builder.io/docs/qwikcity/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -37,8 +39,6 @@ MarkDown + Writer。
 
 1. <http://localhost/docs/#/>
    バックエンド（APIドキュメント）
-2. <http://db-admin.localhost/>
-   MongoDB Express（MongoDBのGUI）
 3. <http://traefik.localhost/>
    Traefikのダッシュボード
 
