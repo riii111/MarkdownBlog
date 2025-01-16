@@ -1,15 +1,22 @@
 package migration
 
 import (
+	"log"
+	"os"
+
 	"github.com/riii111/markdown-blog-api/internal/domain/model"
 	"gorm.io/gorm"
-	"log"
 )
 
 func Migrate(db *gorm.DB) error {
+	// 開発環境でのみ自動マイグレーションを実行
+	if os.Getenv("APP_ENV") != "development" {
+		log.Println("Skipping auto-migration in non-development environment")
+		return nil
+	}
+
 	log.Println("Running database migrations...")
 
-	// マイグレーションの実行
 	err := db.AutoMigrate(
 		&model.User{},
 		&model.Session{},
