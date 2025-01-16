@@ -14,11 +14,7 @@ RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/i
 # 作業ディレクトリを設定
 WORKDIR /usr/src/app
 
-# ホストのファイルをコンテナにコピー
-COPY go.mod go.sum ./
-
-# 依存関係をインストール
-RUN go mod download
+# go.modとgo.sumのコピーは不要（volumeでマウントされるため）
 
 # Airをグローバルにインストール
 RUN go install github.com/cosmtrek/air@v1.42.0

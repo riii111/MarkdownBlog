@@ -1,6 +1,12 @@
 開発フェーズ.md
+要件定義書_Phase1.md
+テーブル設計書_Phase1.md
+
+# ログ
 traefik-logs/access.log
+
+# 一時ファイル
 backend/tmp
 
-# backend
+# 環境変数
 backend/.env
