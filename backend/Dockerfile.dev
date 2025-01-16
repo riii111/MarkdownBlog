@@ -1,8 +1,15 @@
 # 軽量なベースイメージを使用
-FROM golang:1.23.4-alpine
+FROM golang:1.22.1-bullseye
 
 # 必要なパッケージをインストール
-RUN apk update && apk add --no-cache git make
+RUN apt-get update && apt-get install -y \
+    git \
+    make \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# golangci-lintのインストール
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
 
 # 作業ディレクトリを設定
 WORKDIR /usr/src/app
@@ -17,4 +24,4 @@ RUN go mod download
 RUN go install github.com/cosmtrek/air@v1.42.0
 
 # Airでアプリケーションを起動
-CMD ["air", "-c", ".air.toml"] 
+CMD ["air", "-c", ".air.toml"]

@@ -45,3 +45,29 @@ logs-all:
 
 exec:
 	docker compose exec ${container} ${command}
+
+# リンターとフォーマッター関連のコマンド
+lint:
+	docker compose exec api golangci-lint run ./...
+
+fmt:
+	docker compose exec api go fmt ./...
+
+# コードの品質チェック（フォーマット＋リント）
+check:
+	make fmt
+	make lint
+
+# テスト実行
+test:
+	docker compose exec api go test ./...
+
+# 全ての検証を実行（フォーマット、リント、テスト）
+verify:
+	make fmt
+	make lint
+	make test
+
+# コードジェネレート
+generate:
+	docker compose exec api go generate ./...
