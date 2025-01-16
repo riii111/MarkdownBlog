@@ -20,7 +20,7 @@ var models = []interface{}{
 }
 
 func Migrate(db *gorm.DB) error {
-	if os.Getenv("APP_ENV") != "development" {
+	if os.Getenv("APP_ENV") != "dev" {
 		log.Println("Skipping auto-migration in non-development environment")
 		return nil
 	}
@@ -103,7 +103,7 @@ func Rollback(db *gorm.DB) error {
 	log.Println("Rolling back last migration...")
 
 	// 安全のため、開発環境でのみ実行可能
-	if os.Getenv("APP_ENV") != "development" {
+	if os.Getenv("APP_ENV") != "dev" {
 		return fmt.Errorf("rollback is only allowed in development environment")
 	}
 
