@@ -84,10 +84,10 @@ migrate:
 		-user=$${POSTGRES_USER:-root} \
 		-password=$${POSTGRES_PASSWORD:-password}
 
-# マイグレーションのステータス確認（必要に応じて実装）
+# マイグレーションのステータス確認
 migrate-status:
 	docker compose exec api go run cmd/migrate/main.go -status
 
-# マイグレーションのロールバック（必要に応じて実装）
+# マイグレーションのロールバック
 migrate-rollback:
 	docker compose exec api go run cmd/migrate/main.go -rollback
