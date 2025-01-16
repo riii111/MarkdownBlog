@@ -12,8 +12,8 @@ func main() {
 	http.HandleFunc("/health", health.Handler)
 
 	// サーバーの起動
-	log.Println("Server starting on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Println("Server starting on :8088")
+	if err := http.ListenAndServe(":8088", nil); err != nil {
 		log.Fatal(err)
 	}
 }
