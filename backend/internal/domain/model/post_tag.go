@@ -1,15 +1,12 @@
 package model
 
-import (
-	"github.com/google/uuid"
-	"time"
-)
+import "github.com/google/uuid"
 
 // PostTag 記事とタグの中間テーブル
 type PostTag struct {
-	PostID    uuid.UUID `gorm:"type:uuid;primaryKey"`
-	TagID     uuid.UUID `gorm:"type:uuid;primaryKey"`
-	CreatedAt time.Time `gorm:"not null"`
-	Post      Post      `gorm:"foreignKey:PostID"`
-	Tag       Tag       `gorm:"foreignKey:TagID"`
+	BaseModel
+	PostID uuid.UUID `gorm:"type:uuid;primaryKey"`
+	TagID  uuid.UUID `gorm:"type:uuid;primaryKey"`
+	Post   Post      `gorm:"foreignKey:PostID"`
+	Tag    Tag       `gorm:"foreignKey:TagID"`
 }
