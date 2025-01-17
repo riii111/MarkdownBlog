@@ -19,5 +19,8 @@ WORKDIR /usr/src/app
 # Airをグローバルにインストール
 RUN go install github.com/cosmtrek/air@v1.42.0
 
+# swagger関連のパッケージをインストール
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+
 # Airでアプリケーションを起動
 CMD ["air", "-c", ".air.toml"]

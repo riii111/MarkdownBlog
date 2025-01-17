@@ -18,7 +18,17 @@ func NewUserHandler(userUsecase *usecase.UserUsecase) *UserHandler {
 	}
 }
 
-// User登録ハンドラ
+// Register godoc
+// @Summary      Register a new user
+// @Description  Register a new user with email, password and display name
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request body dto.RegisterUserRequest true "User registration data"
+// @Success      201  {object}  dto.RegisterUserResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/users/register [post]
 func (h *UserHandler) Register(c *gin.Context) {
 	var req dto.RegisterUserRequest
 
@@ -46,4 +56,8 @@ func (h *UserHandler) Register(c *gin.Context) {
 		DisplayName: user.DisplayName,
 		CreatedAt:   user.BaseModel.CreatedAt,
 	})
+}
+
+type ErrorResponse struct {
+	Error string `json:"error" example:"error message"`
 }

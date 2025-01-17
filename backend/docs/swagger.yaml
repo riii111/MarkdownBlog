@@ -1,0 +1,74 @@
+basePath: /
+definitions:
+  dto.RegisterUserRequest:
+    properties:
+      display_name:
+        example: John Doe
+        type: string
+      email:
+        description: emailタグでバリデーションが行える（Ginのvalidatorパッケージの仕様）
+        example: user@example.com
+        type: string
+      password:
+        example: password
+        minLength: 8
+        type: string
+    required:
+    - display_name
+    - email
+    - password
+    type: object
+  dto.RegisterUserResponse:
+    properties:
+      created_at:
+        type: string
+      display_name:
+        description: UI表示用
+        type: string
+      id:
+        type: string
+    type: object
+  handler.ErrorResponse:
+    properties:
+      error:
+        example: error message
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is Markdown Blog API
+  title: Markdown Blog API
+  version: "1.0"
+paths:
+  /api/users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email, password and display name
+      parameters:
+      - description: User registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.RegisterUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - users
+swagger: "2.0"

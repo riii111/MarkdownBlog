@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/riii111/markdown-blog-api/docs"
 	"github.com/riii111/markdown-blog-api/internal/handler"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/database"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
@@ -24,6 +25,11 @@ func initDB() (*gorm.DB, error) {
 	return database.NewDB(config)
 }
 
+// @title           Markdown Blog API
+// @version         1.0
+// @description     This is Markdown Blog API
+// @host           localhost:8080
+// @BasePath       /
 func main() {
 	// Ginルーターの初期化
 	router := gin.Default()
