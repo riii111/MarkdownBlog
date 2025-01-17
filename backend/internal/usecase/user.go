@@ -8,6 +8,7 @@ import (
 
 	"github.com/riii111/markdown-blog-api/internal/domain/model"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 // カスタムエラーの定義
@@ -17,10 +18,10 @@ var (
 )
 
 type UserUsecase struct {
-	userRepo repository.UserRepository
+	userRepo model.UserRepository
 }
 
-func NewUserUsecase(userRepo repository.UserRepository) *UserUsecase {
+func NewUserUsecase(userRepo model.UserRepository) *UserUsecase {
 	return &UserUsecase{
 		userRepo: userRepo,
 	}
@@ -29,7 +30,7 @@ func NewUserUsecase(userRepo repository.UserRepository) *UserUsecase {
 func (u *UserUsecase) Register(ctx context.Context, email, password, displayName string) (*model.User, error) {
 	// メールアドレスの重複チェック
 	existingUser, err := u.userRepo.FindByEmail(ctx, email)
-	if err != nil && !errors.Is(err, repository.ErrUserNotFound) {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("failed to check existing user: %w", err)
 	}
 	if existingUser != nil {
