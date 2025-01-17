@@ -21,14 +21,15 @@ backend/
 ├── internal/              # プライベートなアプリケーションコード
 │   ├── domain/           # ドメイン層
 │   │   ├── model/       # ドメインモデル
-│   │   └── repository/  # リポジトリインターフェース
+│   │   └── repository/  # リポジトリ（インターフェースのみ）
 │   ├── handler/         # HTTPハンドラー層
-│   │   ├── dto/        # Data Transfer Objects
-│   │   ├── middleware/ # HTTPミドルウェア
-│   │   └── router/     # ルーティング設定
+│   │   ├── dto/         # Data Transfer Objects
+│   │   ├── middleware/  # HTTPミドルウェア
+│   │   └── router.go    # ルーティング設定
+│   │   └── user_handler.go # ユーザー関連のハンドラー
 │   ├── infrastructure/ # インフラストラクチャ層
 │   │   └── migration/  # マイグレーション関連の処理
-│   │   └── database/   # データベース関連の処理
+│   │   └── database/   # データベース関連の処理（リポジトリの実装）
 │   └── usecase/        # ユースケース層
 └── pkg/                # 公開可能な再利用可能なコード
 ```

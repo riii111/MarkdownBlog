@@ -2,12 +2,13 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
+	_ "github.com/riii111/markdown-blog-api/docs"
 	"github.com/riii111/markdown-blog-api/internal/handler"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/database"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
+	"github.com/riii111/markdown-blog-api/internal/usecase"
 	"gorm.io/gorm"
 )
 
@@ -23,9 +24,20 @@ func initDB() (*gorm.DB, error) {
 	return database.NewDB(config)
 }
 
+// @title           Markdown Blog API
+// @version         1.0
+// @description     This is Markdown Blog API
+// @host           localhost:8088
+// @BasePath       /
 func main() {
-	// ヘルスチェックエンドポイントの登録
-	http.HandleFunc("/health", handler.HealthCheck)
+	// バリデーションの初期化
+	validationRegistry, err := handler.NewValidationRegistry()
+	if err != nil {
+		log.Fatalf("Failed to create validation registry: %v", err)
+	}
+	if err := validationRegistry.RegisterCustomValidations(); err != nil {
+		log.Fatalf("Failed to register custom validations: %v", err)
+	}
 
 	// データベース接続の初期化
 	db, err := initDB()
@@ -38,9 +50,22 @@ func main() {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
+	// TODO: インスタンス生成ロジックは一式置き換える（動作確認優先）
+	// リポジトリの初期化
+	userRepo := database.NewUserRepository(db)
+
+	// ユースケースの初期化
+	userUsecase := usecase.NewUserUsecase(userRepo)
+
+	// ハンドラーの初期化
+	userHandler := handler.NewUserHandler(userUsecase)
+
+	// ルーターのセットアップ
+	router := handler.SetupRouter(userHandler)
+
 	// サーバーの起動
 	log.Println("Server starting on :8088")
-	if err := http.ListenAndServe(":8088", nil); err != nil {
+	if err := router.Run(":8088"); err != nil {
 		log.Fatal(err)
 	}
 }
