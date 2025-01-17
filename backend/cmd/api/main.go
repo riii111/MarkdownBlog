@@ -10,9 +10,9 @@ import (
 	"github.com/riii111/markdown-blog-api/internal/handler"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/database"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
-	"gorm.io/gorm"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"gorm.io/gorm"
 )
 
 func initDB() (*gorm.DB, error) {
