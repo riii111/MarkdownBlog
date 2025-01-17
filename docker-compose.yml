@@ -4,6 +4,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     image: markdown-blog-api:latest
+    ports:
+      - 8088:8088
     expose:
       - 8088
     volumes:

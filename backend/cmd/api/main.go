@@ -11,6 +11,8 @@ import (
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/database"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
 	"gorm.io/gorm"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func initDB() (*gorm.DB, error) {
@@ -28,7 +30,7 @@ func initDB() (*gorm.DB, error) {
 // @title           Markdown Blog API
 // @version         1.0
 // @description     This is Markdown Blog API
-// @host           localhost:8080
+// @host           localhost:8088
 // @BasePath       /
 func main() {
 	// Ginルーターの初期化
@@ -42,6 +44,9 @@ func main() {
 	if err := validationRegistry.RegisterCustomValidations(); err != nil {
 		log.Fatalf("Failed to register custom validations: %v", err)
 	}
+
+	// Swaggerのルーティングを追加
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// ヘルスチェックエンドポイントの登録
 	router.GET("/health", func(c *gin.Context) {

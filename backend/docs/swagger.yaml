@@ -34,7 +34,7 @@ definitions:
         example: error message
         type: string
     type: object
-host: localhost:8080
+host: localhost:8088
 info:
   contact: {}
   description: This is Markdown Blog API
