@@ -21,10 +21,10 @@ services:
       replicas: 1
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend-api.entrypoints=web"
-      - "traefik.http.routers.backend-api.rule=Host(`localhost`)"
-      - "traefik.http.routers.backend-api.middlewares=cors@file"
-      - "traefik.http.services.backend-api.loadbalancer.server.port=8088"
+      - "traefik.http.routers.markdown-blog-api.entrypoints=web"
+      - "traefik.http.routers.markdown-blog-api.rule=Host(`localhost`)"
+      - "traefik.http.routers.markdown-blog-api.middlewares=cors@file"
+      - "traefik.http.services.markdown-blog-api.loadbalancer.server.port=8088"
 
   db:
     image: postgres:15
