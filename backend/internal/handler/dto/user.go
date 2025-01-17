@@ -2,8 +2,10 @@ package dto
 
 import (
 	"regexp"
+	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 type RegisterUserRequest struct {
