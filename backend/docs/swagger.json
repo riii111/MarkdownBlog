@@ -7,7 +7,7 @@
         "version": "1.0"
     },
     "host": "localhost:8088",
-    "basePath": "/api",
+    "basePath": "/",
     "paths": {
         "/api/users/register": {
             "post": {

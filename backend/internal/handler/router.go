@@ -23,17 +23,10 @@ func SetupRouter(userHandler *UserHandler) *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
-	// APIグループ
-	api := r.Group("/api")
+	// APIグループを削除し、直接ルーティング
+	users := r.Group("/api/users")
 	{
-		users := api.Group("/users")
-		{
-			users.POST("/register", userHandler.Register)
-			// OPTIONSメソッドを明示的に処理
-			users.OPTIONS("/register", func(c *gin.Context) {
-				c.Status(http.StatusOK)
-			})
-		}
+		users.POST("/register", userHandler.Register)
 	}
 
 	return r
