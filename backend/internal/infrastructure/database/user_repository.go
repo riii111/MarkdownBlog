@@ -29,11 +29,12 @@ func (r *userRepository) Create(ctx context.Context, user *model.User) error {
 // メールアドレスによるユーザ検索。存在しない場合は（nil, nil）を返す
 func (r *userRepository) FindByEmail(ctx context.Context, email string) (*model.User, error) {
 	var user model.User
-	result := r.db.WithContext(ctx).Where("email = ?", email).Find(&user)
+	// Takeで1件のみ取得
+	result := r.db.WithContext(ctx).Where("email = ?", email).Take(&user)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, nil
+			return nil, nil // 該当するレコードが見つからないのは正常
 		}
 		return nil, result.Error // その他のDBエラー
 	}

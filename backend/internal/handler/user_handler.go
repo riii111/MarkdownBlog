@@ -35,7 +35,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 	// リクエストボディのbindとvalidation
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+			"error": "Invalid request format",
 		})
 		return
 	}
@@ -43,14 +43,13 @@ func (h *UserHandler) Register(c *gin.Context) {
 	// ユースケースの呼び出し
 	user, err := h.userUsecase.Register(c.Request.Context(), req.Email, req.Password, req.DisplayName)
 	if err != nil {
-		// TODO: あとでエラーハンドリング見直す
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to register user",
+		// すべての登録エラーを400 Bad Requestとして扱う
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Registration failed. Please check your input and try again",
 		})
 		return
 	}
 
-	// 成功時
 	c.JSON(http.StatusCreated, dto.RegisterUserResponse{
 		ID:          user.ID,
 		DisplayName: user.DisplayName,

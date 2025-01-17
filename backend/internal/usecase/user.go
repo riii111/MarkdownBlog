@@ -2,19 +2,19 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/riii111/markdown-blog-api/internal/domain/model"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 // カスタムエラーの定義
 var (
 	ErrEmailAlreadyExists = fmt.Errorf("email already exists")
 	ErrInvalidCredentials = fmt.Errorf("invalid credentials")
+	ErrRegistrationFailed = fmt.Errorf("registration failed")
 )
 
 type UserUsecase struct {
@@ -28,19 +28,11 @@ func NewUserUsecase(userRepo model.UserRepository) *UserUsecase {
 }
 
 func (u *UserUsecase) Register(ctx context.Context, email, password, displayName string) (*model.User, error) {
-	// メールアドレスの重複チェック
-	existingUser, err := u.userRepo.FindByEmail(ctx, email)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("failed to check existing user: %w", err)
-	}
-	if existingUser != nil {
-		return nil, ErrEmailAlreadyExists
-	}
-
 	// パスワードのハッシュ化
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %w", err)
+		log.Printf("failed to hash password: %v", err)
+		return nil, ErrRegistrationFailed
 	}
 
 	// ユーザーモデルの生成
@@ -55,9 +47,11 @@ func (u *UserUsecase) Register(ctx context.Context, email, password, displayName
 		},
 	}
 
-	// ユーザーの保存
+	// ユーザーの保存（ユニーク制約違反を含むすべてのエラーを一般的なエラーとして扱う）
 	if err := u.userRepo.Create(ctx, user); err != nil {
-		return nil, fmt.Errorf("failed to create user: %w", err)
+		// エラーの詳細はログに記録するが、呼び出し元には一般的なエラーのみを返す
+		log.Printf("failed to create user: %v", err)
+		return nil, ErrRegistrationFailed
 	}
 
 	return user, nil
