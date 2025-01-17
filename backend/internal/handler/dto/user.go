@@ -20,9 +20,11 @@ var (
 
 func RegisterCustomValidations(v *validator.Validate) {
 	// パスワードのバリデーション
-	v.RegisterValidation("password", func(fl validator.FieldLevel) bool {
+	if err := v.RegisterValidation("password", func(fl validator.FieldLevel) bool {
 		return passwordRegex.MatchString(fl.Field().String())
-	})
+	}); err != nil {
+		panic(err) // バリデーション登録に失敗した場合はpanicを発生させる
+	}
 }
 
 type RegisterUserResponse struct {
