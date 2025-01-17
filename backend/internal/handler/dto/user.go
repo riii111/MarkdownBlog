@@ -9,9 +9,9 @@ import (
 )
 
 type RegisterUserRequest struct {
-	Email       string `json:"email" binding:"required,email" example:"user@example.com"` // emailタグでバリデーションが行える（Ginのvalidatorパッケージの仕様）
-	Password    string `json:"password" binding:"required,min=8, max=32" example:"password"`
-	DisplayName string `json:"display_name" binding:"required, min=1, max=100" example:"John Doe"`
+	Email       string `json:"email" binding:"required,email" example:"user@example.com"`
+	Password    string `json:"password" binding:"required,min=8,max=32" example:"password"`
+	DisplayName string `json:"display_name" binding:"required,min=1,max=100" example:"John Doe"`
 }
 
 var (
