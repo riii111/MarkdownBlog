@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
 	"github.com/riii111/markdown-blog-api/internal/usecase"
@@ -10,6 +11,7 @@ import (
 type UserHandler struct {
 	userUsecase *usecase.UserUsecase
 }
+
 func NewUserHandler(userUsecase *usecase.UserUsecase) *UserHandler {
 	return &UserHandler{
 		userUsecase: userUsecase,
@@ -17,11 +19,11 @@ func NewUserHandler(userUsecase *usecase.UserUsecase) *UserHandler {
 }
 
 // User登録ハンドラ
-func (h *UserHandler) Register(c *.gin.Context) {
+func (h *UserHandler) Register(c *gin.Context) {
 	var req dto.RegisterUserRequest
 
 	// リクエストボディのbindとvalidation
-	if err := c.ShouldBindJSON(&req) != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -40,8 +42,8 @@ func (h *UserHandler) Register(c *.gin.Context) {
 
 	// 成功時
 	c.JSON(http.StatusCreated, dto.RegisterUserResponse{
-		ID:	user.ID.string(),
-		DisplayName:  user.DisplayName,
-		CreatedAt:	user.CreatedAt,
+		ID:          user.ID.string(),
+		DisplayName: user.DisplayName,
+		CreatedAt:   user.CreatedAt,
 	})
 }
