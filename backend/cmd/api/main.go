@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/riii111/markdown-blog-api/internal/handler"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/database"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
@@ -24,8 +25,22 @@ func initDB() (*gorm.DB, error) {
 }
 
 func main() {
+	// Ginルーターの初期化
+	router := gin.Default()
+
+	// バリデーションの初期化
+	validationRegistry, err := handler.NewValidationRegistry()
+	if err != nil {
+		log.Fatalf("Failed to create validation registry: %v", err)
+	}
+	if err := validationRegistry.RegisterCustomValidations(); err != nil {
+		log.Fatalf("Failed to register custom validations: %v", err)
+	}
+
 	// ヘルスチェックエンドポイントの登録
-	http.HandleFunc("/health", handler.HealthCheck)
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
 
 	// データベース接続の初期化
 	db, err := initDB()
@@ -40,7 +55,7 @@ func main() {
 
 	// サーバーの起動
 	log.Println("Server starting on :8088")
-	if err := http.ListenAndServe(":8088", nil); err != nil {
+	if err := router.Run(":8088"); err != nil {
 		log.Fatal(err)
 	}
 }

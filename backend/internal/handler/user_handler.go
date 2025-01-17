@@ -42,8 +42,8 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 	// 成功時
 	c.JSON(http.StatusCreated, dto.RegisterUserResponse{
-		ID:          user.ID.string(),
+		ID:          user.ID,
 		DisplayName: user.DisplayName,
-		CreatedAt:   user.CreatedAt,
+		CreatedAt:   user.BaseModel.CreatedAt,
 	})
 }

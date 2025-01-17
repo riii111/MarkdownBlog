@@ -3,8 +3,11 @@
 package handler
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
+	"github.com/riii111/markdown-blog-api/internal/handler/dto"
 )
 
 type ValidationRegistry struct {
@@ -24,5 +27,11 @@ func (vr *ValidationRegistry) RegisterCustomValidations() error {
 		return err
 	}
 
+	return nil
+}
+
+func (vr *ValidationRegistry) registerEmailValidations() error {
+	// dto パッケージで定義されているカスタムバリデーションを登録
+	dto.RegisterCustomValidations(vr.validator)
 	return nil
 }
