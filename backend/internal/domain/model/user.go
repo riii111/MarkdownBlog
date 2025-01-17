@@ -1,6 +1,10 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 // User ユーザーモデル
 type User struct {
@@ -12,9 +16,9 @@ type User struct {
 
 // UserRepository ユーザーリポジトリのインターフェース
 type UserRepository interface {
-	Create(user *User) error
-	FindByID(id uuid.UUID) (*User, error)
-	FindByEmail(email string) (*User, error)
-	Update(user *User) error
-	Delete(id uuid.UUID) error
+	Create(ctx context.Context, user *User) error
+	FindByID(ctx context.Context, id uuid.UUID) (*User, error)
+	FindByEmail(ctx context.Context, email string) (*User, error)
+	Update(ctx context.Context, user *User) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }
