@@ -2,11 +2,18 @@ package handler
 
 import (
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
 	"github.com/riii111/markdown-blog-api/internal/usecase"
 )
+
+// TODO: あとで見直し
+type ErrorResponse struct {
+	Error string `json:"error" example:"error message"`
+}
 
 type UserHandler struct {
 	userUsecase *usecase.UserUsecase
@@ -50,6 +57,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// レスポンス
 	c.JSON(http.StatusCreated, dto.RegisterUserResponse{
 		ID:          user.ID,
 		DisplayName: user.DisplayName,
@@ -57,6 +65,91 @@ func (h *UserHandler) Register(c *gin.Context) {
 	})
 }
 
-type ErrorResponse struct {
-	Error string `json:"error" example:"error message"`
+// Login godoc
+// @Summary      Login user
+// @Description  Login with email and password
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request body dto.LoginRequest true "Login credentials"
+// @Success      200  {object}  dto.LoginResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      401  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/users/login [post]
+func (h *UserHandler) Login(c *gin.Context) {
+	var req dto.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error: "Invalid request format",
+		})
+		return
+	}
+
+	session, err := h.userUsecase.Login(c.Request.Context(), req.Email, req.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, ErrorResponse{
+			Error: "Invalid credentials",
+		})
+		return
+	}
+
+	// 環境変数から直接セッション期間を取得
+	sessionDuration, _ := strconv.Atoi(os.Getenv("SESSION_DURATION"))
+
+	// セッションCookieを設定
+	c.SetCookie(
+		os.Getenv("SESSION_COOKIE_NAME"),
+		session.SessionToken,
+		sessionDuration,
+		os.Getenv("COOKIE_PATH"),
+		os.Getenv("COOKIE_DOMAIN"),
+		os.Getenv("COOKIE_SECURE") == "true",
+		os.Getenv("COOKIE_HTTP_ONLY") == "true",
+	)
+
+	// レスポンス
+	c.JSON(http.StatusOK, dto.LoginResponse{
+		ID:          session.UserID,
+		DisplayName: session.User.DisplayName,
+	})
+}
+
+// Logout godoc
+// @Summary      Logout user
+// @Description  Logout current user and invalidate session
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Success      204
+// @Failure      401  {object}  ErrorResponse
+// @Router       /api/users/logout [post]
+func (h *UserHandler) Logout(c *gin.Context) {
+	sessionToken, err := c.Cookie(os.Getenv("SESSION_COOKIE_NAME"))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, ErrorResponse{
+			Error: "No active session",
+		})
+		return
+	}
+
+	if err := h.userUsecase.Logout(c.Request.Context(), sessionToken); err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: "Failed to logout",
+		})
+		return
+	}
+
+	// セッションCookieを削除
+	c.SetCookie(
+		os.Getenv("SESSION_COOKIE_NAME"),
+		"",
+		-1,
+		os.Getenv("COOKIE_PATH"),
+		os.Getenv("COOKIE_DOMAIN"),
+		os.Getenv("COOKIE_SECURE") == "true",
+		os.Getenv("COOKIE_HTTP_ONLY") == "true",
+	)
+
+	c.Status(http.StatusNoContent)
 }

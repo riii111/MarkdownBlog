@@ -27,6 +27,8 @@ func SetupRouter(userHandler *UserHandler) *gin.Engine {
 	users := r.Group("/api/users")
 	{
 		users.POST("/register", userHandler.Register)
+		users.POST("/login", userHandler.Login)
+		users.POST("/logout", userHandler.Logout)
 	}
 
 	return r

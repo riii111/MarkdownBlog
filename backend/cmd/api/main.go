@@ -53,9 +53,10 @@ func main() {
 	// TODO: インスタンス生成ロジックは一式置き換える（動作確認優先）
 	// リポジトリの初期化
 	userRepo := database.NewUserRepository(db)
+	sessionRepo := database.NewSessionRepository(db)
 
 	// ユースケースの初期化
-	userUsecase := usecase.NewUserUsecase(userRepo)
+	userUsecase := usecase.NewUserUsecase(userRepo, sessionRepo)
 
 	// ハンドラーの初期化
 	userHandler := handler.NewUserHandler(userUsecase)
