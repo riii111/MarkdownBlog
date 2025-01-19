@@ -16,10 +16,13 @@ type BaseModel struct {
 
 // BeforeCreate UUIDv7を生成する共通処理
 func (b *BaseModel) BeforeCreate(tx *gorm.DB) error {
-	id, err := uuid.NewV7()
-	if err != nil {
-		return err
+	// IDが未設定の場合のみ生成
+	if b.ID == uuid.Nil {
+		id, err := uuid.NewV7()
+		if err != nil {
+			return err
+		}
+		b.ID = id
 	}
-	b.ID = id
 	return nil
 }

@@ -18,10 +18,10 @@ func NewCorsMiddleware() gin.HandlerFunc {
 	log.Printf("CORS allowedOrigins: %v", allowedOrigins)
 
 	config := cors.Config{
-		AllowOrigins:     allowedOrigins,
-		AllowMethods:     allowedMethods,
-		AllowHeaders:     allowedHeaders,
-		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
+		AllowOrigins: allowedOrigins,
+		AllowMethods: allowedMethods,
+		AllowHeaders: allowedHeaders,
+		// ExposeHeadersはデフォルトで参照可能なヘッダーのみでOKなので、省略
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}

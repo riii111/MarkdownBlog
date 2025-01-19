@@ -11,6 +11,7 @@ Markdown BlogのバックエンドAPIサーバーです。
 ## プロジェクト構造
 
 <https://github.com/golang-standards/project-layout/tree/master>を参考にしつつ、internal配下はレイヤードアーキテクチャを採用。
+
 保守性と拡張性の高いコードベースを目指しています。
 
 ```text
