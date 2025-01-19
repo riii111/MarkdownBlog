@@ -2,10 +2,15 @@ package usecase
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/riii111/markdown-blog-api/internal/domain/model"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -15,18 +20,22 @@ var (
 	ErrEmailAlreadyExists = fmt.Errorf("email already exists")
 	ErrInvalidCredentials = fmt.Errorf("invalid credentials")
 	ErrRegistrationFailed = fmt.Errorf("registration failed")
+	ErrSessionNotFound    = fmt.Errorf("session not found")
 )
 
 type UserUsecase struct {
-	userRepo model.UserRepository
+	userRepo    model.UserRepository
+	sessionRepo model.SessionRepository
 }
 
-func NewUserUsecase(userRepo model.UserRepository) *UserUsecase {
+func NewUserUsecase(userRepo model.UserRepository, sessionRepo model.SessionRepository) *UserUsecase {
 	return &UserUsecase{
-		userRepo: userRepo,
+		userRepo:    userRepo,
+		sessionRepo: sessionRepo,
 	}
 }
 
+// ユーザー登録
 func (u *UserUsecase) Register(ctx context.Context, email, password, displayName string) (*model.User, error) {
 	// パスワードのハッシュ化
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -55,4 +64,76 @@ func (u *UserUsecase) Register(ctx context.Context, email, password, displayName
 	}
 
 	return user, nil
+}
+
+// ログイン
+func (u *UserUsecase) Login(ctx context.Context, email, password string) (*model.Session, error) {
+	// ユーザーを検索
+	user, err := u.userRepo.FindByEmail(ctx, email)
+	if err != nil {
+		log.Printf("FindByEmail error: %v", err)
+		return nil, err
+	}
+	if user == nil {
+		return nil, ErrInvalidCredentials
+	}
+
+	// 見つかったユーザー情報のログ
+	log.Printf("Found user - ID: %v, Email: %v", user.ID, user.Email)
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+		return nil, ErrInvalidCredentials
+	}
+
+	// セッショントークンの生成
+	token, err := generateSessionToken()
+	if err != nil {
+		return nil, err
+	}
+
+	// セッション期間を取得
+	sessionDuration, _ := strconv.Atoi(os.Getenv("SESSION_DURATION"))
+	expiresAt := time.Now().Add(time.Duration(sessionDuration) * time.Second)
+
+	// セッションの作成
+	session := &model.Session{
+		BaseModel:    model.BaseModel{ID: uuid.New()},
+		UserID:       user.ID,
+		User:         *user,
+		SessionToken: token,
+		ExpiresAt:    expiresAt,
+	}
+
+	log.Printf("Creating session - UserID: %v, Token: %v", session.UserID, session.SessionToken)
+
+	if err := u.sessionRepo.Create(session); err != nil {
+		log.Printf("Session creation error: %v", err)
+		return nil, err
+	}
+
+	return session, nil
+}
+
+// ログアウト
+func (u *UserUsecase) Logout(ctx context.Context, sessionToken string) error {
+	// セッションを検索
+	session, err := u.sessionRepo.FindByToken(sessionToken)
+	if err != nil {
+		return err
+	}
+	if session == nil {
+		return ErrSessionNotFound
+	}
+
+	// セッションを削除
+	return u.sessionRepo.Delete(session.ID)
+}
+
+// セッショントークンの生成
+func generateSessionToken() (string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
 }

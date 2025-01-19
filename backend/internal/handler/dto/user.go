@@ -32,3 +32,13 @@ type RegisterUserResponse struct {
 	DisplayName string    `json:"display_name"` // UI表示用
 	CreatedAt   time.Time `json:"created_at"`
 }
+
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email" example:"user@example.com"`
+	Password string `json:"password" binding:"required,min=8" example:"password"`
+}
+
+type LoginResponse struct {
+	ID          uuid.UUID `json:"id"`
+	DisplayName string    `json:"display_name"` // UI表示用
+}

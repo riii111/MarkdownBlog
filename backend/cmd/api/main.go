@@ -29,6 +29,15 @@ func initDB() (*gorm.DB, error) {
 // @description     This is Markdown Blog API
 // @host           localhost:8088
 // @BasePath       /
+
+// @securityDefinitions.apikey CookieAuth
+// @in cookie
+// @name session_token
+
+// @securityScheme CookieAuth
+// @type apiKey
+// @in cookie
+// @name session_token
 func main() {
 	// バリデーションの初期化
 	validationRegistry, err := handler.NewValidationRegistry()
@@ -53,9 +62,10 @@ func main() {
 	// TODO: インスタンス生成ロジックは一式置き換える（動作確認優先）
 	// リポジトリの初期化
 	userRepo := database.NewUserRepository(db)
+	sessionRepo := database.NewSessionRepository(db)
 
 	// ユースケースの初期化
-	userUsecase := usecase.NewUserUsecase(userRepo)
+	userUsecase := usecase.NewUserUsecase(userRepo, sessionRepo)
 
 	// ハンドラーの初期化
 	userHandler := handler.NewUserHandler(userUsecase)

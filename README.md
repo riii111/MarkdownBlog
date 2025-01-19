@@ -40,7 +40,7 @@ MarkDown + Writer。
 
 ---
 
-1. <http://localhost/swagger/index.html#/>
+1. <http://localhost:8088/swagger/index.html>
    バックエンド（APIドキュメント）
 2. <http://traefik.localhost/>
    Traefikのダッシュボード
