@@ -29,6 +29,9 @@ func initDB() (*gorm.DB, error) {
 // @description     This is Markdown Blog API
 // @host           localhost:8088
 // @BasePath       /
+// @securityDefinitions.apikey CookieAuth
+// @in cookie
+// @name session
 func main() {
 	// バリデーションの初期化
 	validationRegistry, err := handler.NewValidationRegistry()

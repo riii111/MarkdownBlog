@@ -112,6 +112,8 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: Logout user
       tags:
       - users
@@ -145,4 +147,9 @@ paths:
       summary: Register a new user
       tags:
       - users
+securityDefinitions:
+  CookieAuth:
+    in: cookie
+    name: session
+    type: apiKey
 swagger: "2.0"

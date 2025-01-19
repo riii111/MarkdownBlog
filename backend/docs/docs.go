@@ -69,6 +69,11 @@ const docTemplate = `{
         },
         "/api/users/logout": {
             "post": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "description": "Logout current user and invalidate session",
                 "consumes": [
                     "application/json"
@@ -220,6 +225,13 @@ const docTemplate = `{
                     "example": "error message"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "CookieAuth": {
+            "type": "apiKey",
+            "name": "session",
+            "in": "cookie"
         }
     }
 }`

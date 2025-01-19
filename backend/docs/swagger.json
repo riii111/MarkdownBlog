@@ -63,6 +63,11 @@
         },
         "/api/users/logout": {
             "post": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "description": "Logout current user and invalidate session",
                 "consumes": [
                     "application/json"
@@ -214,6 +219,13 @@
                     "example": "error message"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "CookieAuth": {
+            "type": "apiKey",
+            "name": "session",
+            "in": "cookie"
         }
     }
 }
