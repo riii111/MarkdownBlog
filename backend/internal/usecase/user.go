@@ -71,13 +71,16 @@ func (u *UserUsecase) Login(ctx context.Context, email, password string) (*model
 	// ユーザーを検索
 	user, err := u.userRepo.FindByEmail(ctx, email)
 	if err != nil {
+		log.Printf("FindByEmail error: %v", err)
 		return nil, err
 	}
 	if user == nil {
 		return nil, ErrInvalidCredentials
 	}
 
-	// パスワードの検証
+	// 見つかったユーザー情報のログ
+	log.Printf("Found user - ID: %v, Email: %v", user.ID, user.Email)
+
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
 		return nil, ErrInvalidCredentials
 	}
@@ -101,7 +104,10 @@ func (u *UserUsecase) Login(ctx context.Context, email, password string) (*model
 		ExpiresAt:    expiresAt,
 	}
 
+	log.Printf("Creating session - UserID: %v, Token: %v", session.UserID, session.SessionToken)
+
 	if err := u.sessionRepo.Create(session); err != nil {
+		log.Printf("Session creation error: %v", err)
 		return nil, err
 	}
 

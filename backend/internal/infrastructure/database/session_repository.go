@@ -1,6 +1,7 @@
 package database
 
 import (
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,7 +19,23 @@ func NewSessionRepository(db *gorm.DB) *sessionRepository {
 
 // セッションを作成
 func (r *sessionRepository) Create(session *model.Session) error {
-	return r.db.Create(session).Error
+	// トランザクションを使用して、ユーザーの存在確認とセッション作成を行う
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		// ユーザーの存在確認
+		var user model.User
+		if err := tx.First(&user, "id = ?", session.UserID).Error; err != nil {
+			log.Printf("User existence check failed: %v", err)
+			return err
+		}
+
+		// セッションの作成
+		if err := tx.Create(session).Error; err != nil {
+			log.Printf("Session creation failed: %v", err)
+			return err
+		}
+
+		return nil
+	})
 }
 
 // IDによるセッション検索
