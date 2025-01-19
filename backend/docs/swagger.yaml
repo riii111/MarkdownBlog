@@ -150,6 +150,6 @@ paths:
 securityDefinitions:
   CookieAuth:
     in: cookie
-    name: session
+    name: session_token
     type: apiKey
 swagger: "2.0"

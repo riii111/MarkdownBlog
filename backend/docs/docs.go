@@ -230,7 +230,7 @@ const docTemplate = `{
     "securityDefinitions": {
         "CookieAuth": {
             "type": "apiKey",
-            "name": "session",
+            "name": "session_token",
             "in": "cookie"
         }
     }

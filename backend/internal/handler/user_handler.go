@@ -3,7 +3,9 @@ package handler
 import (
 	"net/http"
 	"os"
-	"strconv"
+	"time"
+
+	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
@@ -94,14 +96,32 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// 環境変数から直接セッション期間を取得
-	sessionDuration, _ := strconv.Atoi(os.Getenv("SESSION_DURATION"))
+	// 環境変数からセッション期間を取得（時間単位の文字列をパース）
+	duration, err := time.ParseDuration(os.Getenv("SESSION_DURATION"))
+	if err != nil {
+		log.Printf("Failed to parse SESSION_DURATION: %v", err)
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: "Internal server error",
+		})
+		return
+	}
+
+	// Cookie設定の値をログ出力
+	log.Printf("Setting cookie with values: name=%s, token=%s, maxAge=%d, path=%s, domain=%s, secure=%v, httpOnly=%v",
+		os.Getenv("SESSION_COOKIE_NAME"),
+		session.SessionToken,
+		int(duration.Seconds()),
+		os.Getenv("COOKIE_PATH"),
+		os.Getenv("COOKIE_DOMAIN"),
+		os.Getenv("COOKIE_SECURE") == "true",
+		os.Getenv("COOKIE_HTTP_ONLY") == "true",
+	)
 
 	// セッションCookieを設定
 	c.SetCookie(
 		os.Getenv("SESSION_COOKIE_NAME"),
 		session.SessionToken,
-		sessionDuration,
+		int(duration.Seconds()), // 秒単位に変換
 		os.Getenv("COOKIE_PATH"),
 		os.Getenv("COOKIE_DOMAIN"),
 		os.Getenv("COOKIE_SECURE") == "true",
@@ -121,6 +141,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Security     CookieAuth
 // @Success      204
 // @Failure      401  {object}  ErrorResponse
 // @Router       /api/users/logout [post]
