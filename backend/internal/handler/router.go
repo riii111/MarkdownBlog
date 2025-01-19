@@ -2,6 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/riii111/markdown-blog-api/internal/handler/middleware"
@@ -15,8 +17,16 @@ func SetupRouter(userHandler *UserHandler) *gin.Engine {
 	// CORSミドルウェアを設定
 	r.Use(middleware.NewCorsMiddleware())
 
-	// Swaggerのルーティング
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// 開発環境でのみSwaggerを有効化
+	if strings.ToLower(os.Getenv("APP_ENV")) == "dev" &&
+		strings.ToLower(os.Getenv("ENABLE_SWAGGER")) == "true" {
+		// SwaggerルートにだけBasic認証を適用
+		swaggerAuth := r.Group("/swagger", gin.BasicAuth(gin.Accounts{
+			os.Getenv("SWAGGER_USER"): os.Getenv("SWAGGER_PASSWORD"),
+		}))
+
+		swaggerAuth.GET("/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	// ヘルスチェック
 	r.GET("/health", func(c *gin.Context) {
