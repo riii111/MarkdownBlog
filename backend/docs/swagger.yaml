@@ -1,16 +1,39 @@
 basePath: /
 definitions:
-  dto.RegisterUserRequest:
+  dto.LoginRequest:
     properties:
-      display_name:
-        example: John Doe
-        type: string
       email:
-        description: emailタグでバリデーションが行える（Ginのvalidatorパッケージの仕様）
         example: user@example.com
         type: string
       password:
         example: password
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.LoginResponse:
+    properties:
+      display_name:
+        description: UI表示用
+        type: string
+      id:
+        type: string
+    type: object
+  dto.RegisterUserRequest:
+    properties:
+      display_name:
+        example: John Doe
+        maxLength: 100
+        minLength: 1
+        type: string
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: password
+        maxLength: 32
         minLength: 8
         type: string
     required:
@@ -41,6 +64,57 @@ info:
   title: Markdown Blog API
   version: "1.0"
 paths:
+  /api/users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with email and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Login user
+      tags:
+      - users
+  /api/users/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout current user and invalidate session
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Logout user
+      tags:
+      - users
   /api/users/register:
     post:
       consumes:
