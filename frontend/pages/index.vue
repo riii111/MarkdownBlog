@@ -8,6 +8,7 @@
             </p>
             <BlogGrid :posts="posts || []" />
         </main>
+        <TheFooter />
     </div>
 </template>
 
