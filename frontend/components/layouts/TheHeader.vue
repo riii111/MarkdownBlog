@@ -14,7 +14,7 @@
                 <div class="flex items-center space-x-4">
                     <UInput icon="i-lucide-search" color="white" variant="outline" placeholder="Search articles..."
                         class="w-64" />
-                    <BaseButton color="white" variant="ghost" label="Log in" />
+                    <BaseButton variant="ghost" class="text-white" label="Log in" />
                     <BaseButton color="white" variant="solid" label="Sign Up" />
                 </div>
             </nav>

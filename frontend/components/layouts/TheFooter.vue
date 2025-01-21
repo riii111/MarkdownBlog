@@ -93,6 +93,5 @@
                 <a href="#" class="hover:text-white">Cookies</a>
             </div>
         </div>
-
     </footer>
 </template>
