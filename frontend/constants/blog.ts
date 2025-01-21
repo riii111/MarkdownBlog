@@ -10,3 +10,13 @@ export const SORT_OPTIONS = [
   { label: "Oldest", value: "oldest" },
   { label: "Most Popular", value: "popular" },
 ] as const;
+
+export const BLOG_CONSTANTS = {
+  ITEMS_PER_PAGE: 9,
+  DEFAULT_PAGE: 1,
+} as const;
+
+export const BLOG_MESSAGES = {
+  DESCRIPTION:
+    "Here, we share development tips, technical guides, and stories that inspire your next project.",
+} as const;

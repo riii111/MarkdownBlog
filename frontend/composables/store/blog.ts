@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { IPost } from "~/types/blog";
+import { BLOG_CONSTANTS } from "~/constants/blog";
 
 export const useBlogStore = defineStore("blog", () => {
   const _state = reactive({
@@ -40,12 +41,137 @@ export const useBlogStore = defineStore("blog", () => {
           avatar: "https://i.pravatar.cc/150?img=3",
         },
       },
+      {
+        id: "4",
+        title: "Modern CSS Techniques",
+        excerpt: "Exploring the latest CSS features and best practices",
+        image: "https://picsum.photos/800/600?random=4",
+        date: "2024-03-17",
+        readTime: "8 min read",
+        author: {
+          name: "Sarah Wilson",
+          avatar: "https://i.pravatar.cc/150?img=4",
+        },
+      },
+      {
+        id: "5",
+        title: "Testing Vue Applications",
+        excerpt:
+          "Comprehensive guide to testing Vue.js applications with Vitest",
+        image: "https://picsum.photos/800/600?random=5",
+        date: "2024-03-16",
+        readTime: "10 min read",
+        author: {
+          name: "Alex Brown",
+          avatar: "https://i.pravatar.cc/150?img=5",
+        },
+      },
+      {
+        id: "6",
+        title: "State Management with Pinia",
+        excerpt:
+          "Learn how to effectively manage state in Vue applications using Pinia",
+        image: "https://picsum.photos/800/600?random=6",
+        date: "2024-03-15",
+        readTime: "9 min read",
+        author: {
+          name: "Emily Chen",
+          avatar: "https://i.pravatar.cc/150?img=6",
+        },
+      },
+      {
+        id: "7",
+        title: "Building Responsive Layouts with Tailwind CSS",
+        excerpt: "Master responsive design using Tailwind CSS utility classes",
+        image: "https://picsum.photos/800/600?random=7",
+        date: "2024-03-14",
+        readTime: "7 min read",
+        author: {
+          name: "David Lee",
+          avatar: "https://i.pravatar.cc/150?img=7",
+        },
+      },
+      {
+        id: "8",
+        title: "API Integration in Nuxt Applications",
+        excerpt:
+          "Best practices for integrating APIs in your Nuxt.js applications",
+        image: "https://picsum.photos/800/600?random=8",
+        date: "2024-03-13",
+        readTime: "8 min read",
+        author: {
+          name: "Sophie Taylor",
+          avatar: "https://i.pravatar.cc/150?img=8",
+        },
+      },
+      {
+        id: "9",
+        title: "Optimizing Vue Application Performance",
+        excerpt:
+          "Tips and techniques for improving Vue.js application performance",
+        image: "https://picsum.photos/800/600?random=9",
+        date: "2024-03-12",
+        readTime: "12 min read",
+        author: {
+          name: "Ryan Martinez",
+          avatar: "https://i.pravatar.cc/150?img=9",
+        },
+      },
+      {
+        id: "10",
+        title: "Authentication in Nuxt Applications",
+        excerpt:
+          "Implementing secure authentication in your Nuxt.js applications",
+        image: "https://picsum.photos/800/600?random=10",
+        date: "2024-03-11",
+        readTime: "11 min read",
+        author: {
+          name: "Lisa Anderson",
+          avatar: "https://i.pravatar.cc/150?img=10",
+        },
+      },
+      {
+        id: "11",
+        title: "Deploying Nuxt Applications",
+        excerpt:
+          "Complete guide to deploying Nuxt applications to various platforms",
+        image: "https://picsum.photos/800/600?random=11",
+        date: "2024-03-10",
+        readTime: "9 min read",
+        author: {
+          name: "Tom Wilson",
+          avatar: "https://i.pravatar.cc/150?img=11",
+        },
+      },
     ] as IPost[],
-    currentPage: 1,
-    totalPages: 1,
+    currentPage: BLOG_CONSTANTS.DEFAULT_PAGE as number,
+    itemsPerPage: BLOG_CONSTANTS.ITEMS_PER_PAGE,
   });
 
-  const posts = computed(() => _state.posts);
+  const allPosts = computed(() => _state.posts);
+
+  const posts = computed(() => {
+    const start = (_state.currentPage - 1) * _state.itemsPerPage;
+    const end = start + _state.itemsPerPage;
+    return _state.posts.slice(start, end);
+  });
+
+  const currentPage = computed({
+    get: () => _state.currentPage,
+    set: (value: number) => {
+      _state.currentPage = value;
+    },
+  });
+
+  const totalPages = computed(() =>
+    Math.ceil(_state.posts.length / _state.itemsPerPage)
+  );
+
+  function setPage(page: number) {
+    if (page > 0 && page <= totalPages.value) {
+      _state.currentPage = page;
+    }
+  }
 
   async function fetchPosts() {
     // TODO: APIが実装されるまでは何もしない
@@ -54,8 +180,10 @@ export const useBlogStore = defineStore("blog", () => {
 
   return {
     posts,
-    currentPage: computed(() => _state.currentPage),
-    totalPages: computed(() => _state.totalPages),
+    allPosts,
+    currentPage,
+    totalPages,
+    setPage,
     fetchPosts,
   };
 });
