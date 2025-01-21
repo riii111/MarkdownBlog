@@ -10,7 +10,7 @@
                     </p>
                 </div>
                 <div class="lg:flex lg:justify-center">
-                    <div class="mx-w-md space-y-4">
+                    <div class="space-y-4">
                         <h3 class="text-lg font-semibold">Get Updates</h3>
                         <p class="text-gray-400">
                             Subscribe to our newsletter to get the latest articles, tools, and resources.
@@ -19,7 +19,7 @@
                             <UInput type="email" placeholder="Enter your email" class="flex-1" />
                             <BaseButton icon="i-lucide-send" type="submit" label="Subscribe" />
                         </div>
-                        <div class="flex space-x-8 justify-center">
+                        <div class="flex justify-between w-full mt-4">
                             <a href="#" class="hover:text-blue-400">
                                 <Icon name="lucide:twitter" class="h-5 w-5" />
                             </a>
