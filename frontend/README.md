@@ -13,16 +13,20 @@ Markdown記事作成・管理のためのフロントエンドアプリケーシ
 
 ```text
 frontend/
-├── apps/
-│   └── md-writer/
-│       ├── components/
-│       │   ├── common/           # 再利用可能な共通コンポーネント
-│       │   ├── features/         # 機能単位のコンポーネント
-│       │   └── layouts/          # レイアウトコンポーネント
-│       ├── composables/
-│       │   ├── api/             # API関連のcomposables
-│       │   │   └── useCoreApi.ts  # カスタムフェッチHooks
-│       │   └── utils/           # ユーティリティcomposables
+├── components/
+│   ├── common/           # 再利用可能な共通コンポーネント
+│   ├── features/         # 機能単位のコンポーネント
+│   └── layouts/          # レイアウトコンポーネント
+├── composables/
+│   ├── utils/           # 共通のcomposables
+│   │   ├── useArray.ts
+│   │   ├── useCookie.ts
+│   │   ├── useDate.ts   # 日付フォーマットなどの共通処理
+│   │   └── ...
+│   ├── feature/         # 機能単位のcomposables
+│   └── store/           # Pinia stores
+│       ├── api/             # API関連のcomposables
+│       │   └── useCoreApi.ts  # カスタムフェッチHooks
 │       ├── types/               # 型定義
 │       ├── constants/           # 定数
 │       ├── middleware/          # ミドルウェア

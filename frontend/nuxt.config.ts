@@ -1,7 +1,28 @@
 export default defineNuxtConfig({
-  modules: ["@nuxt/ui"],
+  srcDir: "./",
+  components: {
+    dirs: [
+      {
+        path: "~/components",
+        pathPrefix: false,
+      },
+    ],
+  },
+  // ネストしたcomposableも自動でインポートするように設定
+  // https://nuxt.com/docs/guide/directory-structure/composables#how-files-are-scanned
+  imports: {
+    dirs: ["composables/**"],
+  },
+  modules: ["@nuxt/ui", [
+    "@pinia/nuxt",
+    {
+      autoImports: ["defineStore", ["defineStore", "definePiniaStore"]],
+    },
+  ], "@nuxt/image"],
   devtools: { enabled: true },
-
+  ui: {
+    icons: ["lucide"],
+  },
   typescript: {
     strict: true,
   },
