@@ -13,15 +13,12 @@ export default defineNuxtConfig({
   imports: {
     dirs: ["composables/**"],
   },
-  modules: [
-    "@nuxt/ui",
-    [
-      "@pinia/nuxt",
-      {
-        autoImports: ["defineStore", ["defineStore", "definePiniaStore"]],
-      },
-    ],
-  ],
+  modules: ["@nuxt/ui", [
+    "@pinia/nuxt",
+    {
+      autoImports: ["defineStore", ["defineStore", "definePiniaStore"]],
+    },
+  ], "@nuxt/image"],
   devtools: { enabled: true },
   ui: {
     icons: ["lucide"],
