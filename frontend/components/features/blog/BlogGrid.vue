@@ -4,10 +4,10 @@
     </section>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { IPost } from '~/types/blog';
 
 defineProps<{
     posts: IPost[]
-}>()
+}>();
 </script>

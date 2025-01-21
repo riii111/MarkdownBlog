@@ -1,9 +1,17 @@
 export default defineNuxtConfig({
   srcDir: "./",
-  // ネストしたcomposable, componentsも自動でインポートするようにする
+  components: {
+    dirs: [
+      {
+        path: "~/components",
+        pathPrefix: false,
+      },
+    ],
+  },
+  // ネストしたcomposableも自動でインポートするように設定
   // https://nuxt.com/docs/guide/directory-structure/composables#how-files-are-scanned
   imports: {
-    dirs: ["composables/**", "components/**"],
+    dirs: ["composables/**"],
   },
   modules: [
     "@nuxt/ui",
