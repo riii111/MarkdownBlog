@@ -1,6 +1,7 @@
 開発フェーズ.md
 要件定義書_Phase1.md
-テーブル設計書_Phase1.md
+backend/テーブル設計書_Phase1.md
+backend/API設計.md
 
 # ログ
 traefik-logs/access.log
