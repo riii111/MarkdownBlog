@@ -7,13 +7,22 @@
                 <BlogCard v-for="post in posts" :key="post.id" :post="post" />
             </TransitionGroup>
 
-            <BlogCardSkeleton v-if="loading" v-for="i in BLOG_CONSTANTS.ITEMS_PER_PAGE" :key="`skeleton-${i}`" />
+            <BlogCard v-if="loading" v-for="i in BLOG_CONSTANTS.ITEMS_PER_PAGE" :key="`skeleton-${i}`" skeleton />
         </div>
 
         <!-- ページネーション -->
         <div class="mt-8 h-[36px] flex justify-center">
-            <BlogPaginationSkeleton v-if="loading" />
-            <slot v-else name="pagination" />
+            <!-- Skeletonページネーション -->
+            <div v-if="loading" class="flex items-center gap-2">
+                <USkeleton class="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
+                <div class="flex gap-1">
+                    <USkeleton v-for="i in 3" :key="`page-${i}`" class="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
+                </div>
+                <USkeleton class="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
+            </div>
+            <!-- 実際のページネーション -->
+            <UPagination v-else v-model="currentPage" :total="totalItems" :page-size="BLOG_CONSTANTS.ITEMS_PER_PAGE"
+                :ui="{ wrapper: 'flex gap-1' }" />
         </div>
     </section>
 </template>
@@ -25,9 +34,20 @@ import { BLOG_CONSTANTS } from '~/constants/blog';
 interface Props {
     posts: IPost[];
     loading?: boolean;
+    currentPage: number;
+    totalItems: number;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     loading: false
+});
+
+const emit = defineEmits<{
+    'update:currentPage': [value: number]
+}>();
+
+const currentPage = computed({
+    get: () => props.currentPage,
+    set: (value) => emit('update:currentPage', value)
 });
 </script>

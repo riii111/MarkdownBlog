@@ -4,12 +4,7 @@
         <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
             <h2 class="text-xl mb-6">Blog</h2>
             <p class="text-gray-600 mb-8">{{ BLOG_MESSAGES.DESCRIPTION }}</p>
-            <BlogGrid :posts="posts" :loading="isLoading" :show-pagination="totalPages > 1">
-                <template #pagination>
-                    <UPagination v-model="currentPage" :total="totalItems" :page-size="BLOG_CONSTANTS.ITEMS_PER_PAGE"
-                        :ui="{ wrapper: 'flex gap-1' }" />
-                </template>
-            </BlogGrid>
+            <BlogGrid :posts="posts" :loading="isLoading" v-model:currentPage="currentPage" :total-items="totalItems" />
         </main>
         <TheFooter class="mt-auto" />
     </div>
