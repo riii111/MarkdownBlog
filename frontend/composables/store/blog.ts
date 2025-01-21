@@ -167,6 +167,8 @@ export const useBlogStore = defineStore("blog", () => {
     Math.ceil(_state.posts.length / _state.itemsPerPage)
   );
 
+  const totalItems = computed(() => _state.posts.length);
+
   function setPage(page: number) {
     if (page > 0 && page <= totalPages.value) {
       _state.currentPage = page;
@@ -183,6 +185,7 @@ export const useBlogStore = defineStore("blog", () => {
     allPosts,
     currentPage,
     totalPages,
+    totalItems,
     setPage,
     fetchPosts,
   };

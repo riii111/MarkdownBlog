@@ -6,7 +6,7 @@
             <p class="text-gray-600 mb-8">{{ BLOG_MESSAGES.DESCRIPTION }}</p>
             <BlogGrid :posts="posts || []" />
             <div v-if="totalPages > 1" class="mt-8 flex justify-center">
-                <UPagination v-model="currentPage" :total="totalPages" :page-count="5"
+                <UPagination v-model="currentPage" :total="totalItems" :page-size="BLOG_CONSTANTS.ITEMS_PER_PAGE"
                     :ui="{ wrapper: 'flex gap-1' }" />
             </div>
         </main>
@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { BLOG_MESSAGES } from '~/constants/blog';
+import { BLOG_CONSTANTS, BLOG_MESSAGES } from '~/constants/blog';
 
 const blogStore = useBlogStore();
 const posts = computed(() => blogStore.posts);
@@ -24,6 +24,7 @@ const currentPage = computed({
     set: (value) => blogStore.setPage(value)
 });
 const totalPages = computed(() => blogStore.totalPages);
+const totalItems = computed(() => blogStore.totalItems);
 
 onMounted(async () => {
     await blogStore.fetchPosts();
