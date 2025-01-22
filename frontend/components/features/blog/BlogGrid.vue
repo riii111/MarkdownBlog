@@ -4,7 +4,7 @@
             <TransitionGroup v-if="!loading" enter-active-class="transition-all duration-300 ease-out"
                 enter-from-class="opacity-0 translate-y-4" enter-to-class="opacity-100 translate-y-0"
                 move-class="transition-transform duration-300">
-                <BlogCard v-for="post in posts" :key="post.id" :post="post" />
+                <BlogCard v-for="article in articles" :key="article.id" :article="article" />
             </TransitionGroup>
 
             <BlogCard v-if="loading" v-for="i in BLOG_CONSTANTS.ITEMS_PER_PAGE" :key="`skeleton-${i}`" skeleton />
@@ -28,11 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import type { IPost } from '~/types/blog';
+import type { IArticle } from '~/types/blog';
 import { BLOG_CONSTANTS } from '~/constants/blog';
 
 interface Props {
-    posts: IPost[];
+    articles: IArticle[];
     loading?: boolean;
     currentPage: number;
     totalItems: number;

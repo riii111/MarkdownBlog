@@ -6,8 +6,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// Post 記事モデル
-type Post struct {
+// Article 記事モデル
+type Article struct {
 	BaseModel
 	UserID      uuid.UUID  `gorm:"type:uuid;not null"`
 	SeriesID    *uuid.UUID `gorm:"type:uuid"`
@@ -19,12 +19,12 @@ type Post struct {
 	PublishedAt *time.Time
 	User        User    `gorm:"foreignKey:UserID"`
 	Series      *Series `gorm:"foreignKey:SeriesID"`
-	Tags        []Tag   `gorm:"many2many:post_tags;"`
+	Tags        []Tag   `gorm:"many2many:article_tags;"`
 }
 
-// PostRepository 記事リポジトリのインターフェース
-type PostRepository interface {
-	Create(post *Post) error
-	FindByID(id uuid.UUID) (*Post, error)
+// ArticleRepository 記事リポジトリのインターフェース
+type ArticleRepository interface {
+	Create(article *Article) error
+	FindByID(id uuid.UUID) (*Article, error)
 	Delete(id uuid.UUID) error
 }

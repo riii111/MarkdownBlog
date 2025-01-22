@@ -3,7 +3,7 @@ export interface IAuthor {
   avatar: string;
 }
 
-export interface IPost {
+export interface IArticle {
   id: string;
   title: string;
   excerpt: string;

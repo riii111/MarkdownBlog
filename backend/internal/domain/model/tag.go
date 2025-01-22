@@ -5,9 +5,9 @@ import "github.com/google/uuid"
 // Tag タグモデル
 type Tag struct {
 	BaseModel
-	Name  string `gorm:"type:varchar(50);uniqueIndex;not null"`
-	Slug  string `gorm:"type:varchar(50);uniqueIndex;not null"`
-	Posts []Post `gorm:"many2many:post_tags;"`
+	Name     string    `gorm:"type:varchar(50);uniqueIndex;not null"`
+	Slug     string    `gorm:"type:varchar(50);uniqueIndex;not null"`
+	Articles []Article `gorm:"many2many:article_tags;"`
 }
 
 // TagRepository タグリポジトリのインターフェース

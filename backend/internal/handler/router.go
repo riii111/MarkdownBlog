@@ -12,8 +12,11 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRouter(userHandler *UserHandler, postHandler *PostHandler, sessionRepo model.SessionRepository) *gin.Engine {
+func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler, sessionRepo model.SessionRepository) *gin.Engine {
 	r := gin.Default()
+
+	// セキュリティミドルウェアを全体に適用
+	r.Use(middleware.NewSecurityMiddleware())
 
 	// CORSミドルウェアを設定
 	r.Use(middleware.NewCorsMiddleware())
@@ -47,10 +50,10 @@ func SetupRouter(userHandler *UserHandler, postHandler *PostHandler, sessionRepo
 	{
 		authenticated.POST("/users/logout", userHandler.Logout)
 
-		posts := authenticated.Group("/posts")
+		articles := authenticated.Group("/articles")
 		{
-			posts.POST("", postHandler.CreatePost)
-			posts.DELETE("/:slug", postHandler.DeletePost)
+			articles.POST("", articleHandler.CreateArticle)
+			articles.DELETE("/:slug", articleHandler.DeleteArticle)
 		}
 	}
 
