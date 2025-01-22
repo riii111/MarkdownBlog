@@ -31,14 +31,6 @@ func NewPostHandler(postUsecase *usecase.PostUsecase) *PostHandler {
 // @Failure 401 {object} ErrorResponse
 // @Router /posts [post]
 func (h *PostHandler) CreatePost(c *gin.Context) {
-	var req dto.CreatePostRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Error: "Invalid request format",
-		})
-		return
-	}
-
 	// ユーザーIDの取得（認証ミドルウェアで設定されていることを前提）
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -48,12 +40,13 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 		return
 	}
 
+	// 空の記事を作成
 	post, err := h.postUsecase.CreatePost(
 		c.Request.Context(),
 		userID.(uuid.UUID),
-		req.Title,
-		req.Content,
-		req.SeriesID,
+		"",
+		"",
+		nil,
 	)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{
@@ -62,9 +55,10 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, dto.CreatePostResponse{
+	response := dto.CreatePostResponse{
 		Slug: post.Slug,
-	})
+	}
+	c.JSON(http.StatusCreated, response)
 }
 
 // DeletePost godoc
