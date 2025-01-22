@@ -14,9 +14,9 @@ var models = []interface{}{
 	&model.User{},
 	&model.Session{},
 	&model.Series{},
-	&model.Post{},
+	&model.Article{},
 	&model.Tag{},
-	&model.PostTag{},
+	&model.ArticleTag{},
 }
 
 func Migrate(db *gorm.DB) error {

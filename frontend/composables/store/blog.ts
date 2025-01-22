@@ -1,21 +1,21 @@
 import { defineStore } from "pinia";
-import type { IPost } from "~/types/blog";
+import type { IArticle } from "~/types/blog";
 import { BLOG_CONSTANTS } from "~/constants/blog";
 
 export const useBlogStore = defineStore("blog", () => {
   const _state = reactive({
-    posts: [] as readonly IPost[],
+    articles: [] as readonly IArticle[],
     currentPage: BLOG_CONSTANTS.DEFAULT_PAGE as number,
     itemsPerPage: BLOG_CONSTANTS.ITEMS_PER_PAGE,
     isLoading: false,
   });
 
-  const allPosts = computed(() => _state.posts);
+  const allArticles = computed(() => _state.articles);
 
-  const posts = computed(() => {
+  const articles = computed(() => {
     const start = (_state.currentPage - 1) * _state.itemsPerPage;
     const end = start + _state.itemsPerPage;
-    return _state.posts.slice(start, end);
+    return _state.articles.slice(start, end);
   });
 
   const currentPage = computed({
@@ -26,10 +26,10 @@ export const useBlogStore = defineStore("blog", () => {
   });
 
   const totalPages = computed(() =>
-    Math.ceil(_state.posts.length / _state.itemsPerPage)
+    Math.ceil(_state.articles.length / _state.itemsPerPage)
   );
 
-  const totalItems = computed(() => _state.posts.length);
+  const totalItems = computed(() => _state.articles.length);
 
   const isLoading = computed(() => _state.isLoading);
 
@@ -39,12 +39,12 @@ export const useBlogStore = defineStore("blog", () => {
     }
   }
 
-  async function fetchPosts() {
+  async function fetchArticles() {
     _state.isLoading = true;
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      _state.posts = [
+      _state.articles = [
         {
           id: "1",
           title: "Getting Started with Nuxt 3",
@@ -192,13 +192,13 @@ export const useBlogStore = defineStore("blog", () => {
   }
 
   return {
-    posts,
-    allPosts,
+    articles,
+    allArticles,
     currentPage,
     totalPages,
     totalItems,
     isLoading,
     setPage,
-    fetchPosts,
+    fetchArticles,
   };
 });

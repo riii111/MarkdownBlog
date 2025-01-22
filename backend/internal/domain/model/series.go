@@ -10,7 +10,7 @@ type Series struct {
 	Description *string   `gorm:"type:text"`
 	Slug        string    `gorm:"type:varchar(255);uniqueIndex;not null"`
 	User        User      `gorm:"foreignKey:UserID"`
-	Posts       []Post    `gorm:"foreignKey:SeriesID"`
+	Articles    []Article `gorm:"foreignKey:SeriesID"`
 }
 
 // SeriesRepository シリーズリポジトリのインターフェース

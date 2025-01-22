@@ -15,9 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/posts": {
+        "/api/articles": {
             "post": {
-                "description": "Create a new blog post",
+                "description": "Create a new blog article",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,17 +25,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "posts"
+                    "articles"
                 ],
-                "summary": "Create a new post",
+                "summary": "Create a new article",
                 "parameters": [
                     {
-                        "description": "Post creation data",
+                        "description": "Article creation data",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreatePostRequest"
+                            "$ref": "#/definitions/dto.CreateArticleRequest"
                         }
                     }
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.CreatePostResponse"
+                            "$ref": "#/definitions/dto.CreateArticleResponse"
                         }
                     },
                     "400": {
@@ -61,20 +61,20 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/posts/{slug}": {
+        "/api/articles/{slug}": {
             "delete": {
-                "description": "Delete a blog post by slug",
+                "description": "Delete a blog article by slug",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "posts"
+                    "articles"
                 ],
-                "summary": "Delete a post",
+                "summary": "Delete an article",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Post slug",
+                        "description": "Article slug",
                         "name": "slug",
                         "in": "path",
                         "required": true
@@ -230,10 +230,10 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.CreatePostRequest": {
+        "dto.CreateArticleRequest": {
             "type": "object"
         },
-        "dto.CreatePostResponse": {
+        "dto.CreateArticleResponse": {
             "type": "object",
             "properties": {
                 "slug": {

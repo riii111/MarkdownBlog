@@ -1,9 +1,9 @@
 package dto
 
-type CreatePostRequest struct {
+type CreateArticleRequest struct {
 	// 空のリクエストボディを表現するため、フィールドなし
 }
 
-type CreatePostResponse struct {
+type CreateArticleResponse struct {
 	Slug string `json:"slug"`
 }

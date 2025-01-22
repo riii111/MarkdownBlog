@@ -1,8 +1,8 @@
 basePath: /
 definitions:
-  dto.CreatePostRequest:
+  dto.CreateArticleRequest:
     type: object
-  dto.CreatePostResponse:
+  dto.CreateArticleResponse:
     properties:
       slug:
         type: string
@@ -71,25 +71,25 @@ info:
   title: Markdown Blog API
   version: "1.0"
 paths:
-  /api/posts:
+  /api/articles:
     post:
       consumes:
       - application/json
-      description: Create a new blog post
+      description: Create a new blog article
       parameters:
-      - description: Post creation data
+      - description: Article creation data
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.CreatePostRequest'
+          $ref: '#/definitions/dto.CreateArticleRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.CreatePostResponse'
+            $ref: '#/definitions/dto.CreateArticleResponse'
         "400":
           description: Bad Request
           schema:
@@ -98,14 +98,14 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
-      summary: Create a new post
+      summary: Create a new article
       tags:
-      - posts
-  /api/posts/{slug}:
+      - articles
+  /api/articles/{slug}:
     delete:
-      description: Delete a blog post by slug
+      description: Delete a blog article by slug
       parameters:
-      - description: Post slug
+      - description: Article slug
         in: path
         name: slug
         required: true
@@ -123,9 +123,9 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
-      summary: Delete a post
+      summary: Delete an article
       tags:
-      - posts
+      - articles
   /api/users/login:
     post:
       consumes:
