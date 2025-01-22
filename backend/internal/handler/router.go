@@ -21,6 +21,9 @@ func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler, sessi
 	// CORSミドルウェアを設定
 	r.Use(middleware.NewCorsMiddleware())
 
+	// CSRF保護を追加
+	r.Use(middleware.CSRF())
+
 	// 開発環境でのみSwaggerを有効化
 	if strings.ToLower(os.Getenv("APP_ENV")) == "dev" &&
 		strings.ToLower(os.Getenv("ENABLE_SWAGGER")) == "true" {

@@ -37,7 +37,8 @@ func getCSPPolicy() string {
 			"base-uri 'self'; " +
 			"form-action 'self'; " +
 			"frame-ancestors 'none'; " +
-			"object-src 'none'"
+			"object-src 'none'; " +
+			"cookie-same-site 'strict'"
 	}
 
 	return "default-src 'self'; " +
@@ -49,6 +50,8 @@ func getCSPPolicy() string {
 		"base-uri 'self'; " +
 		"form-action 'self'; " +
 		"frame-ancestors 'none'; " +
+		"object-src 'none'; " +
+		"cookie-same-site 'strict'; " +
 		"upgrade-insecure-requests; " +
 		"block-all-mixed-content"
 }
