@@ -1,7 +1,6 @@
 package database
 
 import (
-	"context"
 	"log"
 	"time"
 
@@ -41,9 +40,9 @@ func (r *sessionRepository) FindByID(id uuid.UUID) (*model.Session, error) {
 }
 
 // トークンによるセッション検索
-func (r *sessionRepository) FindByToken(ctx context.Context, token string) (*model.Session, error) {
+func (r *sessionRepository) FindByToken(token string) (*model.Session, error) {
 	var session model.Session
-	err := r.db.WithContext(ctx).Preload("User").Where("session_token = ?", token).First(&session).Error
+	err := r.db.Preload("User").Where("session_token = ?", token).First(&session).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil

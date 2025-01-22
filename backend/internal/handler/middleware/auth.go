@@ -21,7 +21,7 @@ func AuthMiddleware(sessionRepo model.SessionRepository) gin.HandlerFunc {
 		}
 
 		// セッションの検証
-		session, err := sessionRepo.FindByToken(c.Request.Context(), sessionToken)
+		session, err := sessionRepo.FindByToken(sessionToken)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid session"})
 			c.Abort()

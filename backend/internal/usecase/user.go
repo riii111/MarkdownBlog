@@ -125,7 +125,7 @@ func (u *UserUsecase) Login(ctx context.Context, email, password string) (*model
 // ログアウト
 func (u *UserUsecase) Logout(ctx context.Context, sessionToken string) error {
 	// セッションを検索
-	session, err := u.sessionRepo.FindByToken(ctx, sessionToken)
+	session, err := u.sessionRepo.FindByToken(sessionToken)
 	if err != nil {
 		return err
 	}

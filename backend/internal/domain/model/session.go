@@ -1,7 +1,6 @@
 package model
 
 import (
-	"context"
 	"time"
 
 	"github.com/google/uuid"
@@ -20,7 +19,7 @@ type Session struct {
 type SessionRepository interface {
 	Create(session *Session) error
 	FindByID(id uuid.UUID) (*Session, error)
-	FindByToken(ctx context.Context, token string) (*Session, error)
+	FindByToken(token string) (*Session, error)
 	Delete(id uuid.UUID) error
 	DeleteExpired() error
 }
