@@ -146,13 +146,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Failure      401  {object}  ErrorResponse
 // @Router       /api/users/logout [post]
 func (h *UserHandler) Logout(c *gin.Context) {
-	sessionToken, err := c.Cookie(os.Getenv("SESSION_COOKIE_NAME"))
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, ErrorResponse{
-			Error: "No active session",
-		})
-		return
-	}
+	sessionToken, _ := c.Cookie(os.Getenv("SESSION_COOKIE_NAME"))
 
 	if err := h.userUsecase.Logout(c.Request.Context(), sessionToken); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

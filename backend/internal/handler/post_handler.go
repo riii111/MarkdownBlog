@@ -31,14 +31,8 @@ func NewPostHandler(postUsecase *usecase.PostUsecase) *PostHandler {
 // @Failure 401 {object} ErrorResponse
 // @Router /posts [post]
 func (h *PostHandler) CreatePost(c *gin.Context) {
-	// ユーザーIDの取得（認証ミドルウェアで設定されていることを前提）
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, ErrorResponse{
-			Error: "Unauthorized",
-		})
-		return
-	}
+	// ユーザーIDの取得（認証ミドルウェアで設定済み）
+	userID := c.MustGet("userID").(uuid.UUID)
 
 	// 空の記事を作成
 	post, err := h.postUsecase.CreatePost(
@@ -72,13 +66,7 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 // @Failure 404 {object} ErrorResponse
 // @Router /posts/{slug} [delete]
 func (h *PostHandler) DeletePost(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, ErrorResponse{
-			Error: "Unauthorized",
-		})
-		return
-	}
+	userID := c.MustGet("userID").(uuid.UUID)
 
 	postID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
