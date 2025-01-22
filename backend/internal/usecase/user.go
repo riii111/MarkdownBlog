@@ -2,8 +2,6 @@ package usecase
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"log"
 
@@ -87,13 +85,4 @@ func (u *UserUsecase) Logout(ctx context.Context, sessionToken string) error {
 
 	// セッションを削除
 	return u.sessionRepo.Delete(session.ID)
-}
-
-// セッショントークンの生成
-func generateSessionToken() (string, error) {
-	b := make([]byte, 32)
-	if _, err := rand.Read(b); err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(b), nil
 }

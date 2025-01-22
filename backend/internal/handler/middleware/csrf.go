@@ -17,7 +17,10 @@ const (
 
 func generateCSRFToken() string {
 	b := make([]byte, csrfTokenLength)
-	rand.Read(b)
+	_, err := rand.Read(b)
+	if err != nil {
+		return ""
+	}
 	return base64.URLEncoding.EncodeToString(b)
 }
 
