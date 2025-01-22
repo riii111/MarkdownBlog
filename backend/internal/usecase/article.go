@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
-	"github.com/gosimple/slug"
 	"github.com/riii111/markdown-blog-api/internal/domain/model"
 )
 
@@ -22,9 +22,10 @@ func NewArticleUsecase(articleRepo model.ArticleRepository) *ArticleUsecase {
 
 // 記事作成
 func (u *ArticleUsecase) CreateArticle(ctx context.Context, userID uuid.UUID, title, content string, seriesID *string) (*model.Article, error) {
-	slugStr := slug.Make(title)
-
 	articleID := uuid.New()
+
+	// UUIDからハイフンを除去して最初の13文字を使用
+	slugStr := strings.ReplaceAll(articleID.String(), "-", "")[:13]
 
 	var seriesUUID *uuid.UUID
 	if seriesID != nil {
@@ -43,7 +44,7 @@ func (u *ArticleUsecase) CreateArticle(ctx context.Context, userID uuid.UUID, ti
 		SeriesID:   seriesUUID,
 		Title:      title,
 		Content:    content,
-		Slug:       fmt.Sprintf("%s-%s", slugStr, articleID.String()[:8]),
+		Slug:       slugStr,
 		Status:     "draft",
 		LikesCount: 0,
 	}
@@ -55,9 +56,9 @@ func (u *ArticleUsecase) CreateArticle(ctx context.Context, userID uuid.UUID, ti
 	return article, nil
 }
 
-// 記事削除
-func (u *ArticleUsecase) DeleteArticle(ctx context.Context, userID, articleID uuid.UUID) error {
-	article, err := u.articleRepo.FindByID(articleID)
+// Slug使って記事削除
+func (u *ArticleUsecase) DeleteArticleBySlug(ctx context.Context, userID uuid.UUID, slug string) error {
+	article, err := u.articleRepo.FindBySlug(slug)
 	if err != nil {
 		return err
 	}
@@ -69,5 +70,5 @@ func (u *ArticleUsecase) DeleteArticle(ctx context.Context, userID, articleID uu
 		return errors.New("unauthorized")
 	}
 
-	return u.articleRepo.Delete(articleID)
+	return u.articleRepo.Delete(article.ID)
 }

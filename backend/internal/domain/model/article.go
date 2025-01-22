@@ -26,5 +26,6 @@ type Article struct {
 type ArticleRepository interface {
 	Create(article *Article) error
 	FindByID(id uuid.UUID) (*Article, error)
+	FindBySlug(slug string) (*Article, error)
 	Delete(id uuid.UUID) error
 }

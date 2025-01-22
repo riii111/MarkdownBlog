@@ -65,18 +65,23 @@ func (h *ArticleHandler) CreateArticle(c *gin.Context) {
 // @Router /api/articles/{slug} [delete]
 func (h *ArticleHandler) DeleteArticle(c *gin.Context) {
 	userID := c.MustGet("userID").(uuid.UUID)
+	slug := c.Param("slug")
 
-	articleID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Error: "Invalid article ID",
-		})
-		return
-	}
-
-	if err := h.articleUsecase.DeleteArticle(c.Request.Context(), userID, articleID); err != nil {
-		c.JSON(http.StatusNotFound, ErrorResponse{
-			Error: err.Error(),
+	if err := h.articleUsecase.DeleteArticleBySlug(c.Request.Context(), userID, slug); err != nil {
+		if err.Error() == "article not found" {
+			c.JSON(http.StatusNotFound, ErrorResponse{
+				Error: "Article not found",
+			})
+			return
+		}
+		if err.Error() == "unauthorized" {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{
+				Error: "Unauthorized",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: "Failed to delete article",
 		})
 		return
 	}
