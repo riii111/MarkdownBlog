@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/riii111/markdown-blog-api/internal/pkg/config"
 )
 
 const (
@@ -36,11 +37,11 @@ func CSRF() gin.HandlerFunc {
 			c.SetCookie(
 				csrfTokenKey,
 				token,
-				3600, // 1時間
+				config.GetSessionMaxAge(),
 				os.Getenv("COOKIE_PATH"),
 				os.Getenv("COOKIE_DOMAIN"),
 				os.Getenv("COOKIE_SECURE") == "true",
-				true, // HttpOnlyをtrue
+				true,
 			)
 
 			// レスポンスヘッダーにも設定（フロントエンドはこちらを使用する）
