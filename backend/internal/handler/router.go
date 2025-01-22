@@ -15,6 +15,9 @@ import (
 func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler, sessionRepo model.SessionRepository) *gin.Engine {
 	r := gin.Default()
 
+	// セキュリティミドルウェアを全体に適用
+	r.Use(middleware.NewSecurityMiddleware())
+
 	// CORSミドルウェアを設定
 	r.Use(middleware.NewCorsMiddleware())
 
