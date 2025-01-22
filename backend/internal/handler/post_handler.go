@@ -29,7 +29,7 @@ func NewPostHandler(postUsecase *usecase.PostUsecase) *PostHandler {
 // @Success 201 {object} dto.CreatePostResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
-// @Router /posts [post]
+// @Router /api/posts [post]
 func (h *PostHandler) CreatePost(c *gin.Context) {
 	// ユーザーIDの取得（認証ミドルウェアで設定済み）
 	userID := c.MustGet("userID").(uuid.UUID)
@@ -64,7 +64,7 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 // @Success 204 "No Content"
 // @Failure 401 {object} ErrorResponse
 // @Failure 404 {object} ErrorResponse
-// @Router /posts/{slug} [delete]
+// @Router /api/posts/{slug} [delete]
 func (h *PostHandler) DeletePost(c *gin.Context) {
 	userID := c.MustGet("userID").(uuid.UUID)
 

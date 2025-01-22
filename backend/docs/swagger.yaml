@@ -71,6 +71,61 @@ info:
   title: Markdown Blog API
   version: "1.0"
 paths:
+  /api/posts:
+    post:
+      consumes:
+      - application/json
+      description: Create a new blog post
+      parameters:
+      - description: Post creation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreatePostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Create a new post
+      tags:
+      - posts
+  /api/posts/{slug}:
+    delete:
+      description: Delete a blog post by slug
+      parameters:
+      - description: Post slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Delete a post
+      tags:
+      - posts
   /api/users/login:
     post:
       consumes:
@@ -154,61 +209,6 @@ paths:
       summary: Register a new user
       tags:
       - users
-  /posts:
-    post:
-      consumes:
-      - application/json
-      description: Create a new blog post
-      parameters:
-      - description: Post creation data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreatePostRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/dto.CreatePostResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      summary: Create a new post
-      tags:
-      - posts
-  /posts/{slug}:
-    delete:
-      description: Delete a blog post by slug
-      parameters:
-      - description: Post slug
-        in: path
-        name: slug
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      summary: Delete a post
-      tags:
-      - posts
 securityDefinitions:
   CookieAuth:
     in: cookie
