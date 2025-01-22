@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
 
 # 作業ディレクトリを設定
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/backend
 
 # go.modとgo.sumのコピーは不要（volumeでマウントされるため）
 
