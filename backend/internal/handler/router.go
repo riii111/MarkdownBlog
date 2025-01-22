@@ -5,24 +5,70 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/riii111/markdown-blog-api/internal/domain/model"
 	"github.com/riii111/markdown-blog-api/internal/handler/middleware"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler, sessionRepo model.SessionRepository) *gin.Engine {
+func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler) *gin.Engine {
 	r := gin.Default()
 
-	// セキュリティミドルウェアを全体に適用
-	r.Use(middleware.NewSecurityMiddleware())
+	// セッションの設定（最初に行う）
+	sessionKey := []byte(os.Getenv("SESSION_SECRET"))
+	if len(sessionKey) < 32 {
+		// キーが32バイト未満の場合は32バイトに拡張
+		newKey := make([]byte, 32)
+		copy(newKey, sessionKey)
+		sessionKey = newKey
+	}
 
-	// CORSミドルウェアを設定
+	store := cookie.NewStore(sessionKey)
+	store.Options(sessions.Options{
+		Path:     os.Getenv("COOKIE_PATH"),
+		Domain:   os.Getenv("COOKIE_DOMAIN"),
+		MaxAge:   86400 * 30, // 30日
+		Secure:   os.Getenv("COOKIE_SECURE") == "true",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	// セッションミドルウェアを最初に設定
+	r.Use(sessions.Sessions(os.Getenv("SESSION_NAME"), store))
+
+	// その他のミドルウェア
+	r.Use(middleware.NewSecurityMiddleware())
 	r.Use(middleware.NewCorsMiddleware())
 
-	// CSRF保護を追加
-	r.Use(middleware.CSRF())
+	// 認証不要のエンドポイント
+	public := r.Group("/api")
+	{
+		users := public.Group("/users")
+		{
+			users.POST("/register", userHandler.Register)
+			users.POST("/login", userHandler.Login)
+		}
+	}
+
+	// 認証が必要なエンドポイント
+	protected := r.Group("/api")
+	protected.Use(middleware.CSRF())
+	protected.Use(middleware.AuthMiddleware())
+	protected.Use(middleware.CSRF())
+	{
+		users := protected.Group("/users")
+		{
+			users.POST("/logout", userHandler.Logout)
+		}
+
+		articles := protected.Group("/articles")
+		{
+			articles.POST("", articleHandler.CreateArticle)
+			articles.DELETE("/:slug", articleHandler.DeleteArticle)
+		}
+	}
 
 	// 開発環境でのみSwaggerを有効化
 	if strings.ToLower(os.Getenv("APP_ENV")) == "dev" &&
@@ -39,26 +85,6 @@ func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler, sessi
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
-
-	// 認証不要のエンドポイント
-	users := r.Group("/api/users")
-	{
-		users.POST("/register", userHandler.Register)
-		users.POST("/login", userHandler.Login)
-	}
-
-	// 認証が必要なエンドポイント
-	authenticated := r.Group("/api")
-	authenticated.Use(middleware.AuthMiddleware(sessionRepo))
-	{
-		authenticated.POST("/users/logout", userHandler.Logout)
-
-		articles := authenticated.Group("/articles")
-		{
-			articles.POST("", articleHandler.CreateArticle)
-			articles.DELETE("/:slug", articleHandler.DeleteArticle)
-		}
-	}
 
 	return r
 }

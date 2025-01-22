@@ -3,10 +3,8 @@ package handler
 import (
 	"net/http"
 	"os"
-	"time"
 
-	"log"
-
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
 	"github.com/riii111/markdown-blog-api/internal/usecase"
@@ -88,7 +86,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	session, err := h.userUsecase.Login(c.Request.Context(), req.Email, req.Password)
+	user, err := h.userUsecase.Login(c.Request.Context(), req.Email, req.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, ErrorResponse{
 			Error: "Invalid credentials",
@@ -96,42 +94,24 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// 環境変数からセッション期間を取得（時間単位の文字列をパース）
-	duration, err := time.ParseDuration(os.Getenv("SESSION_DURATION"))
-	if err != nil {
-		log.Printf("Failed to parse SESSION_DURATION: %v", err)
+	// セッションの取得と検証
+	session := sessions.Default(c)
+
+	// セッションデータを設定
+	session.Set("user_id", user.ID.String())
+	session.Set("email", user.Email)
+
+	// セッションを保存
+	if err := session.Save(); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Error: "Internal server error",
+			Error: "Failed to create session",
 		})
 		return
 	}
 
-	// Cookie設定の値をログ出力
-	log.Printf("Setting cookie with values: name=%s, token=%s, maxAge=%d, path=%s, domain=%s, secure=%v, httpOnly=%v",
-		os.Getenv("SESSION_COOKIE_NAME"),
-		session.SessionToken,
-		int(duration.Seconds()),
-		os.Getenv("COOKIE_PATH"),
-		os.Getenv("COOKIE_DOMAIN"),
-		os.Getenv("COOKIE_SECURE") == "true",
-		os.Getenv("COOKIE_HTTP_ONLY") == "true",
-	)
-
-	// セッションCookieを設定
-	c.SetCookie(
-		os.Getenv("SESSION_COOKIE_NAME"),
-		session.SessionToken,
-		int(duration.Seconds()), // 秒単位に変換
-		os.Getenv("COOKIE_PATH"),
-		os.Getenv("COOKIE_DOMAIN"),
-		os.Getenv("COOKIE_SECURE") == "true",
-		os.Getenv("COOKIE_HTTP_ONLY") == "true",
-	)
-
-	// レスポンス
 	c.JSON(http.StatusOK, dto.LoginResponse{
-		ID:          session.UserID,
-		DisplayName: session.User.DisplayName,
+		ID:          user.ID,
+		DisplayName: user.DisplayName,
 	})
 }
 
@@ -146,25 +126,28 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Failure      401  {object}  ErrorResponse
 // @Router       /api/users/logout [post]
 func (h *UserHandler) Logout(c *gin.Context) {
-	sessionToken, _ := c.Cookie(os.Getenv("SESSION_COOKIE_NAME"))
+	session := sessions.Default(c)
 
-	if err := h.userUsecase.Logout(c.Request.Context(), sessionToken); err != nil {
+	// セッションの内容をクリア
+	session.Clear()
+
+	// セッションCookieを削除するために有効期限を過去に設定
+	session.Options(sessions.Options{
+		Path:     os.Getenv("COOKIE_PATH"),
+		Domain:   os.Getenv("COOKIE_DOMAIN"),
+		MaxAge:   -1, // 負の値を設定することでブラウザがすぐにCookieを削除
+		Secure:   os.Getenv("COOKIE_SECURE") == "true",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	// 変更を保存
+	if err := session.Save(); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
 			Error: "Failed to logout",
 		})
 		return
 	}
-
-	// セッションCookieを削除
-	c.SetCookie(
-		os.Getenv("SESSION_COOKIE_NAME"),
-		"",
-		-1,
-		os.Getenv("COOKIE_PATH"),
-		os.Getenv("COOKIE_DOMAIN"),
-		os.Getenv("COOKIE_SECURE") == "true",
-		os.Getenv("COOKIE_HTTP_ONLY") == "true",
-	)
 
 	c.Status(http.StatusNoContent)
 }

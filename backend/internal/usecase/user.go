@@ -6,10 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"log"
-	"os"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/riii111/markdown-blog-api/internal/domain/model"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -43,16 +40,10 @@ func (u *UserUsecase) Register(ctx context.Context, email, password, displayName
 		return nil, ErrRegistrationFailed
 	}
 
-	// ユーザーモデルの生成
-	now := time.Now() // デフォルトはローカル時刻
 	user := &model.User{
 		Email:        email,
 		PasswordHash: string(hashedPassword),
 		DisplayName:  displayName,
-		BaseModel: model.BaseModel{
-			CreatedAt: now,
-			UpdatedAt: now,
-		},
 	}
 
 	// ユーザーの保存（ユニーク制約違反を含むすべてのエラーを一般的なエラーとして扱う）
@@ -66,8 +57,7 @@ func (u *UserUsecase) Register(ctx context.Context, email, password, displayName
 }
 
 // ログイン
-func (u *UserUsecase) Login(ctx context.Context, email, password string) (*model.Session, error) {
-	// ユーザーを検索
+func (u *UserUsecase) Login(ctx context.Context, email, password string) (*model.User, error) {
 	user, err := u.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		log.Printf("FindByEmail error: %v", err)
@@ -77,49 +67,11 @@ func (u *UserUsecase) Login(ctx context.Context, email, password string) (*model
 		return nil, ErrInvalidCredentials
 	}
 
-	// 見つかったユーザー情報のログ
-	log.Printf("Found user - ID: %v, Email: %v", user.ID, user.Email)
-
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
 		return nil, ErrInvalidCredentials
 	}
 
-	// セッショントークンの生成
-	token, err := generateSessionToken()
-	if err != nil {
-		return nil, err
-	}
-
-	// 期間のパース
-	duration, err := time.ParseDuration(os.Getenv("SESSION_DURATION"))
-	if err != nil {
-		log.Printf("Failed to parse SESSION_DURATION: %v", err)
-		return nil, fmt.Errorf("invalid session duration configuration")
-	}
-
-	// 有効期限の設定
-	expiresAt := time.Now().Add(duration)
-
-	// セッションの有効期限のログ
-	log.Printf("Session created with expiry: %v (duration: %v)", expiresAt, duration)
-
-	// セッションの作成
-	session := &model.Session{
-		BaseModel:    model.BaseModel{ID: uuid.New()},
-		UserID:       user.ID,
-		User:         *user,
-		SessionToken: token,
-		ExpiresAt:    expiresAt,
-	}
-
-	log.Printf("Creating session - UserID: %v, Token: %v", session.UserID, session.SessionToken)
-
-	if err := u.sessionRepo.Create(session); err != nil {
-		log.Printf("Session creation error: %v", err)
-		return nil, err
-	}
-
-	return session, nil
+	return user, nil
 }
 
 // ログアウト
