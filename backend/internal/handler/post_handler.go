@@ -37,7 +37,7 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 	// 空の記事を作成
 	post, err := h.postUsecase.CreatePost(
 		c.Request.Context(),
-		userID.(uuid.UUID),
+		userID,
 		"",
 		"",
 		nil,
@@ -76,7 +76,7 @@ func (h *PostHandler) DeletePost(c *gin.Context) {
 		return
 	}
 
-	if err := h.postUsecase.DeletePost(c.Request.Context(), userID.(uuid.UUID), postID); err != nil {
+	if err := h.postUsecase.DeletePost(c.Request.Context(), userID, postID); err != nil {
 		c.JSON(http.StatusNotFound, ErrorResponse{
 			Error: err.Error(),
 		})

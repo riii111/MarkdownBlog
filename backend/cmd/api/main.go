@@ -74,7 +74,7 @@ func main() {
 	postHandler := handler.NewPostHandler(postUsecase)
 
 	// ルーターのセットアップ
-	router := handler.SetupRouter(userHandler, postHandler)
+	router := handler.SetupRouter(userHandler, postHandler, sessionRepo)
 
 	// サーバーの起動
 	log.Println("Server starting on :8088")
