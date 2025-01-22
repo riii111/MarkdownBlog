@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -91,9 +90,18 @@ func (u *UserUsecase) Login(ctx context.Context, email, password string) (*model
 		return nil, err
 	}
 
-	// セッション期間を取得
-	sessionDuration, _ := strconv.Atoi(os.Getenv("SESSION_DURATION"))
-	expiresAt := time.Now().Add(time.Duration(sessionDuration) * time.Second)
+	// 期間のパース
+	duration, err := time.ParseDuration(os.Getenv("SESSION_DURATION"))
+	if err != nil {
+		log.Printf("Failed to parse SESSION_DURATION: %v", err)
+		return nil, fmt.Errorf("invalid session duration configuration")
+	}
+
+	// 有効期限の設定
+	expiresAt := time.Now().Add(duration)
+
+	// セッションの有効期限のログ
+	log.Printf("Session created with expiry: %v (duration: %v)", expiresAt, duration)
 
 	// セッションの作成
 	session := &model.Session{
