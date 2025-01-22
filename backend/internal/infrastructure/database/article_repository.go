@@ -44,3 +44,16 @@ func (r *articleRepository) Delete(id uuid.UUID) error {
 	}
 	return nil
 }
+
+// slugによる投稿検索
+func (r *articleRepository) FindBySlug(slug string) (*model.Article, error) {
+	var article model.Article
+	result := r.db.Where("slug = ?", slug).First(&article)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &article, nil
+}

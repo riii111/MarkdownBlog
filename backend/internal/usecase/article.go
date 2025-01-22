@@ -23,6 +23,9 @@ func NewArticleUsecase(articleRepo model.ArticleRepository) *ArticleUsecase {
 // 記事作成
 func (u *ArticleUsecase) CreateArticle(ctx context.Context, userID uuid.UUID, title, content string, seriesID *string) (*model.Article, error) {
 	slugStr := slug.Make(title)
+	if slugStr == "" {
+		slugStr = "untitled" // タイトルが空の場合のデフォルト値
+	}
 
 	articleID := uuid.New()
 
@@ -55,9 +58,9 @@ func (u *ArticleUsecase) CreateArticle(ctx context.Context, userID uuid.UUID, ti
 	return article, nil
 }
 
-// 記事削除
-func (u *ArticleUsecase) DeleteArticle(ctx context.Context, userID, articleID uuid.UUID) error {
-	article, err := u.articleRepo.FindByID(articleID)
+// Slug使って記事削除
+func (u *ArticleUsecase) DeleteArticleBySlug(ctx context.Context, userID uuid.UUID, slug string) error {
+	article, err := u.articleRepo.FindBySlug(slug)
 	if err != nil {
 		return err
 	}
@@ -69,5 +72,5 @@ func (u *ArticleUsecase) DeleteArticle(ctx context.Context, userID, articleID uu
 		return errors.New("unauthorized")
 	}
 
-	return u.articleRepo.Delete(articleID)
+	return u.articleRepo.Delete(article.ID)
 }
