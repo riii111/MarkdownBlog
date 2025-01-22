@@ -63,15 +63,18 @@ func main() {
 	// リポジトリの初期化
 	userRepo := database.NewUserRepository(db)
 	sessionRepo := database.NewSessionRepository(db)
+	postRepo := database.NewPostRepository(db)
 
 	// ユースケースの初期化
 	userUsecase := usecase.NewUserUsecase(userRepo, sessionRepo)
+	postUsecase := usecase.NewPostUsecase(postRepo)
 
 	// ハンドラーの初期化
 	userHandler := handler.NewUserHandler(userUsecase)
+	postHandler := handler.NewPostHandler(postUsecase)
 
 	// ルーターのセットアップ
-	router := handler.SetupRouter(userHandler)
+	router := handler.SetupRouter(userHandler, postHandler)
 
 	// サーバーの起動
 	log.Println("Server starting on :8088")

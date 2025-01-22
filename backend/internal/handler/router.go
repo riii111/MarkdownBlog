@@ -11,7 +11,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRouter(userHandler *UserHandler) *gin.Engine {
+func SetupRouter(userHandler *UserHandler, postHandler *PostHandler) *gin.Engine {
 	r := gin.Default()
 
 	// CORSミドルウェアを設定
@@ -33,12 +33,17 @@ func SetupRouter(userHandler *UserHandler) *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
-	// APIグループを削除し、直接ルーティング
 	users := r.Group("/api/users")
 	{
 		users.POST("/register", userHandler.Register)
 		users.POST("/login", userHandler.Login)
 		users.POST("/logout", userHandler.Logout)
+	}
+
+	posts := r.Group("/api/posts")
+	{
+		posts.POST("", postHandler.CreatePost)
+		posts.DELETE("/:slug", postHandler.DeletePost)
 	}
 
 	return r
