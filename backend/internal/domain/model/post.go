@@ -26,8 +26,5 @@ type Post struct {
 type PostRepository interface {
 	Create(post *Post) error
 	FindByID(id uuid.UUID) (*Post, error)
-	FindBySlug(slug string) (*Post, error)
-	FindPublished(page, limit int) ([]Post, error)
-	Update(post *Post) error
 	Delete(id uuid.UUID) error
 }
