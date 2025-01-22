@@ -47,7 +47,7 @@ func CSRF() gin.HandlerFunc {
 				true,
 			)
 
-			// レスポンスヘッダーにも設定（フロントエンドはこちらを使用する）
+			// フロントエンドでのリクエスト時にヘッダーからトークンを取得するため設定
 			c.Header(csrfTokenKey, token)
 		} else {
 			// POST, PUT, DELETE等の場合、トークンを検証
