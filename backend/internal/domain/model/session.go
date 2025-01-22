@@ -23,3 +23,8 @@ type SessionRepository interface {
 	Delete(id uuid.UUID) error
 	DeleteExpired() error
 }
+
+// IsExpired セッションが期限切れかどうかを確認するメソッド
+func (s *Session) IsExpired() bool {
+	return time.Now().After(s.ExpiresAt)
+}
