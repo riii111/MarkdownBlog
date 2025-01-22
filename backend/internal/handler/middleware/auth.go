@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/riii111/markdown-blog-api/internal/domain/model"
 )
 
@@ -35,11 +36,15 @@ func AuthMiddleware(sessionRepo model.SessionRepository) gin.HandlerFunc {
 
 		// 有効期限チェック
 		if time.Now().After(session.ExpiresAt) {
-			// 期限切れセッションの削除
-			if err := sessionRepo.Delete(session.ID); err != nil {
-				log.Printf("Failed to delete expired session: %v", err)
-				// 削除に失敗しても認証エラーは返す
-			}
+			// 期限切れセッションを非同期で削除
+			go func(sessionID uuid.UUID) {
+				if err := sessionRepo.Delete(sessionID); err != nil {
+					log.Printf("Failed to delete expired session: %v", err)
+				}
+			}(session.ID)
+
+			// TODO: 期限切れセッションの一括削除バッチ処理の実装
+			// 一定期間経過した期限切れセッションを定期的に削除
 
 			// Cookieの削除
 			c.SetCookie(
