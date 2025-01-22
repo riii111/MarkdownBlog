@@ -1,21 +1,6 @@
 basePath: /
 definitions:
   dto.CreatePostRequest:
-    properties:
-      content:
-        type: string
-      series_id:
-        type: string
-      tags:
-        items:
-          type: string
-        type: array
-      title:
-        maxLength: 255
-        type: string
-    required:
-    - content
-    - title
     type: object
   dto.CreatePostResponse:
     properties:

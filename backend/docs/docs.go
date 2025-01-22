@@ -231,29 +231,7 @@ const docTemplate = `{
     },
     "definitions": {
         "dto.CreatePostRequest": {
-            "type": "object",
-            "required": [
-                "content",
-                "title"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "series_id": {
-                    "type": "string"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 255
-                }
-            }
+            "type": "object"
         },
         "dto.CreatePostResponse": {
             "type": "object",
