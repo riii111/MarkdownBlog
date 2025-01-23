@@ -1,11 +1,13 @@
-package handler
+package endpoint
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
+	"github.com/riii111/markdown-blog-api/internal/infrastructure/config"
 	"github.com/riii111/markdown-blog-api/internal/usecase"
 )
 
@@ -87,4 +89,75 @@ func (h *ArticleHandler) DeleteArticle(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+// GetArticles godoc
+// @Summary Get published articles
+// @Description Get published articles with cursor-based pagination
+// @Tags articles
+// @Produce json
+// @Param limit query int false "Number of articles per page"
+// @Param cursor query string false "Cursor for pagination"
+// @Success 200 {object} dto.ArticleListResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /api/articles [get]
+func (h *ArticleHandler) GetArticles(c *gin.Context) {
+	limit := config.GetDefaultPerPage()
+	var cursor *string
+
+	if limitStr := c.Query("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil {
+			limit = l
+		}
+	}
+
+	if cursorStr := c.Query("cursor"); cursorStr != "" {
+		cursor = &cursorStr
+	}
+
+	// limitの検証
+	if limit <= 0 || limit > config.GetMaxPerPage() {
+		limit = config.GetDefaultPerPage()
+	}
+
+	articles, nextCursor, err := h.articleUsecase.GetPublishedArticles(c.Request.Context(), limit, cursor)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: "Failed to fetch articles",
+		})
+		return
+	}
+
+	response := dto.NewArticleListResponse(articles, limit, nextCursor)
+	c.JSON(http.StatusOK, response)
+}
+
+// GetArticle godoc
+// @Summary Get an article detail
+// @Description Get a blog article by slug
+// @Tags articles
+// @Produce json
+// @Param slug path string true "Article slug"
+// @Success 200 {object} dto.ArticleDetailResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /api/articles/{slug} [get]
+func (h *ArticleHandler) GetArticleBySlug(c *gin.Context) {
+	slug := c.Param("slug")
+
+	article, err := h.articleUsecase.GetArticleBySlug(c.Request.Context(), slug)
+	if err != nil {
+		if err.Error() == "article not found" {
+			c.JSON(http.StatusNotFound, ErrorResponse{
+				Error: "Article not found",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: "Failed to fetch article",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.NewArticleDetailResponse(article))
 }

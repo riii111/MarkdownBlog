@@ -10,6 +10,13 @@ import (
 	"github.com/riii111/markdown-blog-api/internal/domain/model"
 )
 
+// ページネーションのデフォルト値
+const (
+	DefaultPage    = 1
+	DefaultPerPage = 9
+	MaxPerPage     = 100
+)
+
 type ArticleUsecase struct {
 	articleRepo model.ArticleRepository
 }
@@ -71,4 +78,27 @@ func (u *ArticleUsecase) DeleteArticleBySlug(ctx context.Context, userID uuid.UU
 	}
 
 	return u.articleRepo.Delete(article.ID)
+}
+
+// slugで記事の詳細を取得
+func (u *ArticleUsecase) GetArticleBySlug(ctx context.Context, slug string) (*model.Article, error) {
+	article, err := u.articleRepo.FindBySlugWithRelations(slug)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find article: %w", err)
+	}
+	if article == nil {
+		return nil, errors.New("article not found")
+	}
+
+	return article, nil
+}
+
+// カーソルベースで公開済み記事一覧を取得
+func (u *ArticleUsecase) GetPublishedArticles(ctx context.Context, limit int, cursor *string) ([]model.Article, *string, error) {
+	// limitの値を検証
+	if limit <= 0 || limit > MaxPerPage {
+		limit = DefaultPerPage
+	}
+
+	return u.articleRepo.FindPublished(limit, cursor)
 }

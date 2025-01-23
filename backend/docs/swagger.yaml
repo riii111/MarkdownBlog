@@ -1,10 +1,78 @@
 basePath: /
 definitions:
+  dto.ArticleDetail:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      likes_count:
+        type: integer
+      published_at:
+        type: string
+      series:
+        $ref: '#/definitions/dto.SeriesInfo'
+      slug:
+        type: string
+      status:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/dto.TagInfo'
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserInfo'
+    type: object
+  dto.ArticleDetailResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.ArticleDetail'
+    type: object
+  dto.ArticleListItem:
+    properties:
+      id:
+        type: string
+      likes_count:
+        type: integer
+      published_at:
+        type: string
+      slug:
+        type: string
+      title:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserInfo'
+    type: object
+  dto.ArticleListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.ArticleListItem'
+        type: array
+      pagination:
+        $ref: '#/definitions/dto.CursorPaginationMeta'
+    type: object
   dto.CreateArticleRequest:
     type: object
   dto.CreateArticleResponse:
     properties:
       slug:
+        example: slug
+        type: string
+    type: object
+  dto.CursorPaginationMeta:
+    properties:
+      has_more:
+        type: boolean
+      items_per_page:
+        type: integer
+      next_cursor:
         type: string
     type: object
   dto.LoginRequest:
@@ -58,7 +126,32 @@ definitions:
       id:
         type: string
     type: object
-  handler.ErrorResponse:
+  dto.SeriesInfo:
+    properties:
+      id:
+        type: string
+      slug:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.TagInfo:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
+  dto.UserInfo:
+    properties:
+      display_name:
+        type: string
+      id:
+        type: string
+    type: object
+  endpoint.ErrorResponse:
     properties:
       error:
         example: error message
@@ -72,6 +165,31 @@ info:
   version: "1.0"
 paths:
   /api/articles:
+    get:
+      description: Get published articles with cursor-based pagination
+      parameters:
+      - description: Number of articles per page
+        in: query
+        name: limit
+        type: integer
+      - description: Cursor for pagination
+        in: query
+        name: cursor
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ArticleListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/endpoint.ErrorResponse'
+      summary: Get published articles
+      tags:
+      - articles
     post:
       consumes:
       - application/json
@@ -93,11 +211,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Create a new article
       tags:
       - articles
@@ -118,12 +236,38 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Delete an article
+      tags:
+      - articles
+    get:
+      description: Get a blog article by slug
+      parameters:
+      - description: Article slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ArticleDetailResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/endpoint.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/endpoint.ErrorResponse'
+      summary: Get an article detail
       tags:
       - articles
   /api/users/login:
@@ -148,15 +292,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Login user
       tags:
       - users
@@ -173,7 +317,7 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Logout user
@@ -201,11 +345,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Register a new user
       tags:
       - users

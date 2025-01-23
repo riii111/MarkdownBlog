@@ -6,6 +6,7 @@ import (
 
 	_ "github.com/riii111/markdown-blog-api/docs"
 	"github.com/riii111/markdown-blog-api/internal/handler"
+	"github.com/riii111/markdown-blog-api/internal/handler/endpoint"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/database"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
 	"github.com/riii111/markdown-blog-api/internal/usecase"
@@ -70,8 +71,8 @@ func main() {
 	articleUsecase := usecase.NewArticleUsecase(articleRepo)
 
 	// ハンドラーの初期化
-	userHandler := handler.NewUserHandler(userUsecase)
-	articleHandler := handler.NewArticleHandler(articleUsecase)
+	userHandler := endpoint.NewUserHandler(userUsecase)
+	articleHandler := endpoint.NewArticleHandler(articleUsecase)
 
 	// ルーターのセットアップ
 	router := handler.SetupRouter(userHandler, articleHandler)

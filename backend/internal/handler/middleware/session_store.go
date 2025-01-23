@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
-	"github.com/riii111/markdown-blog-api/internal/pkg/config"
+	"github.com/riii111/markdown-blog-api/internal/infrastructure/config"
 )
 
 type Store interface {

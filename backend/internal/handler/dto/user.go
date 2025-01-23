@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
+	"github.com/riii111/markdown-blog-api/internal/domain/model"
 )
 
 type RegisterUserRequest struct {
@@ -28,7 +28,7 @@ func RegisterCustomValidations(v *validator.Validate) {
 }
 
 type RegisterUserResponse struct {
-	ID          uuid.UUID `json:"id"`
+	ID          string    `json:"id"`           // Responseではuuid型にしない（フロントでは文字列扱いとなる）
 	DisplayName string    `json:"display_name"` // UI表示用
 	CreatedAt   time.Time `json:"created_at"`
 }
@@ -39,6 +39,28 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	ID          uuid.UUID `json:"id"`
-	DisplayName string    `json:"display_name"` // UI表示用
+	ID          string `json:"id"`           // Responseではuuid型にしない（フロントでは文字列扱いとなる）
+	DisplayName string `json:"display_name"` // UI表示用
+}
+
+type UserInfo struct {
+	ID          string `json:"id"` // Responseではuuid型にしない（フロントでは文字列扱いとなる）
+	DisplayName string `json:"display_name"`
+}
+
+// ユーザー登録レスポンスのDTO変換
+func NewRegisterUserResponse(user *model.User) RegisterUserResponse {
+	return RegisterUserResponse{
+		ID:          user.ID.String(),
+		DisplayName: user.DisplayName,
+		CreatedAt:   user.CreatedAt,
+	}
+}
+
+// ログインレスポンスのDTO変換
+func NewLoginResponse(user *model.User) LoginResponse {
+	return LoginResponse{
+		ID:          user.ID.String(),
+		DisplayName: user.DisplayName,
+	}
 }

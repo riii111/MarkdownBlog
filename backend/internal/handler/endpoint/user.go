@@ -1,4 +1,4 @@
-package handler
+package endpoint
 
 import (
 	"net/http"
@@ -41,8 +41,8 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 	// リクエストボディのbindとvalidation
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request format",
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error: "Invalid request format",
 		})
 		return
 	}
@@ -51,18 +51,13 @@ func (h *UserHandler) Register(c *gin.Context) {
 	user, err := h.userUsecase.Register(c.Request.Context(), req.Email, req.Password, req.DisplayName)
 	if err != nil {
 		// すべての登録エラーを400 Bad Requestとして扱う
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Registration failed. Please check your input and try again",
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error: "Registration failed. Please check your input and try again",
 		})
 		return
 	}
 
-	// レスポンス
-	c.JSON(http.StatusCreated, dto.RegisterUserResponse{
-		ID:          user.ID,
-		DisplayName: user.DisplayName,
-		CreatedAt:   user.BaseModel.CreatedAt,
-	})
+	c.JSON(http.StatusCreated, dto.NewRegisterUserResponse(user))
 }
 
 // Login godoc
@@ -109,10 +104,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.LoginResponse{
-		ID:          user.ID,
-		DisplayName: user.DisplayName,
-	})
+	c.JSON(http.StatusOK, dto.NewLoginResponse(user))
 }
 
 // Logout godoc

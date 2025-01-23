@@ -8,12 +8,13 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"github.com/riii111/markdown-blog-api/internal/handler/endpoint"
 	"github.com/riii111/markdown-blog-api/internal/handler/middleware"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler) *gin.Engine {
+func SetupRouter(userHandler *endpoint.UserHandler, articleHandler *endpoint.ArticleHandler) *gin.Engine {
 	r := gin.Default()
 
 	// セッションの設定（最初に行う）
@@ -41,6 +42,7 @@ func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler) *gin.
 	// その他のミドルウェア
 	r.Use(middleware.NewSecurityMiddleware())
 	r.Use(middleware.NewCorsMiddleware())
+	r.Use(middleware.TimeoutMiddleware())
 
 	// 認証不要のエンドポイント
 	public := r.Group("/api")
@@ -49,6 +51,12 @@ func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler) *gin.
 		{
 			users.POST("/register", userHandler.Register)
 			users.POST("/login", userHandler.Login)
+		}
+
+		articles := public.Group("/articles")
+		{
+			articles.GET("", articleHandler.GetArticles)
+			articles.GET("/:slug", articleHandler.GetArticleBySlug)
 		}
 	}
 
