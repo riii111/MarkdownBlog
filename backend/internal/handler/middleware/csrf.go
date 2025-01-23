@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/riii111/markdown-blog-api/internal/pkg/config"
+	"github.com/riii111/markdown-blog-api/internal/infrastructure/config"
 )
 
 const (

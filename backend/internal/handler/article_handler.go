@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
-	"github.com/riii111/markdown-blog-api/internal/pkg/config"
+	"github.com/riii111/markdown-blog-api/internal/infrastructure/config"
 	"github.com/riii111/markdown-blog-api/internal/usecase"
 )
 
