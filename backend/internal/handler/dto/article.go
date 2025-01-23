@@ -29,7 +29,7 @@ type ArticleListResponse struct {
 
 // 記事一覧のアイテム
 type ArticleListItem struct {
-	ID          string    `json:"id"`
+	ID          string    `json:"id"` // Responseではuuid型にしない（フロントでは文字列扱いとなる）
 	Title       string    `json:"title"`
 	Slug        string    `json:"slug"`
 	User        UserInfo  `json:"user"`
@@ -43,7 +43,7 @@ type ArticleDetailResponse struct {
 }
 
 type ArticleDetail struct {
-	ID          string      `json:"id"`
+	ID          string      `json:"id"` // Responseではuuid型にしない（フロントでは文字列扱いとなる）
 	Title       string      `json:"title"`
 	Content     string      `json:"content"`
 	Slug        string      `json:"slug"`

@@ -28,7 +28,7 @@ func RegisterCustomValidations(v *validator.Validate) {
 }
 
 type RegisterUserResponse struct {
-	ID          string    `json:"id"`
+	ID          string    `json:"id"`           // Responseではuuid型にしない（フロントでは文字列扱いとなる）
 	DisplayName string    `json:"display_name"` // UI表示用
 	CreatedAt   time.Time `json:"created_at"`
 }
@@ -39,12 +39,12 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	ID          string `json:"id"`
+	ID          string `json:"id"`           // Responseではuuid型にしない（フロントでは文字列扱いとなる）
 	DisplayName string `json:"display_name"` // UI表示用
 }
 
 type UserInfo struct {
-	ID          string `json:"id"`
+	ID          string `json:"id"` // Responseではuuid型にしない（フロントでは文字列扱いとなる）
 	DisplayName string `json:"display_name"`
 }
 
