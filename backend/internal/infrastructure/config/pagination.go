@@ -34,14 +34,3 @@ func GetMaxPerPage() int {
 	}
 	return maxPerPage
 }
-
-// ページネーションパラメータを検証して調整
-func ValidateAndAdjustPagination(page, perPage int) (int, int) {
-	if page < 1 {
-		page = GetDefaultPage()
-	}
-	if perPage < 1 || perPage > GetMaxPerPage() {
-		perPage = GetDefaultPerPage()
-	}
-	return page, perPage
-}

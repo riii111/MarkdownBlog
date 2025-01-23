@@ -21,12 +21,13 @@ type CursorPaginationMeta struct {
 	ItemsPerPage int     `json:"items_per_page"`
 }
 
-// 記事一覧のレスポンスを修正
+// 記事一覧のレスポンス
 type ArticleListResponse struct {
 	Data       []ArticleListItem    `json:"data"`
 	Pagination CursorPaginationMeta `json:"pagination"`
 }
 
+// 記事一覧のアイテム
 type ArticleListItem struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
@@ -34,12 +35,6 @@ type ArticleListItem struct {
 	User        UserInfo  `json:"user"`
 	LikesCount  int       `json:"likes_count"`
 	PublishedAt time.Time `json:"published_at"`
-}
-
-type PaginationMeta struct {
-	CurrentPage int `json:"current_page"`
-	PerPage     int `json:"per_page"`
-	Total       int `json:"total"`
 }
 
 // 記事詳細のレスポンス
