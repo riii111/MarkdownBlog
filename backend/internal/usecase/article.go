@@ -80,12 +80,7 @@ func (u *ArticleUsecase) DeleteArticleBySlug(ctx context.Context, userID uuid.UU
 	return u.articleRepo.Delete(article.ID)
 }
 
-// GetPublishedArticles 公開済み記事一覧を取得
-func (u *ArticleUsecase) GetPublishedArticles(ctx context.Context, page, perPage int) ([]model.Article, int, error) {
-	return u.articleRepo.FindPublished(page, perPage)
-}
-
-// GetArticleBySlug slugで記事の詳細を取得
+// slugで記事の詳細を取得
 func (u *ArticleUsecase) GetArticleBySlug(ctx context.Context, slug string) (*model.Article, error) {
 	article, err := u.articleRepo.FindBySlugWithRelations(slug)
 	if err != nil {
@@ -96,4 +91,14 @@ func (u *ArticleUsecase) GetArticleBySlug(ctx context.Context, slug string) (*mo
 	}
 
 	return article, nil
+}
+
+// カーソルベースで公開済み記事一覧を取得
+func (u *ArticleUsecase) GetPublishedArticles(ctx context.Context, limit int, cursor *string) ([]model.Article, *string, error) {
+	// limitの値を検証
+	if limit <= 0 || limit > MaxPerPage {
+		limit = DefaultPerPage
+	}
+
+	return u.articleRepo.FindPublished(limit, cursor)
 }

@@ -14,10 +14,17 @@ type CreateArticleResponse struct {
 	Slug string `json:"slug" example:"slug"`
 }
 
-// 記事一覧のレスポンス
+// カーソルベースページネーション用のメタ情報
+type CursorPaginationMeta struct {
+	NextCursor   *string `json:"next_cursor,omitempty"`
+	HasMore      bool    `json:"has_more"`
+	ItemsPerPage int     `json:"items_per_page"`
+}
+
+// 記事一覧のレスポンスを修正
 type ArticleListResponse struct {
-	Data       []ArticleListItem `json:"data"`
-	Pagination PaginationMeta    `json:"pagination"`
+	Data       []ArticleListItem    `json:"data"`
+	Pagination CursorPaginationMeta `json:"pagination"`
 }
 
 type ArticleListItem struct {
@@ -56,7 +63,7 @@ type ArticleDetail struct {
 }
 
 // 記事一覧のレスポンスDTO変換
-func NewArticleListResponse(articles []model.Article, page, perPage, total int) ArticleListResponse {
+func NewArticleListResponse(articles []model.Article, limit int, nextCursor *string) ArticleListResponse {
 	items := make([]ArticleListItem, len(articles))
 	for i, article := range articles {
 		items[i] = NewArticleListItem(article)
@@ -64,10 +71,10 @@ func NewArticleListResponse(articles []model.Article, page, perPage, total int) 
 
 	return ArticleListResponse{
 		Data: items,
-		Pagination: PaginationMeta{
-			CurrentPage: page,
-			PerPage:     perPage,
-			Total:       total,
+		Pagination: CursorPaginationMeta{
+			NextCursor:   nextCursor,
+			HasMore:      nextCursor != nil,
+			ItemsPerPage: limit,
 		},
 	}
 }

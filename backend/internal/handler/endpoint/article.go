@@ -93,34 +93,34 @@ func (h *ArticleHandler) DeleteArticle(c *gin.Context) {
 
 // GetArticles godoc
 // @Summary Get published articles
-// @Description Get published articles
+// @Description Get published articles with cursor-based pagination
 // @Tags articles
 // @Produce json
-// @Param page query int false "Page number"
-// @Param per_page query int false "Number of articles per page"
+// @Param limit query int false "Number of articles per page"
+// @Param cursor query string false "Cursor for pagination"
 // @Success 200 {object} dto.ArticleListResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /api/articles [get]
 func (h *ArticleHandler) GetArticles(c *gin.Context) {
-	page := config.GetDefaultPage()
-	perPage := config.GetDefaultPerPage()
+	limit := config.GetDefaultPerPage()
+	var cursor *string
 
-	if pageStr := c.Query("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil {
-			page = p
+	if limitStr := c.Query("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil {
+			limit = l
 		}
 	}
 
-	if perPageStr := c.Query("per_page"); perPageStr != "" {
-		if pp, err := strconv.Atoi(perPageStr); err == nil {
-			perPage = pp
-		}
+	if cursorStr := c.Query("cursor"); cursorStr != "" {
+		cursor = &cursorStr
 	}
 
-	// バリデーション
-	page, perPage = config.ValidateAndAdjustPagination(page, perPage)
+	// limitの検証
+	if limit <= 0 || limit > config.GetMaxPerPage() {
+		limit = config.GetDefaultPerPage()
+	}
 
-	articles, total, err := h.articleUsecase.GetPublishedArticles(c.Request.Context(), page, perPage)
+	articles, nextCursor, err := h.articleUsecase.GetPublishedArticles(c.Request.Context(), limit, cursor)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
 			Error: "Failed to fetch articles",
@@ -128,7 +128,8 @@ func (h *ArticleHandler) GetArticles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.NewArticleListResponse(articles, page, perPage, total))
+	response := dto.NewArticleListResponse(articles, limit, nextCursor)
+	c.JSON(http.StatusOK, response)
 }
 
 // GetArticle godoc
