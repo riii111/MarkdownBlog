@@ -11,7 +11,7 @@
     "paths": {
         "/api/articles": {
             "get": {
-                "description": "Get published articles",
+                "description": "Get published articles with cursor-based pagination",
                 "produces": [
                     "application/json"
                 ],
@@ -22,14 +22,14 @@
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
+                        "description": "Number of articles per page",
+                        "name": "limit",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "Number of articles per page",
-                        "name": "per_page",
+                        "type": "string",
+                        "description": "Cursor for pagination",
+                        "name": "cursor",
                         "in": "query"
                     }
                 ],
@@ -43,7 +43,7 @@
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -81,13 +81,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -122,13 +122,13 @@
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -158,13 +158,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -204,19 +204,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -247,7 +247,7 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -287,13 +287,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -386,7 +386,7 @@
                     }
                 },
                 "pagination": {
-                    "$ref": "#/definitions/dto.PaginationMeta"
+                    "$ref": "#/definitions/dto.CursorPaginationMeta"
                 }
             }
         },
@@ -399,6 +399,20 @@
                 "slug": {
                     "type": "string",
                     "example": "slug"
+                }
+            }
+        },
+        "dto.CursorPaginationMeta": {
+            "type": "object",
+            "properties": {
+                "has_more": {
+                    "type": "boolean"
+                },
+                "items_per_page": {
+                    "type": "integer"
+                },
+                "next_cursor": {
+                    "type": "string"
                 }
             }
         },
@@ -429,20 +443,6 @@
                 },
                 "id": {
                     "type": "string"
-                }
-            }
-        },
-        "dto.PaginationMeta": {
-            "type": "object",
-            "properties": {
-                "current_page": {
-                    "type": "integer"
-                },
-                "per_page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
                 }
             }
         },
@@ -526,7 +526,7 @@
                 }
             }
         },
-        "handler.ErrorResponse": {
+        "endpoint.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {

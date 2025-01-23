@@ -56,7 +56,7 @@ definitions:
           $ref: '#/definitions/dto.ArticleListItem'
         type: array
       pagination:
-        $ref: '#/definitions/dto.PaginationMeta'
+        $ref: '#/definitions/dto.CursorPaginationMeta'
     type: object
   dto.CreateArticleRequest:
     type: object
@@ -64,6 +64,15 @@ definitions:
     properties:
       slug:
         example: slug
+        type: string
+    type: object
+  dto.CursorPaginationMeta:
+    properties:
+      has_more:
+        type: boolean
+      items_per_page:
+        type: integer
+      next_cursor:
         type: string
     type: object
   dto.LoginRequest:
@@ -86,15 +95,6 @@ definitions:
         type: string
       id:
         type: string
-    type: object
-  dto.PaginationMeta:
-    properties:
-      current_page:
-        type: integer
-      per_page:
-        type: integer
-      total:
-        type: integer
     type: object
   dto.RegisterUserRequest:
     properties:
@@ -151,7 +151,7 @@ definitions:
       id:
         type: string
     type: object
-  handler.ErrorResponse:
+  endpoint.ErrorResponse:
     properties:
       error:
         example: error message
@@ -166,16 +166,16 @@ info:
 paths:
   /api/articles:
     get:
-      description: Get published articles
+      description: Get published articles with cursor-based pagination
       parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
       - description: Number of articles per page
         in: query
-        name: per_page
+        name: limit
         type: integer
+      - description: Cursor for pagination
+        in: query
+        name: cursor
+        type: string
       produces:
       - application/json
       responses:
@@ -186,7 +186,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Get published articles
       tags:
       - articles
@@ -211,11 +211,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Create a new article
       tags:
       - articles
@@ -236,11 +236,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Delete an article
       tags:
       - articles
@@ -262,11 +262,11 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Get an article detail
       tags:
       - articles
@@ -292,15 +292,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Login user
       tags:
       - users
@@ -317,7 +317,7 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       security:
       - CookieAuth: []
       summary: Logout user
@@ -345,11 +345,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/endpoint.ErrorResponse'
       summary: Register a new user
       tags:
       - users

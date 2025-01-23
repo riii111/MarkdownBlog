@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/api/articles": {
             "get": {
-                "description": "Get published articles",
+                "description": "Get published articles with cursor-based pagination",
                 "produces": [
                     "application/json"
                 ],
@@ -28,14 +28,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
+                        "description": "Number of articles per page",
+                        "name": "limit",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "Number of articles per page",
-                        "name": "per_page",
+                        "type": "string",
+                        "description": "Cursor for pagination",
+                        "name": "cursor",
                         "in": "query"
                     }
                 ],
@@ -49,7 +49,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -87,13 +87,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -128,13 +128,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -164,13 +164,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -210,19 +210,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -253,7 +253,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -293,13 +293,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
                     }
                 }
@@ -392,7 +392,7 @@ const docTemplate = `{
                     }
                 },
                 "pagination": {
-                    "$ref": "#/definitions/dto.PaginationMeta"
+                    "$ref": "#/definitions/dto.CursorPaginationMeta"
                 }
             }
         },
@@ -405,6 +405,20 @@ const docTemplate = `{
                 "slug": {
                     "type": "string",
                     "example": "slug"
+                }
+            }
+        },
+        "dto.CursorPaginationMeta": {
+            "type": "object",
+            "properties": {
+                "has_more": {
+                    "type": "boolean"
+                },
+                "items_per_page": {
+                    "type": "integer"
+                },
+                "next_cursor": {
+                    "type": "string"
                 }
             }
         },
@@ -435,20 +449,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
-                }
-            }
-        },
-        "dto.PaginationMeta": {
-            "type": "object",
-            "properties": {
-                "current_page": {
-                    "type": "integer"
-                },
-                "per_page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
                 }
             }
         },
@@ -532,7 +532,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.ErrorResponse": {
+        "endpoint.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
