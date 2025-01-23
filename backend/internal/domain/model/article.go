@@ -28,4 +28,6 @@ type ArticleRepository interface {
 	FindByID(id uuid.UUID) (*Article, error)
 	FindBySlug(slug string) (*Article, error)
 	Delete(id uuid.UUID) error
+	FindPublished(page, perPage int) ([]Article, int, error)
+	FindBySlugWithRelations(slug string) (*Article, error)
 }

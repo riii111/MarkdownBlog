@@ -42,3 +42,8 @@ type LoginResponse struct {
 	ID          uuid.UUID `json:"id"`
 	DisplayName string    `json:"display_name"` // UI表示用
 }
+
+type UserInfo struct {
+	ID          string `json:"id"`
+	DisplayName string `json:"display_name"`
+}

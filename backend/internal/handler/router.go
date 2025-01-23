@@ -41,6 +41,7 @@ func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler) *gin.
 	// その他のミドルウェア
 	r.Use(middleware.NewSecurityMiddleware())
 	r.Use(middleware.NewCorsMiddleware())
+	r.Use(middleware.TimeoutMiddleware())
 
 	// 認証不要のエンドポイント
 	public := r.Group("/api")
@@ -49,6 +50,12 @@ func SetupRouter(userHandler *UserHandler, articleHandler *ArticleHandler) *gin.
 		{
 			users.POST("/register", userHandler.Register)
 			users.POST("/login", userHandler.Login)
+		}
+
+		articles := public.Group("/articles")
+		{
+			articles.GET("", articleHandler.GetArticles)
+			articles.GET("/:slug", articleHandler.GetArticleBySlug)
 		}
 	}
 
