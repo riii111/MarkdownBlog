@@ -64,7 +64,6 @@ func SetupRouter(userHandler *endpoint.UserHandler, articleHandler *endpoint.Art
 	protected := r.Group("/api")
 	protected.Use(middleware.CSRF())
 	protected.Use(middleware.AuthMiddleware())
-	protected.Use(middleware.CSRF())
 	{
 		users := protected.Group("/users")
 		{
