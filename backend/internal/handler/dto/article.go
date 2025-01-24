@@ -32,6 +32,7 @@ type ArticleListItem struct {
 	ID          string    `json:"id"` // Responseではuuid型にしない（フロントでは文字列扱いとなる）
 	Title       string    `json:"title"`
 	Slug        string    `json:"slug"`
+	Status      string    `json:"status"`
 	User        UserInfo  `json:"user"`
 	LikesCount  int       `json:"likes_count"`
 	PublishedAt time.Time `json:"published_at"`
@@ -77,11 +78,17 @@ func NewArticleListResponse(articles []model.Article, limit int, nextCursor *str
 // 記事一覧のアイテムDTO変換
 func NewArticleListItem(article model.Article) ArticleListItem {
 	return ArticleListItem{
-		ID:          article.ID.String(),
-		Title:       article.Title,
-		Slug:        article.Slug,
-		LikesCount:  article.LikesCount,
-		PublishedAt: *article.PublishedAt,
+		ID:         article.ID.String(),
+		Title:      article.Title,
+		Slug:       article.Slug,
+		Status:     article.Status,
+		LikesCount: article.LikesCount,
+		PublishedAt: func() time.Time {
+			if article.PublishedAt != nil {
+				return *article.PublishedAt
+			}
+			return article.CreatedAt
+		}(),
 		User: UserInfo{
 			ID:          article.User.ID.String(),
 			DisplayName: article.User.DisplayName,
