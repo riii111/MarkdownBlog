@@ -72,6 +72,7 @@ func SetupRouter(userHandler *endpoint.UserHandler, articleHandler *endpoint.Art
 
 		articles := protected.Group("/articles")
 		{
+			articles.GET("/me", articleHandler.GetMeArticles)
 			articles.POST("", articleHandler.CreateArticle)
 			articles.DELETE("/:slug", articleHandler.DeleteArticle)
 		}

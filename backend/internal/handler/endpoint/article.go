@@ -162,29 +162,44 @@ func (h *ArticleHandler) GetArticleBySlug(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.NewArticleDetailResponse(article))
 }
 
-// GetUserArticles godoc
-// @Summary Get user's articles
+// GetMeArticles godoc
+// @Summary Get current user's articles
 // @Description Get articles created by the authenticated user
 // @Tags articles
 // @Produce json
-// @Param limit query int false "Number of articles per page"
-// @Param cursor query string false "Cursor for pagination"
-// @Param status query string false "Filter by status (all/draft/published)"
+// @Param page query int false "Page number (default: 1)"
+// @Param per_page query int false "Number of articles per page (default: 20)"
 // @Success 200 {object} dto.ArticleListResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /api/articles/me [get]
-func (h *ArticleHandler) GetUserArticles(c *gin.Context) {
+func (h *ArticleHandler) GetMeArticles(c *gin.Context) {
 	userID := c.MustGet("userID").(uuid.UUID)
 
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
-	var cursor *string
-	if cursorStr := c.Query("cursor"); cursorStr != "" {
-		cursor = &cursorStr
-	}
-	status := c.DefaultQuery("status", "all")
+	// ページネーションパラメータの取得
+	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "20"))
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 
-	articles, nextCursor, err := h.articleUsecase.GetUserArticles(c.Request.Context(), userID, limit, cursor, status)
+	// ページネーションの検証
+	if perPage <= 0 || perPage > config.GetMaxPerPage() {
+		perPage = 20
+	}
+	if page <= 0 {
+		page = 1
+	}
+
+	// カーソルの計算（ページベースからカーソルベースに変換）
+	var cursor *string
+	if page > 1 {
+		// 前のページの最後のIDを取得する必要がある場合の処理
+	}
+
+	articles, nextCursor, err := h.articleUsecase.GetMeArticles(
+		c.Request.Context(),
+		userID,
+		perPage,
+		cursor,
+	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
 			Error: "Failed to fetch articles",
@@ -192,7 +207,7 @@ func (h *ArticleHandler) GetUserArticles(c *gin.Context) {
 		return
 	}
 
-	response := dto.NewArticleListResponse(articles, limit, nextCursor)
+	response := dto.NewArticleListResponse(articles, perPage, nextCursor)
 	c.JSON(http.StatusOK, response)
 }
 

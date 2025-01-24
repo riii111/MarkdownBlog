@@ -119,17 +119,12 @@ func (r *articleRepository) FindPublished(limit int, cursor *string) ([]model.Ar
 	return articles, nextCursor, nil
 }
 
-// ユーザーIDによる記事検索
-func (r *articleRepository) FindByUserID(userID uuid.UUID, limit int, cursor *string, status string) ([]model.Article, *string, error) {
+// FindByUserID gets all articles for a specific user
+func (r *articleRepository) FindByUserID(userID uuid.UUID, limit int, cursor *string) ([]model.Article, *string, error) {
 	var articles []model.Article
 	query := r.db.Model(&model.Article{}).
 		Preload("User").
 		Where("user_id = ?", userID)
-
-	// ステータスフィルター
-	if status != "all" {
-		query = query.Where("status = ?", status)
-	}
 
 	// カーソルが指定されている場合、そのIDより小さいものを取得
 	if cursor != nil {
