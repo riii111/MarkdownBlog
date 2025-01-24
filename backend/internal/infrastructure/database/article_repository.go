@@ -118,3 +118,91 @@ func (r *articleRepository) FindPublished(limit int, cursor *string) ([]model.Ar
 
 	return articles, nextCursor, nil
 }
+
+// ユーザーIDによる記事検索
+func (r *articleRepository) FindByUserID(userID uuid.UUID, limit int, cursor *string, status string) ([]model.Article, *string, error) {
+	var articles []model.Article
+	query := r.db.Model(&model.Article{}).
+		Preload("User").
+		Where("user_id = ?", userID)
+
+	// ステータスフィルター
+	if status != "all" {
+		query = query.Where("status = ?", status)
+	}
+
+	// カーソルが指定されている場合、そのIDより小さいものを取得
+	if cursor != nil {
+		cursorUUID, err := uuid.Parse(*cursor)
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid cursor format: %w", err)
+		}
+		query = query.Where("id < ?", cursorUUID)
+	}
+
+	// ID降順で取得（新しい順）
+	result := query.Order("id DESC").
+		Limit(limit + 1). // 次ページの有無を確認するため、1つ多めに取得
+		Find(&articles)
+
+	if result.Error != nil {
+		return nil, nil, result.Error
+	}
+
+	var nextCursor *string
+	hasMore := len(articles) > limit
+
+	// 次ページがある場合
+	if hasMore {
+		// 最後の要素を除去（limit + 1件目）
+		articles = articles[:limit]
+		// 次のカーソルを設定
+		lastID := articles[len(articles)-1].ID.String()
+		nextCursor = &lastID
+	}
+
+	return articles, nextCursor, nil
+}
+
+// タグスラッグによる記事検索（カーソルベース）
+func (r *articleRepository) FindByTagSlug(tagSlug string, limit int, cursor *string) ([]model.Article, *string, error) {
+	var articles []model.Article
+	query := r.db.Model(&model.Article{}).
+		Preload("User").
+		Joins("JOIN article_tags ON articles.id = article_tags.article_id").
+		Joins("JOIN tags ON article_tags.tag_id = tags.id").
+		Where("tags.slug = ? AND articles.status = ? AND articles.published_at <= ?",
+			tagSlug, "published", time.Now())
+
+	// カーソルが指定されている場合、そのIDより小さいものを取得
+	if cursor != nil {
+		cursorUUID, err := uuid.Parse(*cursor)
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid cursor format: %w", err)
+		}
+		query = query.Where("articles.id < ?", cursorUUID)
+	}
+
+	// ID降順で取得（新しい順）
+	result := query.Order("articles.id DESC").
+		Limit(limit + 1).
+		Find(&articles)
+
+	if result.Error != nil {
+		return nil, nil, result.Error
+	}
+
+	var nextCursor *string
+	hasMore := len(articles) > limit
+
+	// 次ページがある場合
+	if hasMore {
+		// 最後の要素を除去（limit + 1件目）
+		articles = articles[:limit]
+		// 次のカーソルを設定
+		lastID := articles[len(articles)-1].ID.String()
+		nextCursor = &lastID
+	}
+
+	return articles, nextCursor, nil
+}

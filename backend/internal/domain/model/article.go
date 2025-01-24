@@ -30,4 +30,6 @@ type ArticleRepository interface {
 	Delete(id uuid.UUID) error
 	FindPublished(limit int, cursor *string) ([]Article, *string, error)
 	FindBySlugWithRelations(slug string) (*Article, error)
+	FindByUserID(userID uuid.UUID, limit int, cursor *string, status string) ([]Article, *string, error)
+	FindByTagSlug(tagSlug string, limit int, cursor *string) ([]Article, *string, error)
 }

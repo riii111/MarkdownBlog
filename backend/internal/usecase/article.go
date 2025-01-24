@@ -102,3 +102,26 @@ func (u *ArticleUsecase) GetPublishedArticles(ctx context.Context, limit int, cu
 
 	return u.articleRepo.FindPublished(limit, cursor)
 }
+
+// ユーザーの記事一覧を取得
+func (u *ArticleUsecase) GetUserArticles(ctx context.Context, userID uuid.UUID, limit int, cursor *string, status string) ([]model.Article, *string, error) {
+	if limit <= 0 || limit > MaxPerPage {
+		limit = DefaultPerPage
+	}
+
+	// ステータスの検証
+	if status != "all" && status != "draft" && status != "published" {
+		status = "all"
+	}
+
+	return u.articleRepo.FindByUserID(userID, limit, cursor, status)
+}
+
+// タグに紐づく記事一覧を取得
+func (u *ArticleUsecase) GetArticlesByTag(ctx context.Context, tagSlug string, limit int, cursor *string) ([]model.Article, *string, error) {
+	if limit <= 0 || limit > MaxPerPage {
+		limit = DefaultPerPage
+	}
+
+	return u.articleRepo.FindByTagSlug(tagSlug, limit, cursor)
+}
