@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Session セッションモデル
+// セッションモデル
 type Session struct {
 	BaseModel
 	UserID       uuid.UUID `gorm:"type:uuid;not null"`
@@ -15,7 +15,7 @@ type Session struct {
 	User         User      `gorm:"foreignKey:UserID"`
 }
 
-// SessionRepository セッションリポジトリのインターフェース
+// セッションリポジトリのインターフェース
 type SessionRepository interface {
 	Create(session *Session) error
 	FindByID(id uuid.UUID) (*Session, error)
@@ -24,7 +24,7 @@ type SessionRepository interface {
 	DeleteExpired() error
 }
 
-// IsExpired セッションが期限切れかどうかを確認するメソッド
+// セッションが期限切れかどうかを確認するメソッド
 func (s *Session) IsExpired() bool {
 	return time.Now().After(s.ExpiresAt)
 }

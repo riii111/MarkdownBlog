@@ -2,7 +2,7 @@ package model
 
 import "github.com/google/uuid"
 
-// ArticleTag 記事とタグの中間テーブル
+// 記事とタグの中間テーブル
 type ArticleTag struct {
 	BaseModel
 	ArticleID uuid.UUID `gorm:"type:uuid;primaryKey"`

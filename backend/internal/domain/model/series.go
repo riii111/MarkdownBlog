@@ -2,7 +2,7 @@ package model
 
 import "github.com/google/uuid"
 
-// Series シリーズモデル
+// シリーズモデル
 type Series struct {
 	BaseModel
 	UserID      uuid.UUID `gorm:"type:uuid;not null"`
@@ -13,7 +13,7 @@ type Series struct {
 	Articles    []Article `gorm:"foreignKey:SeriesID"`
 }
 
-// SeriesRepository シリーズリポジトリのインターフェース
+// シリーズリポジトリのインターフェース
 type SeriesRepository interface {
 	Create(series *Series) error
 	FindByID(id uuid.UUID) (*Series, error)
