@@ -29,12 +29,14 @@ type ArticleListResponse struct {
 
 // 記事一覧のアイテム
 type ArticleListItem struct {
-	ID          string    `json:"id"` // Responseではuuid型にしない（フロントでは文字列扱いとなる）
-	Title       string    `json:"title"`
-	Slug        string    `json:"slug"`
-	User        UserInfo  `json:"user"`
-	LikesCount  int       `json:"likes_count"`
-	PublishedAt time.Time `json:"published_at"`
+	ID          string     `json:"id"` // Responseではuuid型にしない（フロントでは文字列扱いとなる）
+	Title       string     `json:"title"`
+	Slug        string     `json:"slug"`
+	Status      string     `json:"status"`
+	User        UserInfo   `json:"user"`
+	LikesCount  int        `json:"likes_count"`
+	PublishedAt *time.Time `json:"published_at"`
+	CreatedAt   time.Time  `json:"created_at"`
 }
 
 // 記事詳細のレスポンス
@@ -80,8 +82,10 @@ func NewArticleListItem(article model.Article) ArticleListItem {
 		ID:          article.ID.String(),
 		Title:       article.Title,
 		Slug:        article.Slug,
+		Status:      article.Status,
 		LikesCount:  article.LikesCount,
-		PublishedAt: *article.PublishedAt,
+		PublishedAt: article.PublishedAt,
+		CreatedAt:   article.CreatedAt,
 		User: UserInfo{
 			ID:          article.User.ID.String(),
 			DisplayName: article.User.DisplayName,

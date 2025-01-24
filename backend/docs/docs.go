@@ -99,6 +99,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/articles/me": {
+            "get": {
+                "description": "Get articles created by the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "summary": "Get current user's articles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number (default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of articles per page (default: 20)",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ArticleListResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/articles/{slug}": {
             "get": {
                 "description": "Get a blog article by slug",
@@ -169,6 +215,59 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tags/{slug}/articles": {
+            "get": {
+                "description": "Get published articles with specific tag",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "summary": "Get articles by tag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tag slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of articles per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor for pagination",
+                        "name": "cursor",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ArticleListResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/endpoint.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/endpoint.ErrorResponse"
                         }
@@ -317,6 +416,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "description": "Responseではuuid型にしない（フロントでは文字列扱いとなる）",
                     "type": "string"
                 },
                 "likes_count": {
@@ -363,6 +463,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "description": "Responseではuuid型にしない（フロントでは文字列扱いとなる）",
                     "type": "string"
                 },
                 "likes_count": {
@@ -448,6 +549,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "description": "Responseではuuid型にしない（フロントでは文字列扱いとなる）",
                     "type": "string"
                 }
             }
@@ -489,6 +591,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "description": "Responseではuuid型にしない（フロントでは文字列扱いとなる）",
                     "type": "string"
                 }
             }
@@ -497,6 +600,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "description": "Responseではuuid型にしない（フロントでは文字列扱いとなる）",
                     "type": "string"
                 },
                 "slug": {
@@ -511,6 +615,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "description": "Responseではuuid型にしない（フロントでは文字列扱いとなる）",
                     "type": "string"
                 },
                 "name": {
@@ -528,6 +633,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "description": "Responseではuuid型にしない（フロントでは文字列扱いとなる）",
                     "type": "string"
                 }
             }

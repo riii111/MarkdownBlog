@@ -2,7 +2,7 @@ package model
 
 import "github.com/google/uuid"
 
-// Tag タグモデル
+// タグモデル
 type Tag struct {
 	BaseModel
 	Name     string    `gorm:"type:varchar(50);uniqueIndex;not null"`
@@ -10,7 +10,7 @@ type Tag struct {
 	Articles []Article `gorm:"many2many:article_tags;"`
 }
 
-// TagRepository タグリポジトリのインターフェース
+// タグリポジトリのインターフェース
 type TagRepository interface {
 	Create(tag *Tag) error
 	FindByID(id uuid.UUID) (*Tag, error)

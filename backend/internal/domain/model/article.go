@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Article 記事モデル
+// 記事モデル
 type Article struct {
 	BaseModel
 	UserID      uuid.UUID  `gorm:"type:uuid;not null"`
@@ -22,7 +22,7 @@ type Article struct {
 	Tags        []Tag   `gorm:"many2many:article_tags;"`
 }
 
-// ArticleRepository 記事リポジトリのインターフェース
+// 記事リポジトリのインターフェース
 type ArticleRepository interface {
 	Create(article *Article) error
 	FindByID(id uuid.UUID) (*Article, error)
@@ -30,4 +30,6 @@ type ArticleRepository interface {
 	Delete(id uuid.UUID) error
 	FindPublished(limit int, cursor *string) ([]Article, *string, error)
 	FindBySlugWithRelations(slug string) (*Article, error)
+	FindByUserID(userID uuid.UUID, limit int, cursor *string) ([]Article, *string, error)
+	FindByTagSlug(tagSlug string, limit int, cursor *string) ([]Article, *string, error)
 }

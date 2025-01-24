@@ -102,3 +102,21 @@ func (u *ArticleUsecase) GetPublishedArticles(ctx context.Context, limit int, cu
 
 	return u.articleRepo.FindPublished(limit, cursor)
 }
+
+// タグに紐づく記事一覧を取得
+func (u *ArticleUsecase) GetArticlesByTag(ctx context.Context, tagSlug string, limit int, cursor *string) ([]model.Article, *string, error) {
+	if limit <= 0 || limit > MaxPerPage {
+		limit = DefaultPerPage
+	}
+
+	return u.articleRepo.FindByTagSlug(tagSlug, limit, cursor)
+}
+
+// GetMeArticles gets all articles for the authenticated user
+func (u *ArticleUsecase) GetMeArticles(ctx context.Context, userID uuid.UUID, limit int, cursor *string) ([]model.Article, *string, error) {
+	if limit <= 0 || limit > MaxPerPage {
+		limit = DefaultPerPage
+	}
+
+	return u.articleRepo.FindByUserID(userID, limit, cursor)
+}

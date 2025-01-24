@@ -64,7 +64,6 @@ func SetupRouter(userHandler *endpoint.UserHandler, articleHandler *endpoint.Art
 	protected := r.Group("/api")
 	protected.Use(middleware.CSRF())
 	protected.Use(middleware.AuthMiddleware())
-	protected.Use(middleware.CSRF())
 	{
 		users := protected.Group("/users")
 		{
@@ -73,6 +72,7 @@ func SetupRouter(userHandler *endpoint.UserHandler, articleHandler *endpoint.Art
 
 		articles := protected.Group("/articles")
 		{
+			articles.GET("/me", articleHandler.GetMeArticles)
 			articles.POST("", articleHandler.CreateArticle)
 			articles.DELETE("/:slug", articleHandler.DeleteArticle)
 		}

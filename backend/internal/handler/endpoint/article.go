@@ -161,3 +161,91 @@ func (h *ArticleHandler) GetArticleBySlug(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dto.NewArticleDetailResponse(article))
 }
+
+// GetMeArticles godoc
+// @Summary Get current user's articles
+// @Description Get articles created by the authenticated user
+// @Tags articles
+// @Produce json
+// @Param page query int false "Page number (default: 1)"
+// @Param per_page query int false "Number of articles per page (default: 20)"
+// @Success 200 {object} dto.ArticleListResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /api/articles/me [get]
+func (h *ArticleHandler) GetMeArticles(c *gin.Context) {
+	userID := c.MustGet("userID").(uuid.UUID)
+
+	// ページネーションパラメータの取得
+	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "20"))
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+
+	// ページネーションの検証
+	if perPage <= 0 || perPage > config.GetMaxPerPage() {
+		perPage = 20
+	}
+	if page <= 0 {
+		page = 1
+	}
+
+	// カーソルの計算（ページベースからカーソルベースに変換）
+	var cursor *string
+	if page > 1 {
+		// 前のページの最後のIDを取得する必要がある場合の処理
+	}
+
+	articles, nextCursor, err := h.articleUsecase.GetMeArticles(
+		c.Request.Context(),
+		userID,
+		perPage,
+		cursor,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: "Failed to fetch articles",
+		})
+		return
+	}
+
+	response := dto.NewArticleListResponse(articles, perPage, nextCursor)
+	c.JSON(http.StatusOK, response)
+}
+
+// GetArticlesByTag godoc
+// @Summary Get articles by tag
+// @Description Get published articles with specific tag
+// @Tags articles
+// @Produce json
+// @Param slug path string true "Tag slug"
+// @Param limit query int false "Number of articles per page"
+// @Param cursor query string false "Cursor for pagination"
+// @Success 200 {object} dto.ArticleListResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /api/tags/{slug}/articles [get]
+func (h *ArticleHandler) GetArticlesByTag(c *gin.Context) {
+	tagSlug := c.Param("slug")
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
+	var cursor *string
+	if cursorStr := c.Query("cursor"); cursorStr != "" {
+		cursor = &cursorStr
+	}
+
+	articles, nextCursor, err := h.articleUsecase.GetArticlesByTag(c.Request.Context(), tagSlug, limit, cursor)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: "Failed to fetch articles",
+		})
+		return
+	}
+
+	if len(articles) == 0 && cursor == nil {
+		c.JSON(http.StatusNotFound, ErrorResponse{
+			Error: "Tag not found or no articles",
+		})
+		return
+	}
+
+	response := dto.NewArticleListResponse(articles, limit, nextCursor)
+	c.JSON(http.StatusOK, response)
+}

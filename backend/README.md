@@ -26,11 +26,12 @@ backend/
 │   ├── handler/         # HTTPハンドラー層
 │   │   ├── dto/         # Data Transfer Objects
 │   │   ├── middleware/  # HTTPミドルウェア
+│   │   ├── endpoint/    # 各APIのエンドポイント
 │   │   └── router.go    # ルーティング設定
-│   │   └── user_handler.go # ユーザー関連のハンドラー
 │   ├── infrastructure/ # インフラストラクチャ層
+│   │   └── config/      # internal配下の設定関連の処理
 │   │   └── migration/  # マイグレーション関連の処理
-│   │   └── database/   # データベース関連の処理（リポジトリの実装）
+│   │   └── database/   # データベース関連の処理（リポジトリの実処理など）
 │   └── usecase/        # ユースケース層
 ├── pkg/                # 公開可能な再利用可能なコード
 │   └── config/         # 設定関連の処理
