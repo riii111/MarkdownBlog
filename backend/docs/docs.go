@@ -108,24 +108,18 @@ const docTemplate = `{
                 "tags": [
                     "articles"
                 ],
-                "summary": "Get user's articles",
+                "summary": "Get current user's articles",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Number of articles per page",
-                        "name": "limit",
+                        "description": "Page number (default: 1)",
+                        "name": "page",
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "Cursor for pagination",
-                        "name": "cursor",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by status (all/draft/published)",
-                        "name": "status",
+                        "type": "integer",
+                        "description": "Number of articles per page (default: 20)",
+                        "name": "per_page",
                         "in": "query"
                     }
                 ],

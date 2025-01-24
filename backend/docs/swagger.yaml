@@ -281,18 +281,14 @@ paths:
     get:
       description: Get articles created by the authenticated user
       parameters:
-      - description: Number of articles per page
+      - description: 'Page number (default: 1)'
         in: query
-        name: limit
+        name: page
         type: integer
-      - description: Cursor for pagination
+      - description: 'Number of articles per page (default: 20)'
         in: query
-        name: cursor
-        type: string
-      - description: Filter by status (all/draft/published)
-        in: query
-        name: status
-        type: string
+        name: per_page
+        type: integer
       produces:
       - application/json
       responses:
@@ -308,7 +304,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/endpoint.ErrorResponse'
-      summary: Get user's articles
+      summary: Get current user's articles
       tags:
       - articles
   /api/tags/{slug}/articles:
