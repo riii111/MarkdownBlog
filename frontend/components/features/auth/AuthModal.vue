@@ -29,7 +29,6 @@
 
 <script setup lang="ts">
 import { AUTH_MESSAGES } from '~/constants/auth'
-import type { ILoginPayload, ISignupPayload } from '~/types/auth'
 
 const props = defineProps<{
     modelValue: boolean

@@ -34,8 +34,6 @@
 </template>
 
 <script setup lang="ts">
-import { AUTH_CONSTANTS } from '~/constants/auth'
-import type { ILoginPayload, ISignupPayload } from '~/types/auth'
 
 const props = defineProps<{
     isLogin: boolean

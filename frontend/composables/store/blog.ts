@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import type { IArticle } from "~/types/blog";
 import { BLOG_CONSTANTS } from "~/constants/blog";
 
 export const useBlogStore = defineStore("blog", () => {

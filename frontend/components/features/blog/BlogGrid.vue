@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import type { IArticle } from '~/types/blog';
 import { BLOG_CONSTANTS } from '~/constants/blog';
 
 interface Props {

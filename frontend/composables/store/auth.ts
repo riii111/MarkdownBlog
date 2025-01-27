@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import type { IAuthUser } from "~/types/auth";
 
 export const useAuthStore = defineStore("auth", () => {
   const _state = reactive({
