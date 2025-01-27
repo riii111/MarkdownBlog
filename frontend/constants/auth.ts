@@ -7,5 +7,4 @@ export const AUTH_MESSAGES = {
 
 export const AUTH_CONSTANTS = {
   TOKEN_KEY: "auth_token",
-  MIN_PASSWORD_LENGTH: 8,
 } as const;
