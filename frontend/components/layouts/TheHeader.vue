@@ -14,11 +14,12 @@
                 <div class="flex items-center space-x-4">
                     <UInput icon="i-lucide-search" color="white" variant="outline" placeholder="Search articles..."
                         class="w-64" />
-                    <BaseButton variant="ghost" class="text-white" label="Log in" />
-                    <BaseButton color="white" variant="solid" label="Sign Up" />
+                    <CommonButton variant="ghost" class="text-white" label="Log in" @click="showAuthModal = true" />
+                    <CommonButton color="white" variant="solid" label="Sign Up" @click="showAuthModal = true" />
                 </div>
             </nav>
         </div>
+        <AuthModal v-model="showAuthModal" />
     </header>
 </template>
 
@@ -26,4 +27,6 @@
 const getImageUrl = () => {
     return 'https://picsum.photos/1920/1080'
 }
+
+const showAuthModal = ref(false)
 </script>

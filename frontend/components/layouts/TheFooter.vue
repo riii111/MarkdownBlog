@@ -17,7 +17,7 @@
                         </p>
                         <div class="flex">
                             <UInput type="email" placeholder="Enter your email" class="flex-1" />
-                            <BaseButton icon="i-lucide-send" type="submit" label="Subscribe" />
+                            <CommonButton icon="i-lucide-send" type="submit" label="Subscribe" />
                         </div>
                         <div class="flex justify-between w-full mt-4">
                             <a href="#" class="hover:text-blue-400">
