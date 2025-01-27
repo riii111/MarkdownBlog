@@ -34,6 +34,8 @@
 </template>
 
 <script setup lang="ts">
+import { type ValiError } from 'valibot'
+import { loginSchema, signupSchema } from '~/composables/schemas/auth/user/schema'
 
 const props = defineProps<{
     isLogin: boolean
@@ -72,12 +74,12 @@ const handleSubmit = () => {
                 password: createValidPassword(data.password),
             } as ILoginPayload;
         } else {
-            if (error) {
-                // バリデーションエラーを処理
-                error.issues.forEach((issue) => {
-                    if (issue.path?.includes('email')) {
+            if (error && typeof error === 'object' && 'issues' in error) {
+                (error as ValiError<typeof loginSchema>).issues.forEach((issue) => {
+                    const pathKey = issue.path?.[0]?.key;
+                    if (pathKey === 'email') {
                         errors.email = issue.message;
-                    } else if (issue.path?.includes('password')) {
+                    } else if (pathKey === 'password') {
                         errors.password = issue.message;
                     }
                 });
@@ -98,14 +100,14 @@ const handleSubmit = () => {
                 displayName: createValidDisplayName(data.displayName),
             } as ISignupPayload;
         } else {
-            if (error) {
-                // バリデーションエラーを処理
-                error.issues.forEach((issue: { path: string; message: string }) => {
-                    if (issue.path?.includes('email')) {
+            if (error && typeof error === 'object' && 'issues' in error) {
+                (error as ValiError<typeof signupSchema>).issues.forEach((issue) => {
+                    const pathKey = issue.path?.[0]?.key;
+                    if (pathKey === 'email') {
                         errors.email = issue.message;
-                    } else if (issue.path?.includes('password')) {
+                    } else if (pathKey === 'password') {
                         errors.password = issue.message;
-                    } else if (issue.path?.includes('displayName')) {
+                    } else if (pathKey === 'displayName') {
                         errors.displayName = issue.message;
                     }
                 });
