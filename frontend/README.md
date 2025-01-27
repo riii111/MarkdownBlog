@@ -24,16 +24,18 @@ frontend/
 │   │   ├── useDate.ts        # 日付フォーマットなどの共通処理
 │   │   └── ...
 │   ├── feature/              # 機能単位のcomposables
-│   ├── schemas/              # 型定義とバリデーション
+│   ├── schemas/
 │   │   ├── auth/
-│   │   │   ├── user.ts      # ユーザー関連のスキーマ
-│   │   │   └── session.ts   # セッション関連のスキーマ
-│   │   └── article/
-│   │       └── post.ts      # 記事関連のスキーマ
-│   └── store/           # Pinia stores
-│       ├── api/             # API関連のcomposables
-│       │   └── useCoreApi.ts  # カスタムフェッチHooks
-│       ├── types/               # 型定義
+│   │   │   └── user/
+│   │   │       ├── types.ts     # 認証関連の型定義
+│   │   │       └── schema.ts    # バリデーションスキーマ
+│   │   └── blog/
+│   │       └── article/
+│   │           ├── types.ts     # ブログ関連の型定義
+│   │           └── schema.ts    # バリデーションスキーマ
+│   └── store/                   # Pinia stores
+│       ├── api/                 # API関連のcomposables
+│       │   └── useCoreApi.ts    # カスタムフェッチHooks
 │       ├── constants/           # 定数
 │       ├── middleware/          # ミドルウェア
 │       ├── layouts/             # ページレイアウト
@@ -41,9 +43,7 @@ frontend/
 │       └── stores/             # 状態管理（必要な場合）
 ```
 
-## アーキテクチャの説明
-
-### コンポーネント設計
+### 1. コンポーネント設計
 
 1. **Feature-firstアプローチ**
    - 機能単位でのコンポーネント分割
@@ -54,11 +54,11 @@ frontend/
    - Nuxt UIをベースとしたUIコンポーネント
    - プロジェクト全体で再利用可能な共通部品
 
-### コンポーネント実装Tips
+#### コンポーネント実装Tips
 
 - 検索性が上がるため、ファイル名は必ず 直前の階層構造（名前空間）に合わせたコンポーネント名にすること。
 
-#### NG
+##### NG
 
 components/
 └── common/
@@ -68,7 +68,7 @@ components/
          ├── Combobox.vue
          └── Autocomplete.vue
 
-#### OK
+##### OK
 
 components/
 └── common/
@@ -78,7 +78,7 @@ components/
          ├── FormCombobox.vue
          └── FormAutocomplete.vue
 
-### スキーマ設計
+### 2. スキーマ設計
 
 `Single Source of Truth` を原則守る。
 同じ対象のバリデーションロジックは原則一箇所で定義し、複数箇所での実装を避ける。
@@ -94,19 +94,17 @@ components/
    - バンドルサイズの最適化
    - 型安全性の向上
 
-### バリデーション実装Tips
+#### スキーマ設計Tips
 
-- Valibot + Branded Typesを使用して、バリデーション済みデータの型安全性を確保する
+- バリデーション実装
+  `Valibot + Branded Types`を使用して、バリデーション済みデータの型安全性を確保する
 
 ```typescript
-// schemas/auth/user.ts
-import { createInput, email, string, minLength } from 'valibot';
-
-// Branded Typeの定義
+// schemas/auth/user/types.ts
 export type ValidEmail = string & { readonly brand: 'ValidEmail' };
 
-// バリデーションスキーマ
-export const emailSchema = string([
+// schemas/auth/user/schema.ts
+const emailSchema = string([
   minLength(1, 'メールアドレスを入力してください'),
   email('有効なメールアドレスを入力してください')
 ]);
@@ -126,7 +124,12 @@ function sendEmail(to: ValidEmail, content: string) {
 - 同じモデルのバリデーションロジックは原則一箇所で定義し、複数箇所での実装を避ける
 - バリデーションエラーメッセージは、ユーザーにとってわかりやすい日本語で記述する
 
-### API通信
+---
+
+**Note:** Nuxtの自動インポート機能により、`composables/`配下のファイルは自動的にインポートされます。
+明示的なインポート文は必要ありません。
+
+### 3. API通信
 
 `composables/api/useCoreApi.ts`を使用して、APIとの通信を一元管理：
 
@@ -138,28 +141,41 @@ const { data } = await useCoreApi('/articles', {
 })
 ```
 
-## 開発環境のセットアップ
+### 4. 定数管理
 
-1. リポジトリのクローン
+定数の管理は以下の基準に従って判断します：
 
-```bash
-git clone <repository-url>
-cd frontend
-```
+1. **グローバル定数（constants/配下に配置）**
+   - アプリケーション全体で共有される設定値
 
-2. 依存関係のインストール
+   ```typescript
+   // constants/auth.ts
+   export const AUTH_CONSTANTS = {
+     TOKEN_KEY: "auth_token",
+     API_ENDPOINT: "/api/v1/auth",
+   } as const;
+   ```
 
-```bash
-pnpm install
-```
+2. **機能スコープの定数（各機能のファイル内で定義）**
+   - 特定の機能に閉じた値やメッセージ
 
-3. 開発サーバーの起動
+   ```typescript
+   // schemas/auth/user/schema.ts
+   const VALIDATION_RULES = {
+     PASSWORD: {
+       MIN_LENGTH: 8,
+       MAX_LENGTH: 100,
+     },
+     // ... その他のルール
+   } as const;
+   ```
 
-```bash
-pnpm dev
-```
+#### 定数管理のTips
 
-サーバーは `http://localhost:3000` で起動します。
+- バリデーションメッセージやルールは、使用される場所の近くで定義する
+- 国際化（i18n）が必要な文言は必ず定数化する
+- 数値の閾値は、変更の可能性を考慮して定数化を検討する
+- 定数のスコープは可能な限り小さく保つ
 
 ## コーディング規約
 

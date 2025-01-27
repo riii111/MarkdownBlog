@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { BLOG_CONSTANTS, BLOG_MESSAGES } from '~/constants/blog';
+import { BLOG_MESSAGES } from '~/constants/blog';
 
 const blogStore = useBlogStore();
 const articles = computed(() => blogStore.articles);

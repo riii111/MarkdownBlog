@@ -15,6 +15,7 @@
     "@pinia/nuxt": "0.5.1",
     "nuxt": "3.14.0",
     "pinia": "^2.1.7",
+    "valibot": "1.0.0-beta.14",
     "vue": "latest",
     "vue-router": "latest"
   },

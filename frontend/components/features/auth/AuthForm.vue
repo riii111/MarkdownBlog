@@ -22,7 +22,7 @@
             </UInput>
             <template v-if="!isLogin">
                 <p class="mt-1.5 text-sm text-gray-500">
-                    Must be at least {{ AUTH_CONSTANTS.MIN_PASSWORD_LENGTH }} characters
+                    Must be at least 8 characters
                 </p>
             </template>
         </UFormGroup>
@@ -60,39 +60,61 @@ const errors = reactive({
 
 const showPassword = ref(false)
 
-const validateForm = () => {
-    let isValid = true
-    errors.email = ''
-    errors.password = ''
-    errors.displayName = ''
-
-    if (!form.email) {
-        errors.email = 'Email is required'
-        isValid = false
-    }
-
-    if (!form.password) {
-        errors.password = 'Password is required'
-        isValid = false
-    } else if (!props.isLogin && form.password.length < AUTH_CONSTANTS.MIN_PASSWORD_LENGTH) {
-        errors.password = `Password must be at least ${AUTH_CONSTANTS.MIN_PASSWORD_LENGTH} characters`
-        isValid = false
-    }
-
-    if (!props.isLogin && !form.displayName) {
-        errors.displayName = 'Display name is required'
-        isValid = false
-    }
-
-    return isValid
-}
-
 const handleSubmit = () => {
-    if (!validateForm()) return
+    let payload;
+    if (props.isLogin) {
+        const { success, data, error } = validateLogin({
+            email: form.email,
+            password: form.password,
+        });
 
-    const payload = props.isLogin
-        ? { email: form.email, password: form.password }
-        : { email: form.email, password: form.password, displayName: form.displayName }
+        if (success && data) {
+            payload = {
+                email: createValidEmail(data.email),
+                password: createValidPassword(data.password),
+            } as ILoginPayload;
+        } else {
+            if (error) {
+                // バリデーションエラーを処理
+                error.issues.forEach((issue) => {
+                    if (issue.path?.includes('email')) {
+                        errors.email = issue.message;
+                    } else if (issue.path?.includes('password')) {
+                        errors.password = issue.message;
+                    }
+                });
+            }
+            return;
+        }
+    } else {
+        const { success, data, error } = validateSignup({
+            email: form.email,
+            password: form.password,
+            displayName: form.displayName,
+        });
+
+        if (success && data) {
+            payload = {
+                email: createValidEmail(data.email),
+                password: createValidPassword(data.password),
+                displayName: createValidDisplayName(data.displayName),
+            } as ISignupPayload;
+        } else {
+            if (error) {
+                // バリデーションエラーを処理
+                error.issues.forEach((issue: { path: string; message: string }) => {
+                    if (issue.path?.includes('email')) {
+                        errors.email = issue.message;
+                    } else if (issue.path?.includes('password')) {
+                        errors.password = issue.message;
+                    } else if (issue.path?.includes('displayName')) {
+                        errors.displayName = issue.message;
+                    }
+                });
+            }
+            return;
+        }
+    }
 
     emit('submit', payload)
 }
