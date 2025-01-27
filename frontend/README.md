@@ -14,16 +14,22 @@ Markdown記事作成・管理のためのフロントエンドアプリケーシ
 ```text
 frontend/
 ├── components/
-│   ├── common/           # 再利用可能な共通コンポーネント
-│   ├── features/         # 機能単位のコンポーネント
-│   └── layouts/          # レイアウトコンポーネント
+│   ├── common/               # 再利用可能な共通コンポーネント
+│   ├── features/             # 機能単位のコンポーネント
+│   └── layouts/              # レイアウトコンポーネント
 ├── composables/
-│   ├── utils/           # 共通のcomposables
+│   ├── utils/                # 共通のcomposables
 │   │   ├── useArray.ts
 │   │   ├── useCookie.ts
-│   │   ├── useDate.ts   # 日付フォーマットなどの共通処理
+│   │   ├── useDate.ts        # 日付フォーマットなどの共通処理
 │   │   └── ...
-│   ├── feature/         # 機能単位のcomposables
+│   ├── feature/              # 機能単位のcomposables
+│   ├── schemas/              # 型定義とバリデーション
+│   │   ├── auth/
+│   │   │   ├── user.ts      # ユーザー関連のスキーマ
+│   │   │   └── session.ts   # セッション関連のスキーマ
+│   │   └── article/
+│   │       └── post.ts      # 記事関連のスキーマ
 │   └── store/           # Pinia stores
 │       ├── api/             # API関連のcomposables
 │       │   └── useCoreApi.ts  # カスタムフェッチHooks
@@ -47,6 +53,78 @@ frontend/
 2. **共通コンポーネント**
    - Nuxt UIをベースとしたUIコンポーネント
    - プロジェクト全体で再利用可能な共通部品
+
+### コンポーネント実装Tips
+
+- 検索性が上がるため、ファイル名は必ず 直前の階層構造（名前空間）に合わせたコンポーネント名にすること。
+
+#### NG
+
+components/
+└── common/
+    └── form/
+         ├── Textfield.vue
+         ├── Select.vue
+         ├── Combobox.vue
+         └── Autocomplete.vue
+
+#### OK
+
+components/
+└── common/
+    └── form/
+         ├── FormTextfield.vue
+         ├── FormSelect.vue
+         ├── FormCombobox.vue
+         └── FormAutocomplete.vue
+
+### スキーマ設計
+
+`Single Source of Truth` を原則守る。
+同じ対象のバリデーションロジックは原則一箇所で定義し、複数箇所での実装を避ける。
+万が一ビジネスロジックごとに分岐する場合はusecaseを作成する。
+
+1. **型定義とバリデーションの一元管理**
+   - `composables/schemas/`に型定義とバリデーションルールを集約
+   - 各機能（auth, articleなど）ごとにディレクトリを分割
+   - 型の再利用性と一貫性を確保
+
+2. **Valibot + Branded Typesの活用**
+   - バリデーション済みの値を型レベルで保証
+   - バンドルサイズの最適化
+   - 型安全性の向上
+
+### バリデーション実装Tips
+
+- Valibot + Branded Typesを使用して、バリデーション済みデータの型安全性を確保する
+
+```typescript
+// schemas/auth/user.ts
+import { createInput, email, string, minLength } from 'valibot';
+
+// Branded Typeの定義
+export type ValidEmail = string & { readonly brand: 'ValidEmail' };
+
+// バリデーションスキーマ
+export const emailSchema = string([
+  minLength(1, 'メールアドレスを入力してください'),
+  email('有効なメールアドレスを入力してください')
+]);
+
+// バリデーション済みの値を作成する関数
+export function createValidEmail(value: string): ValidEmail {
+  const result = parse(emailSchema, value);
+  return result as ValidEmail;
+}
+
+// 使用例
+function sendEmail(to: ValidEmail, content: string) {
+  // ここではtoが必ずバリデーション済みのメールアドレスであることが保証される
+}
+```
+
+- 同じモデルのバリデーションロジックは原則一箇所で定義し、複数箇所での実装を避ける
+- バリデーションエラーメッセージは、ユーザーにとってわかりやすい日本語で記述する
 
 ### API通信
 
