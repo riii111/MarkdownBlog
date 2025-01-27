@@ -1,20 +1,13 @@
-import type {
-  IAuthResponse,
-  ILoginPayload,
-  ISignupPayload,
-} from "~/types/auth";
-import { useCoreApi } from "./useCoreApi";
-
 export const useAuthApi = () => {
   const login = async (payload: ILoginPayload) => {
-    return await useCoreApi<IAuthResponse>("/auth/login", {
+    return await useCoreApi<IAuthResponse, ILoginPayload>("/auth/login", {
       method: "POST",
       body: payload,
     });
   };
 
   const signup = async (payload: ISignupPayload) => {
-    return await useCoreApi<IAuthResponse>("/auth/signup", {
+    return await useCoreApi<IAuthResponse, ISignupPayload>("/auth/signup", {
       method: "POST",
       body: payload,
     });
