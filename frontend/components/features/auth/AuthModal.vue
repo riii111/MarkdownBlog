@@ -55,12 +55,12 @@ const closeModal = () => {
     isLogin.value = true
 }
 
-const handleSubmit = async (payload: ILoginPayload | ISignupPayload) => {
+const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
     loading.value = true
     try {
         const { user, token } = isLogin.value
-            ? await authApi.login(payload as ILoginPayload)
-            : await authApi.signup(payload as ISignupPayload)
+            ? await authApi.login(payload as ILoginRequest)
+            : await authApi.signup(payload as ISignupRequest)
 
         authStore.setAuth(user, token)
         toast.add({

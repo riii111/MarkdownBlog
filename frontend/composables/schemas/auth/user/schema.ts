@@ -8,7 +8,7 @@ import {
   parse,
   pipe,
 } from "valibot";
-import type { InferOutput as ValibotInferOutput } from "valibot";
+import type { InferOutput as ValibotInferOutput, ValiError } from "valibot";
 
 // ----------------------------------------------------------------
 // 各フィールドのバリデーション
@@ -73,7 +73,9 @@ export type SignupSchema = ValibotInferOutput<typeof signupSchema>;
 // ----------------------------------------------------------------
 
 // Login validation
-export function validateLogin(data: unknown) {
+export function validateLogin(
+  data: Partial<LoginSchema>
+): ValidationResult<LoginSchema, typeof loginSchema> {
   try {
     const result = parse(loginSchema, data);
     return {
@@ -85,12 +87,14 @@ export function validateLogin(data: unknown) {
     return {
       success: false as const,
       data: null,
-      error: error,
+      error: error as ValiError<typeof loginSchema>,
     };
   }
 }
 
-export function validateSignup(data: unknown) {
+export function validateSignup(
+  data: Partial<SignupSchema>
+): ValidationResult<SignupSchema, typeof signupSchema> {
   try {
     const result = parse(signupSchema, data);
     return {
@@ -102,13 +106,13 @@ export function validateSignup(data: unknown) {
     return {
       success: false as const,
       data: null,
-      error: error,
+      error: error as ValiError<typeof signupSchema>,
     };
   }
 }
 
 // ----------------------------------------------------------------
-// Branded Typeの生成関数
+// バリデーション済みの値を生成する関数
 // ----------------------------------------------------------------
 
 export function createValidEmail(value: string): ValidEmail {

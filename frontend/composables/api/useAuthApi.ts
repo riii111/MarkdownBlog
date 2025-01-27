@@ -1,6 +1,6 @@
 export const useAuthApi = () => {
-  const login = async (payload: ILoginPayload): Promise<IAuthResponse> => {
-    const { data } = await useCoreApi<IAuthResponse, ILoginPayload>(
+  const login = async (payload: ILoginRequest): Promise<IAuthResponse> => {
+    const { data } = await useCoreApi<IAuthResponse, ILoginRequest>(
       "/auth/login",
       {
         method: "POST",
@@ -10,8 +10,8 @@ export const useAuthApi = () => {
     return data.value as IAuthResponse;
   };
 
-  const signup = async (payload: ISignupPayload): Promise<IAuthResponse> => {
-    const { data } = await useCoreApi<IAuthResponse, ISignupPayload>(
+  const signup = async (payload: ISignupRequest): Promise<IAuthResponse> => {
+    const { data } = await useCoreApi<IAuthResponse, ISignupRequest>(
       "/auth/signup",
       {
         method: "POST",

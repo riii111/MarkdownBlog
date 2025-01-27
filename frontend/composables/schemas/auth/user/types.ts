@@ -10,12 +10,12 @@ export interface IAuthUser {
   avatar?: string;
 }
 
-export interface ILoginPayload {
+export interface ILoginRequest {
   email: ValidEmail;
   password: ValidPassword;
 }
 
-export interface ISignupPayload extends ILoginPayload {
+export interface ISignupRequest extends ILoginRequest {
   displayName: ValidDisplayName;
 }
 

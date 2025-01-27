@@ -141,6 +141,17 @@ const { data } = await useCoreApi('/articles', {
 })
 ```
 
+#### API型定義のTips
+
+- リクエスト/レスポンスの型定義には、それぞれ`Request`/`Response`というサフィックスを使用
+
+  ```typescript
+  interface IUserRequest { ... }  // リクエストボディの型
+  interface IUserResponse { ... } // レスポンスボディの型
+  ```
+
+- この命名規則により、データの流れが型レベルで明確になり、コードの可読性が向上する
+
 ### 4. 定数管理
 
 定数の管理は以下の基準に従って判断します：
