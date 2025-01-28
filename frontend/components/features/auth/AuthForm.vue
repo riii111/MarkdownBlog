@@ -1,6 +1,6 @@
 <template>
-    <UForm :schema="v.safeParser(props.isLogin ? loginSchema : signupSchema)" :state="form" class="space-y-4"
-        @submit="handleSubmit">
+    <UForm :schema="safeParser(props.isLogin ? loginSchema : signupSchema)" :state="form" :validate-on="validateOn"
+        class="space-y-4" @submit="handleSubmit">
         <template v-if="!isLogin">
             <UFormGroup label="Display Name" name="displayName">
                 <UInput v-model="form.displayName" placeholder="Your display name"
@@ -39,8 +39,8 @@
 </template>
 
 <script setup lang="ts">
-import * as v from 'valibot';
-import type { FormSubmitEvent } from '#ui/types';
+import { safeParser } from 'valibot';
+import type { FormSubmitEvent, FormEventType } from '#ui/types'
 
 const props = defineProps<{
     isLogin: boolean
@@ -59,13 +59,24 @@ const form = reactive({
 
 const showPassword = ref(false)
 
+const validateOn = ref<FormEventType[]>(['blur'])
+
 const togglePassword = () => {
     showPassword.value = !showPassword.value;
 }
 
+const enableRealtimeValidation = () => {
+    validateOn.value = ['blur', 'change']
+}
+
 const handleSubmit = async (event: FormSubmitEvent<any>) => {
     console.log("handleSubmit start in AuthForm.vue")
-    emit('submit', event.data);
-    console.log("handleSubmit success in AuthForm.vue")
+    try {
+        emit('submit', event.data);
+        console.log("handleSubmit success in AuthForm.vue")
+    } catch (error) {
+        enableRealtimeValidation()  // エラー発生時にvalidateOnをリアルタイムな検知に変更
+        throw error
+    }
 }
 </script>

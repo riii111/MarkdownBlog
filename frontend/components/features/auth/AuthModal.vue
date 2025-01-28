@@ -79,6 +79,8 @@ const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
                 color: 'red',
             })
         }
+        // エラー発生時にフォームコンポーネントのエラーハンドリングを実行
+        throw error
     } finally {
         loading.value = false
     }
