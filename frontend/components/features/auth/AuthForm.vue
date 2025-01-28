@@ -1,6 +1,7 @@
 <template>
     <UForm :schema="safeParser(props.isLogin ? loginSchema : signupSchema)" :state="form" :validate-on="validateOn"
         class="space-y-4" @submit="handleSubmit" @validated="handleValidated">
+        <!-- Display Name -->
         <template v-if="!isLogin">
             <UFormGroup label="Display Name" name="displayName">
                 <UInput v-model="form.displayName" placeholder="Your display name"
@@ -8,11 +9,13 @@
             </UFormGroup>
         </template>
 
+        <!-- Email -->
         <UFormGroup label="Email" name="email">
             <UInput v-model="form.email" type="email" placeholder="you@example.com"
                 class="border-gray-700 text-white placeholder-gray-500" />
         </UFormGroup>
 
+        <!-- Password -->
         <UFormGroup label="Password" name="password">
             <UInput v-model="form.password" :type="showPassword ? 'text' : 'password'" placeholder="Enter your password"
                 class="border-gray-700 text-white placeholder-gray-500" :ui="{ icon: { trailing: { pointer: '' } } }">
@@ -28,6 +31,7 @@
             </template>
         </UFormGroup>
 
+        <!-- Submit Button -->
         <UButton type="submit" color="emerald" variant="solid" block :loading="loading" :disabled="!isValid">
             {{ isLogin ? 'Sign In' : 'Create Account' }}
         </UButton>
