@@ -45,8 +45,6 @@ const isOpen = computed({
     set: (value) => emit('update:modelValue', value)
 })
 
-console.log(isOpen.value)
-
 const isLogin = ref(true)
 const loading = ref(false)
 
@@ -56,6 +54,7 @@ const closeModal = () => {
 }
 
 const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
+    console.log("handleSubmit start in AuthModal.vue")
     const authStore = useAuthStore()
 
     try {
@@ -71,11 +70,15 @@ const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
             color: 'green',
         })
         closeModal()
+        console.log("handleSubmit success in AuthModal.vue")
     } catch (error) {
-        toast.add({
-            title: AUTH_MESSAGES.INVALID_CREDENTIALS,
-            color: 'red',
-        })
+        // APIエラーの場合のみtoastを表示
+        if (error instanceof Error) {
+            toast.add({
+                title: error.message || AUTH_MESSAGES.INVALID_CREDENTIALS,
+                color: 'red',
+            })
+        }
     } finally {
         loading.value = false
     }
