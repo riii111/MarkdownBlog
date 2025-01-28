@@ -1,6 +1,6 @@
 <template>
     <UModal v-model="isOpen" :ui="{ width: 'max-w-md' }">
-        <div class="bg-white rounded-xl">
+        <div class="bg-white dark:bg-gray-800 rounded-xl">
             <!-- Header -->
             <div class="flex justify-between items-center p-6 border-b border-gray-200">
                 <h2 class="text-xl font-semibold text-gray-900">

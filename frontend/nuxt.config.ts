@@ -13,18 +13,26 @@ export default defineNuxtConfig({
   imports: {
     dirs: ["composables/**"],
   },
-  modules: ["@nuxt/ui", [
-    "@pinia/nuxt",
-    {
-      autoImports: ["defineStore", ["defineStore", "definePiniaStore"]],
-    },
-  ], "@nuxt/image"],
+  modules: [
+    "@nuxt/ui",
+    [
+      "@pinia/nuxt",
+      {
+        autoImports: ["defineStore", ["defineStore", "definePiniaStore"]],
+      },
+    ],
+    "@nuxt/image",
+    "@nuxtjs/color-mode",
+  ],
   devtools: { enabled: true },
   ui: {
     icons: ["lucide"],
   },
   typescript: {
     strict: true,
+  },
+  colorMode: {
+    classSuffix: "",
   },
 
   app: {

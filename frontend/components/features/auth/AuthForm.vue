@@ -4,21 +4,19 @@
         <!-- Display Name -->
         <template v-if="!isLogin">
             <UFormGroup label="Display Name" name="displayName">
-                <UInput v-model="form.displayName" placeholder="Your display name"
-                    class="border-gray-700 text-white placeholder-gray-500" />
+                <UInput v-model="form.displayName" variant="outline" placeholder="Your display name" />
             </UFormGroup>
         </template>
 
         <!-- Email -->
         <UFormGroup label="Email" name="email">
-            <UInput v-model="form.email" type="email" placeholder="you@example.com"
-                class="border-gray-700 text-white placeholder-gray-500" />
+            <UInput v-model="form.email" variant="outline" type="email" placeholder="you@example.com" />
         </UFormGroup>
 
         <!-- Password -->
         <UFormGroup label="Password" name="password">
-            <UInput v-model="form.password" :type="showPassword ? 'text' : 'password'" placeholder="Enter your password"
-                class="border-gray-700 text-white placeholder-gray-500" :ui="{ icon: { trailing: { pointer: '' } } }">
+            <UInput v-model="form.password" variant="outline" :type="showPassword ? 'text' : 'password'"
+                placeholder="Enter your password" :ui="{ icon: { trailing: { pointer: '' } } }">
                 <template #trailing>
                     <UButton color="gray" variant="ghost" :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
                         :padded="false" @click="togglePassword" />
