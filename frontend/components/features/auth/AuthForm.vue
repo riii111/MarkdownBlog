@@ -15,10 +15,10 @@
 
         <UFormGroup label="Password" name="password">
             <UInput v-model="form.password" :type="showPassword ? 'text' : 'password'" placeholder="Enter your password"
-                class="border-gray-700 text-white placeholder-gray-500">
+                class="border-gray-700 text-white placeholder-gray-500" :ui="{ icon: { trailing: { pointer: '' } } }">
                 <template #trailing>
                     <UButton color="gray" variant="ghost" :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-                        :padded="false" @click="togglePassword" class="cursor-pointer" />
+                        :padded="false" @click="togglePassword" />
                 </template>
             </UInput>
             <template v-if="!isLogin">
