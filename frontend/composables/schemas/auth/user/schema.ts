@@ -74,7 +74,7 @@ export type SignupSchema = ValibotInferOutput<typeof signupSchema>;
 
 // Login validation
 export function validateLogin(
-  data: Partial<LoginSchema>
+  data: LoginSchema
 ): ValidationResult<LoginSchema, typeof loginSchema> {
   try {
     const result = parse(loginSchema, data);
@@ -93,7 +93,7 @@ export function validateLogin(
 }
 
 export function validateSignup(
-  data: Partial<SignupSchema>
+  data: SignupSchema
 ): ValidationResult<SignupSchema, typeof signupSchema> {
   try {
     const result = parse(signupSchema, data);
