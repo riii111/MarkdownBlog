@@ -1,6 +1,6 @@
 <template>
     <UForm :schema="safeParser(props.isLogin ? loginSchema : signupSchema)" :state="form" :validate-on="validateOn"
-        class="space-y-4" @submit="handleSubmit">
+        class="space-y-4" @submit="handleSubmit" @validated="handleValidated">
         <template v-if="!isLogin">
             <UFormGroup label="Display Name" name="displayName">
                 <UInput v-model="form.displayName" placeholder="Your display name"
@@ -17,12 +17,8 @@
             <UInput v-model="form.password" :type="showPassword ? 'text' : 'password'" placeholder="Enter your password"
                 class="border-gray-700 text-white placeholder-gray-500">
                 <template #trailing>
-                    <div class="flex items-center">
-                        <UButton color="gray" variant="ghost" :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-                            :padded="false" @click="togglePassword" />
-                        <span class="ml-2 cursor-pointer" @click="togglePassword">{{ showPassword ? 'Hide' : 'Show'
-                            }}</span>
-                    </div>
+                    <UButton color="gray" variant="ghost" :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                        :padded="false" @click="togglePassword" class="cursor-pointer" />
                 </template>
             </UInput>
             <template v-if="!isLogin">
@@ -32,7 +28,7 @@
             </template>
         </UFormGroup>
 
-        <UButton type="submit" color="emerald" variant="solid" block :loading="loading">
+        <UButton type="submit" color="emerald" variant="solid" block :loading="loading" :disabled="!isValid">
             {{ isLogin ? 'Sign In' : 'Create Account' }}
         </UButton>
     </UForm>
@@ -58,6 +54,7 @@ const form = reactive({
 })
 
 const showPassword = ref(false)
+const isValid = ref(false)
 
 const validateOn = ref<FormEventType[]>(['blur'])
 
@@ -67,6 +64,10 @@ const togglePassword = () => {
 
 const enableRealtimeValidation = () => {
     validateOn.value = ['blur', 'change']
+}
+
+const handleValidated = (valid: boolean) => {
+    isValid.value = valid
 }
 
 const handleSubmit = async (event: FormSubmitEvent<any>) => {
