@@ -34,8 +34,6 @@
 </template>
 
 <script setup lang="ts">
-import { type ValiError } from 'valibot'
-
 const props = defineProps<{
     isLogin: boolean
     loading: boolean
@@ -59,60 +57,40 @@ const errors = reactive({
 
 const showPassword = ref(false)
 
-const handleSubmit = () => {
-    const handleValidationError = (error: unknown, schema: typeof loginSchema | typeof signupSchema) => {
-        if (error && typeof error === 'object' && 'issues' in error) {
-            (error as ValiError<typeof schema>).issues.forEach((issue) => {
-                const pathKey = issue.path?.[0]?.key as keyof typeof errors;
-                if (pathKey && pathKey in errors) {
-                    errors[pathKey] = issue.message;
-                }
-            });
-        }
-    };
+const resetErrors = () => {
+    Object.keys(errors).forEach(key => {
+        errors[key as keyof typeof errors] = '';
+    });
+};
 
-    // ログイン/サインアップに応じたバリデーション対象データを作成
-    const validationData = props.isLogin
-        ? {
+const handleSubmit = () => {
+    // エラー状態をリセット
+    resetErrors();
+
+    // ログイン/サインアップに応じたバリデーション実行
+    const validationResult = props.isLogin
+        ? validateLogin({
             email: form.email,
             password: form.password
-        } as const
-        : {
+        })
+        : validateSignup({
             email: form.email,
             password: form.password,
             displayName: form.displayName
-        } as const;
-
-    // フォームデータのバリデーション実行
-    const validationResult = props.isLogin
-        ? validateLogin(validationData)
-        : validateSignup(validationData);
+        });
 
     // バリデーションエラーがある場合、エラーメッセージを表示して処理を中断
-    if (!validationResult.success || !validationResult.data) {
-        handleValidationError(validationResult.error, props.isLogin ? loginSchema : signupSchema);
+    if (!validationResult.success) {
+        validationResult.error?.issues.forEach((issue) => {
+            const pathKey = issue.path?.[0]?.key as keyof typeof errors;
+            if (pathKey && pathKey in errors) {
+                errors[pathKey] = issue.message;
+            }
+        });
         return;
     }
 
-    // バリデーション済みデータを取得
-    const data = validationResult.data;
-
-    // Branded Typesを使用して型安全な値を生成
-    const payload = props.isLogin
-        ? {
-            email: createValidEmail(data.email),
-            password: createValidPassword(data.password),
-        }
-        : {
-            email: createValidEmail(data.email),
-            password: createValidPassword(data.password),
-            // displayNameの存在を型ガードで確認
-            displayName: 'displayName' in data
-                ? createValidDisplayName(data.displayName)
-                : undefined
-        };
-
-    // バリデーション済みのデータを親コンポーネントに送信
-    emit('submit', payload);
+    // バリデーション済みデータを親コンポーネントに送信
+    emit('submit', validationResult.data as ILoginRequest | ISignupRequest);
 }
 </script>

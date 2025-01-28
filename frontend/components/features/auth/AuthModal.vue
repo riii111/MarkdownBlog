@@ -38,14 +38,14 @@ const emit = defineEmits<{
     'update:modelValue': [value: boolean]
 }>()
 
-const authStore = useAuthStore()
-const authApi = useAuthApi()
 const toast = useToast()
 
 const isOpen = computed({
     get: () => props.modelValue,
     set: (value) => emit('update:modelValue', value)
 })
+
+console.log(isOpen.value)
 
 const isLogin = ref(true)
 const loading = ref(false)
@@ -56,13 +56,16 @@ const closeModal = () => {
 }
 
 const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
-    loading.value = true
-    try {
-        const { user, token } = isLogin.value
-            ? await authApi.login(payload as ILoginRequest)
-            : await authApi.signup(payload as ISignupRequest)
+    const authStore = useAuthStore()
 
-        authStore.setAuth(user, token)
+    try {
+        loading.value = true
+        if (isLogin.value) {
+            await authStore.login(payload as ILoginRequest)
+        } else {
+            await authStore.signup(payload as ISignupRequest)
+        }
+
         toast.add({
             title: isLogin.value ? AUTH_MESSAGES.LOGIN_SUCCESS : AUTH_MESSAGES.SIGNUP_SUCCESS,
             color: 'green',
