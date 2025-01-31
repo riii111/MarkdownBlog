@@ -2,10 +2,10 @@ import type { UseFetchOptions } from "nuxt/app";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
-interface IFetchOptions<T> {
+interface IFetchOptions<T = unknown> {
   method: HttpMethod;
-  params?: T;
-  body?: T | FormData;
+  params?: Record<string, unknown>;
+  body?: T;
 }
 
 function createEndpoint(path: string) {
@@ -38,14 +38,14 @@ function getErrorMessage(status: number): string {
   }
 }
 
-export function useCoreApi<T>(
+export function useCoreApi<ResponseType, RequestType = unknown>(
   endpoint: string,
-  options: IFetchOptions<Record<string, unknown>> = { method: "GET" }
+  options: IFetchOptions<RequestType> = { method: "GET" }
 ) {
   const config = useRuntimeConfig();
   const fullUrl = createEndpoint(endpoint);
 
-  const defaults: UseFetchOptions<T extends void ? unknown : T> = {
+  const defaults: UseFetchOptions<ResponseType> = {
     baseURL: config.public.apiBase as string,
     method: options.method,
     credentials: "include",
@@ -80,5 +80,8 @@ export function useCoreApi<T>(
     handleError(context.response.status);
   };
 
-  return useFetch<T>(fullUrl, defaults);
+  return useFetch<ResponseType extends void ? unknown : ResponseType>(
+    fullUrl,
+    defaults
+  );
 }

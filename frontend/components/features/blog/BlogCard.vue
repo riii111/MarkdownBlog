@@ -63,8 +63,6 @@
 </template>
 
 <script setup lang="ts">
-import type { IArticle } from '~/types/blog';
-
 interface Props {
     article?: IArticle;
     skeleton?: boolean;

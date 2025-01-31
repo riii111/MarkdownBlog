@@ -12,9 +12,11 @@
   "dependencies": {
     "@nuxt/image": "1.9.0",
     "@nuxt/ui": "^2.21.0",
+    "@nuxtjs/color-mode": "^3.5.2",
     "@pinia/nuxt": "0.5.1",
     "nuxt": "3.14.0",
     "pinia": "^2.1.7",
+    "valibot": "1.0.0-beta.14",
     "vue": "latest",
     "vue-router": "latest"
   },

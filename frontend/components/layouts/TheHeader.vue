@@ -14,16 +14,25 @@
                 <div class="flex items-center space-x-4">
                     <UInput icon="i-lucide-search" color="white" variant="outline" placeholder="Search articles..."
                         class="w-64" />
-                    <BaseButton variant="ghost" class="text-white" label="Log in" />
-                    <BaseButton color="white" variant="solid" label="Sign Up" />
+                    <CommonButton variant="ghost" class="text-white" label="Sign in" @click="() => openAuth('login')" />
+                    <CommonButton color="white" variant="solid" label="Sign up" @click="() => openAuth('signup')" />
                 </div>
             </nav>
         </div>
+        <AuthModal v-model="showAuthModal" :initial-mode="authMode" />
     </header>
 </template>
 
 <script setup lang="ts">
 const getImageUrl = () => {
     return 'https://picsum.photos/1920/1080'
+}
+
+const showAuthModal = ref(false)
+const authMode = ref<'login' | 'signup'>('login')
+
+const openAuth = (mode: 'login' | 'signup') => {
+    authMode.value = mode
+    showAuthModal.value = true
 }
 </script>
