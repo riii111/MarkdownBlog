@@ -13,16 +13,6 @@
             <div class="p-6">
                 <AuthForm :is-login="currentMode === 'login'" :loading="loading" @submit="handleSubmit" />
             </div>
-
-            <!-- Switch between login/signup -->
-            <div class="px-6 pb-6 text-center">
-                <p class="text-sm text-gray-400">
-                    {{ currentMode === 'login' ? "Don't have an account? " : "Already have an account? " }}
-                    <UButton variant="link" color="primary" @click="toggleMode">
-                        {{ currentMode === 'login' ? 'Sign up' : 'Sign in' }}
-                    </UButton>
-                </p>
-            </div>
         </div>
     </UModal>
 </template>
@@ -56,10 +46,6 @@ const isOpen = computed({
 })
 
 const loading = ref(false)
-
-const toggleMode = () => {
-    currentMode.value = currentMode.value === 'login' ? 'signup' : 'login'
-}
 
 const closeModal = () => {
     isOpen.value = false

@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { safeParser } from 'valibot';
+import { safeParser } from 'valibot'
 import type { FormSubmitEvent, FormEventType } from '#ui/types'
 
 const props = defineProps<{
@@ -57,11 +57,10 @@ const form = reactive({
 
 const showPassword = ref(false)
 const isValid = ref(false)
-
 const validateOn = ref<FormEventType[]>(['blur'])
 
 const togglePassword = () => {
-    showPassword.value = !showPassword.value;
+    showPassword.value = !showPassword.value
 }
 
 const enableRealtimeValidation = () => {
@@ -73,10 +72,8 @@ const handleValidated = (valid: boolean) => {
 }
 
 const handleSubmit = async (event: FormSubmitEvent<any>) => {
-    console.log("handleSubmit start in AuthForm.vue")
     try {
-        emit('submit', event.data);
-        console.log("handleSubmit success in AuthForm.vue")
+        emit('submit', event.data)
     } catch (error) {
         enableRealtimeValidation()  // エラー発生時にvalidateOnをリアルタイムな検知に変更
         throw error
