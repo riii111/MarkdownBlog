@@ -14,13 +14,12 @@
                 <div class="flex items-center space-x-4">
                     <UInput icon="i-lucide-search" color="white" variant="outline" placeholder="Search articles..."
                         class="w-64" />
-                    <CommonButton variant="ghost" class="text-white" label="Sign in" @click="showLoginModal" />
-                    <CommonButton color="white" variant="solid" label="Sign up" @click="showSignupModal" />
+                    <CommonButton variant="ghost" class="text-white" label="Sign in" @click="() => openAuth('login')" />
+                    <CommonButton color="white" variant="solid" label="Sign up" @click="() => openAuth('signup')" />
                 </div>
             </nav>
         </div>
-        <AuthModal v-model="showAuthModal" :is-login-form="isLoginModal"
-            @update:is-login-form="isLoginModal = $event" />
+        <AuthModal v-model="showAuthModal" :initial-mode="authMode" />
     </header>
 </template>
 
@@ -30,15 +29,10 @@ const getImageUrl = () => {
 }
 
 const showAuthModal = ref(false)
-const isLoginModal = ref(true)
+const authMode = ref<'login' | 'signup'>('login')
 
-const showLoginModal = () => {
-    isLoginModal.value = true;
-    showAuthModal.value = true;
-}
-
-const showSignupModal = () => {
-    isLoginModal.value = false;
-    showAuthModal.value = true;
+const openAuth = (mode: 'login' | 'signup') => {
+    authMode.value = mode
+    showAuthModal.value = true
 }
 </script>
