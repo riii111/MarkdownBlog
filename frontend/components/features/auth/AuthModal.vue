@@ -4,22 +4,22 @@
             <!-- Header -->
             <div class="flex justify-between items-center p-6 border-b border-gray-200">
                 <h2 class="text-xl font-semibold text-gray-900">
-                    {{ isLogin ? 'Sign in' : 'Sign up' }}
+                    {{ props.isLoginForm ? 'Sign in' : 'Sign up' }}
                 </h2>
                 <UButton color="gray" variant="ghost" icon="i-lucide-x" @click="closeModal" />
             </div>
 
             <!-- Form -->
             <div class="p-6">
-                <AuthForm :is-login="isLogin" :loading="loading" @submit="handleSubmit" />
+                <AuthForm :is-login="props.isLoginForm" :loading="loading" @submit="handleSubmit" />
             </div>
 
             <!-- Switch between login/signup -->
             <div class="px-6 pb-6 text-center">
                 <p class="text-sm text-gray-400">
-                    {{ isLogin ? "Don't have an account? " : "Already have an account? " }}
-                    <UButton variant="link" color="emerald" @click="isLogin = !isLogin">
-                        {{ isLogin ? 'Sign up' : 'Sign in' }}
+                    {{ props.isLoginForm ? "Don't have an account? " : "Already have an account? " }}
+                    <UButton variant="link" color="primary" @click="emit('update:isLoginForm', !props.isLoginForm)">
+                        {{ props.isLoginForm ? 'Sign up' : 'Sign in' }}
                     </UButton>
                 </p>
             </div>
@@ -32,11 +32,12 @@ import { AUTH_MESSAGES } from '~/constants/auth'
 
 const props = defineProps<{
     modelValue: boolean
-    isLoginInit?: boolean
+    isLoginForm?: boolean
 }>()
 
 const emit = defineEmits<{
     'update:modelValue': [value: boolean]
+    'update:isLoginForm': [value: boolean]
 }>()
 
 const toast = useToast()
@@ -46,22 +47,10 @@ const isOpen = computed({
     set: (value: boolean) => emit('update:modelValue', value)
 })
 
-const isLogin = ref(props.isLoginInit !== undefined ? props.isLoginInit : true)
 const loading = ref(false)
-
-watch(
-    () => props.isLoginInit,
-    (newValue: boolean) => {
-        if (newValue !== undefined) {
-            isLogin.value = newValue;
-        }
-    },
-    { immediate: true }
-)
 
 const closeModal = () => {
     isOpen.value = false
-    isLogin.value = true
 }
 
 const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
@@ -69,14 +58,14 @@ const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
 
     try {
         loading.value = true
-        if (isLogin.value) {
+        if (props.isLoginForm) {
             await authStore.login(payload as ILoginRequest)
         } else {
             await authStore.signup(payload as ISignupRequest)
         }
 
         toast.add({
-            title: isLogin.value ? AUTH_MESSAGES.LOGIN_SUCCESS : AUTH_MESSAGES.SIGNUP_SUCCESS,
+            title: props.isLoginForm ? AUTH_MESSAGES.LOGIN_SUCCESS : AUTH_MESSAGES.SIGNUP_SUCCESS,
             color: 'green',
         })
         closeModal()

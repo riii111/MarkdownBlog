@@ -19,7 +19,8 @@
                 </div>
             </nav>
         </div>
-        <AuthModal v-model="showAuthModal" :is-login-init="isLoginModal" />
+        <AuthModal v-model="showAuthModal" :is-login-form="isLoginModal"
+            @update:is-login-form="isLoginModal = $event" />
     </header>
 </template>
 
