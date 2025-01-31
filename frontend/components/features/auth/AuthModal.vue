@@ -1,10 +1,10 @@
 <template>
     <UModal v-model="isOpen" :ui="{ width: 'max-w-md' }">
-        <div class="bg-white dark:bg-gray-800 rounded-xl">
+        <div class="bg-whiterounded-xl">
             <!-- Header -->
             <div class="flex justify-between items-center p-6 border-b border-gray-200">
                 <h2 class="text-xl font-semibold text-gray-900">
-                    {{ isLogin ? 'Welcome back' : 'Create account' }}
+                    {{ isLogin ? 'Sign in' : 'Sign up' }}
                 </h2>
                 <UButton color="gray" variant="ghost" icon="i-lucide-x" @click="closeModal" />
             </div>
@@ -32,6 +32,7 @@ import { AUTH_MESSAGES } from '~/constants/auth'
 
 const props = defineProps<{
     modelValue: boolean
+    isLoginInit?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -42,11 +43,21 @@ const toast = useToast()
 
 const isOpen = computed({
     get: () => props.modelValue,
-    set: (value) => emit('update:modelValue', value)
+    set: (value: boolean) => emit('update:modelValue', value)
 })
 
 const isLogin = ref(props.isLoginInit !== undefined ? props.isLoginInit : true)
 const loading = ref(false)
+
+watch(
+    () => props.isLoginInit,
+    (newValue: boolean) => {
+        if (newValue !== undefined) {
+            isLogin.value = newValue;
+        }
+    },
+    { immediate: true }
+)
 
 const closeModal = () => {
     isOpen.value = false
@@ -54,7 +65,6 @@ const closeModal = () => {
 }
 
 const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
-    console.log("handleSubmit start in AuthModal.vue")
     const authStore = useAuthStore()
 
     try {
@@ -70,7 +80,6 @@ const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
             color: 'green',
         })
         closeModal()
-        console.log("handleSubmit success in AuthModal.vue")
     } catch (error) {
         // APIエラーの場合のみtoastを表示
         if (error instanceof Error) {
