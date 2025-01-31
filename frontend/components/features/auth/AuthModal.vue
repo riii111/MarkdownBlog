@@ -45,7 +45,7 @@ const isOpen = computed({
     set: (value) => emit('update:modelValue', value)
 })
 
-const isLogin = ref(true)
+const isLogin = ref(props.isLoginInit !== undefined ? props.isLoginInit : true)
 const loading = ref(false)
 
 const closeModal = () => {

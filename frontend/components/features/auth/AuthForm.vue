@@ -31,7 +31,7 @@
 
         <!-- Submit Button -->
         <UButton type="submit" color="emerald" variant="solid" block :loading="loading" :disabled="!isValid">
-            {{ isLogin ? 'Sign In' : 'Create Account' }}
+            {{ isLogin ? 'Sign in' : 'Sign up' }}
         </UButton>
     </UForm>
 </template>

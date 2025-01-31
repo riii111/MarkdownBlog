@@ -14,8 +14,10 @@
                 <div class="flex items-center space-x-4">
                     <UInput icon="i-lucide-search" color="white" variant="outline" placeholder="Search articles..."
                         class="w-64" />
-                    <CommonButton variant="ghost" class="text-white" label="Log in" @click="showAuthModal = true" />
-                    <CommonButton color="white" variant="solid" label="Sign Up" @click="showAuthModal = true" />
+                    <CommonButton variant="ghost" class="text-white" label="Sign in"
+                        @click="isLoginModal = true; showAuthModal = true" />
+                    <CommonButton color="white" variant="solid" label="Sign up"
+                        @click="isLoginModal = false; showAuthModal = true" />
                 </div>
             </nav>
         </div>
