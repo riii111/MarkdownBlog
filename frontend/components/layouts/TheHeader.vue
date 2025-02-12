@@ -14,8 +14,9 @@
                 <div class="flex items-center space-x-4">
                     <UInput icon="i-lucide-search" color="white" variant="outline" placeholder="Search articles..."
                         class="w-64" />
-                    <CommonButton variant="ghost" class="text-white" label="Sign in" @click="() => openAuth('login')" />
-                    <CommonButton color="white" variant="solid" label="Sign up" @click="() => openAuth('signup')" />
+                    <CommonButton variant="outline" class="text-white hover:bg-white/10" label="Sign in"
+                        @click="() => openAuth('login')" />
+                    <CommonButton variant="solid" color="white" label="Sign up" @click="() => openAuth('signup')" />
                 </div>
             </nav>
         </div>
