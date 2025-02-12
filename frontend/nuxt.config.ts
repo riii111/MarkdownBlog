@@ -22,20 +22,30 @@ export default defineNuxtConfig({
       },
     ],
     "@nuxt/image",
-    "@nuxtjs/color-mode",
     "@nuxt/content",
   ],
   devtools: { enabled: true },
   ui: {
     icons: ["lucide"],
+    colors: {
+      primary: "emerald",
+    },
+  },
+  // ゴメン、ダークモードいらん
+  colorMode: {
+    preference: "light",
+    fallback: "light",
+    classSuffix: "",
+    storageKey: "nuxt-color-mode",
+    hid: "nuxt-color-mode-script",
+    globalName: "__NUXT_COLOR_MODE__",
+    componentName: "ColorScheme",
+    classPrefix: "",
+    forced: true,
   },
   typescript: {
     strict: true,
   },
-  colorMode: {
-    classSuffix: "",
-  },
-
   app: {
     head: {
       title: "MD Writer",
@@ -45,9 +55,7 @@ export default defineNuxtConfig({
       ],
     },
   },
-
   compatibilityDate: "2025-01-17",
-
   content: {
     // @ts-ignore
     highlight: {

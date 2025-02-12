@@ -1,9 +1,9 @@
 <template>
     <UModal v-model="isOpen" :ui="{
         width: 'max-w-md',
-        wrapper: 'bg-white dark:bg-white',
-        overlay: { base: 'bg-gray-500/75 dark:bg-gray-900/75' },
-        container: 'text-gray-900 dark:text-gray-900'
+        wrapper: 'bg-white',
+        overlay: { base: 'bg-gray-500/75' },
+        container: 'text-gray-900'
     }">
         <div class="bg-white rounded-xl">
             <!-- Header -->
