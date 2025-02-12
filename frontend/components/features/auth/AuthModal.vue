@@ -9,15 +9,25 @@
             <!-- Header -->
             <div class="flex justify-between items-center p-6 border-b border-gray-200">
                 <h2 class="text-xl font-semibold">
-                    {{ props.initialMode === 'login' ? 'Sign in' : 'Sign up' }}
+                    {{ currentMode === 'login' ? 'Sign in' : 'Sign up' }}
                 </h2>
                 <UButton color="gray" variant="ghost" icon="i-lucide-x" @click="closeModal" />
             </div>
 
             <!-- Form -->
             <div class="p-6">
-                <LoginForm v-if="props.initialMode === 'login'" :loading="loading" @submit="handleSubmit" />
+                <LoginForm v-if="currentMode === 'login'" :loading="loading" @submit="handleSubmit" />
                 <SignupForm v-else :loading="loading" @submit="handleSubmit" />
+            </div>
+
+            <!-- Footer: モード切替 -->
+            <div class="p-6 border-t border-gray-200 text-center">
+                <p class="text-sm text-gray-600">
+                    {{ currentMode === 'login' ? 'アカウントをお持ちでない方は' : 'すでにアカウントをお持ちの方は' }}
+                    <UButton variant="link" color="primary" @click="toggleMode">
+                        {{ currentMode === 'login' ? 'アカウント登録' : 'ログイン' }}
+                    </UButton>
+                </p>
             </div>
         </div>
     </UModal>
@@ -37,14 +47,22 @@ const emit = defineEmits<{
 
 const toast = useToast()
 const loading = ref(false)
+const currentMode = ref(props.initialMode)
 
 const isOpen = computed({
     get: () => props.modelValue,
     set: (value: boolean) => emit('update:modelValue', value)
 })
 
+// モードの切り替え
+const toggleMode = () => {
+    currentMode.value = currentMode.value === 'login' ? 'signup' : 'login'
+}
+
 const closeModal = () => {
     isOpen.value = false
+    // モーダルを閉じる時に初期モードに戻す
+    currentMode.value = props.initialMode
 }
 
 const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
@@ -52,14 +70,14 @@ const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
 
     try {
         loading.value = true
-        if (props.initialMode === 'login') {
+        if (currentMode.value === 'login') {
             await authStore.login(payload as ILoginRequest)
         } else {
             await authStore.signup(payload as ISignupRequest)
         }
 
         toast.add({
-            title: props.initialMode === 'login' ? AUTH_MESSAGES.LOGIN_SUCCESS : AUTH_MESSAGES.SIGNUP_SUCCESS,
+            title: currentMode.value === 'login' ? AUTH_MESSAGES.LOGIN_SUCCESS : AUTH_MESSAGES.SIGNUP_SUCCESS,
             color: 'green',
         })
         closeModal()
@@ -77,5 +95,4 @@ const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
         loading.value = false
     }
 }
-
 </script>
