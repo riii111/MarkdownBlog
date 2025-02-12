@@ -1,9 +1,14 @@
 <template>
-    <UModal v-model="isOpen" :ui="{ width: 'max-w-md' }" @hide="handleHide">
-        <div class="bg-whiterounded-xl">
+    <UModal v-model="isOpen" :ui="{
+        width: 'max-w-md',
+        wrapper: 'bg-white',
+        overlay: { base: 'bg-gray-500/75' },
+        container: 'text-gray-900'
+    }">
+        <div class="bg-white rounded-xl">
             <!-- Header -->
             <div class="flex justify-between items-center p-6 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-900">
+                <h2 class="text-xl font-semibold">
                     {{ currentMode === 'login' ? 'Sign in' : 'Sign up' }}
                 </h2>
                 <UButton color="gray" variant="ghost" icon="i-lucide-x" @click="closeModal" />
@@ -11,7 +16,18 @@
 
             <!-- Form -->
             <div class="p-6">
-                <AuthForm :is-login="currentMode === 'login'" :loading="loading" @submit="handleSubmit" />
+                <LoginForm v-if="currentMode === 'login'" :loading="loading" @submit="handleSubmit" />
+                <SignupForm v-else :loading="loading" @submit="handleSubmit" />
+            </div>
+
+            <!-- Footer: モード切替 -->
+            <div class="p-6 border-t border-gray-200 text-center">
+                <p class="text-sm text-gray-600">
+                    {{ currentMode === 'login' ? 'アカウントをお持ちでない方は' : 'すでにアカウントをお持ちの方は' }}
+                    <UButton variant="link" color="primary" @click="toggleMode">
+                        {{ currentMode === 'login' ? 'アカウント登録' : 'ログイン' }}
+                    </UButton>
+                </p>
             </div>
         </div>
     </UModal>
@@ -20,35 +36,22 @@
 <script setup lang="ts">
 import { AUTH_MESSAGES } from '~/constants/auth'
 
-const props = defineProps<{
-    modelValue: boolean
-    initialMode: 'login' | 'signup'
-}>()
-
-const emit = defineEmits<{
-    'update:modelValue': [value: boolean]
-}>()
-
+const isOpen = defineModel<boolean>('modelValue')
+const currentMode = ref<'login' | 'signup'>('login')
+const loading = ref(false)
 const toast = useToast()
 
-const currentMode = ref<'login' | 'signup'>(props.initialMode)
-
-// initialModeの変更を監視して currentMode を更新
-watch(() => props.initialMode, (newMode: 'login' | 'signup') => {
-    currentMode.value = newMode
-})
-
-const isOpen = computed({
-    get: () => props.modelValue,
-    set: (value: boolean) => {
-        emit('update:modelValue', value)
-    }
-})
-
-const loading = ref(false)
+const toggleMode = () => {
+    currentMode.value = currentMode.value === 'login' ? 'signup' : 'login'
+}
 
 const closeModal = () => {
     isOpen.value = false
+}
+
+const openWithMode = (initialMode: 'login' | 'signup') => {
+    currentMode.value = initialMode
+    isOpen.value = true
 }
 
 const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
@@ -82,13 +85,5 @@ const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
     }
 }
 
-// モーダルが完全に閉じられた後に実行
-const handleHide = () => {
-    // 次のティックで実行することで、
-    // トランジションが完全に終了してから状態をリセットする
-    // 閉じるアニメーション中にcurrentModeをリセットするとフォーム遷移しながら閉じるように見えるため
-    nextTick(() => {
-        currentMode.value = props.initialMode
-    })
-}
+defineExpose({ openWithMode })
 </script>

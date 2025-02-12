@@ -12,14 +12,14 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <UInput icon="i-lucide-search" color="white" variant="outline" placeholder="Search articles..."
-                        class="w-64" />
-                    <CommonButton variant="ghost" class="text-white" label="Sign in" @click="() => openAuth('login')" />
-                    <CommonButton color="white" variant="solid" label="Sign up" @click="() => openAuth('signup')" />
+                    <UInput icon="i-lucide-search" variant="outline" placeholder="Search articles..." class="w-64" />
+                    <CommonButton variant="outline" class="text-white" label="Sign in"
+                        @click="() => openAuth('login')" />
+                    <CommonButton variant="solid" color="white" label="Sign up" @click="() => openAuth('signup')" />
                 </div>
             </nav>
         </div>
-        <AuthModal v-model="showAuthModal" :initial-mode="authMode" />
+        <AuthModal ref="authModalRef" v-model="showAuthModal" />
     </header>
 </template>
 
@@ -29,10 +29,9 @@ const getImageUrl = () => {
 }
 
 const showAuthModal = ref(false)
-const authMode = ref<'login' | 'signup'>('login')
+const authModalRef = ref()
 
-const openAuth = (mode: 'login' | 'signup') => {
-    authMode.value = mode
-    showAuthModal.value = true
+const openAuth = (currentMode: 'login' | 'signup') => {
+    authModalRef.value?.openWithMode(currentMode)
 }
 </script>

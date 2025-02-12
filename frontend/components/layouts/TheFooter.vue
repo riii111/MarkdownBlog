@@ -16,7 +16,7 @@
                             Subscribe to our newsletter to get the latest articles, tools, and resources.
                         </p>
                         <div class="flex">
-                            <UInput type="email" placeholder="Enter your email" class="flex-1" />
+                            <UInput type="email" placeholder="Enter your email" variant="outline" class="flex-1" />
                             <CommonButton icon="i-lucide-send" type="submit" label="Subscribe" />
                         </div>
                         <div class="flex justify-between w-full mt-4">

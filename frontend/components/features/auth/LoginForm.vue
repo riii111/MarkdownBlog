@@ -1,13 +1,6 @@
 <template>
-    <UForm :schema="safeParser(props.isLogin ? loginSchema : signupSchema)" :state="form" :validate-on="validateOn"
-        class="space-y-4" @submit="handleSubmit" @validated="handleValidated">
-        <!-- Display Name -->
-        <template v-if="!isLogin">
-            <UFormGroup label="Display Name" name="displayName">
-                <UInput v-model="form.displayName" variant="outline" placeholder="Your display name" />
-            </UFormGroup>
-        </template>
-
+    <UForm :schema="safeParser(loginSchema)" :state="form" :validate-on="validateOn" class="space-y-4"
+        @submit="handleSubmit">
         <!-- Email -->
         <UFormGroup label="Email" name="email">
             <UInput v-model="form.email" variant="outline" type="email" placeholder="you@example.com" />
@@ -22,56 +15,56 @@
                         :padded="false" @click="togglePassword" />
                 </template>
             </UInput>
-            <template v-if="!isLogin">
-                <p class="mt-1.5 text-sm text-gray-500">
-                    Must be at least 8 characters, include uppercase, lowercase, number and special character
-                </p>
-            </template>
         </UFormGroup>
 
         <!-- Submit Button -->
-        <UButton type="submit" color="emerald" variant="solid" block :loading="loading" :disabled="!isValid">
-            {{ isLogin ? 'Sign in' : 'Sign up' }}
+        <UButton type="submit" color="emerald" variant="solid" block :loading="loading" :disabled="!formIsValid">
+            Sign in
         </UButton>
     </UForm>
 </template>
 
 <script setup lang="ts">
-import { safeParser } from 'valibot'
 import type { FormSubmitEvent, FormEventType } from '#ui/types'
+import { safeParser, parse } from 'valibot'
 
 const props = defineProps<{
-    isLogin: boolean
     loading: boolean
 }>()
 
 const emit = defineEmits<{
-    submit: [payload: ILoginRequest | ISignupRequest]
+    submit: [payload: ILoginRequest]
 }>()
 
 const form = reactive({
-    displayName: '',
     email: '',
     password: '',
 })
 
-const showPassword = ref(false)
-const isValid = ref(false)
+// 初期状態ではblurのみでバリデーション
 const validateOn = ref<FormEventType[]>(['blur'])
+
+const formIsValid = computed(() => {
+    try {
+        parse(loginSchema, form)
+        return true
+    } catch {
+        return false
+    }
+})
+
+const showPassword = ref(false)
 
 const togglePassword = () => {
     showPassword.value = !showPassword.value
 }
 
+// エラー時にリアルタイムバリデーションを有効化
 const enableRealtimeValidation = () => {
     validateOn.value = ['blur', 'change']
 }
 
-const handleValidated = (valid: boolean) => {
-    isValid.value = valid
-}
-
-const handleSubmit = async (event: FormSubmitEvent<any>) => {
+const handleSubmit = async (event: FormSubmitEvent<ILoginRequest>) => {
     try {
         emit('submit', event.data)
     } catch (error) {

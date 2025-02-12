@@ -4,10 +4,10 @@
             <TransitionGroup v-if="!loading" enter-active-class="transition-all duration-300 ease-out"
                 enter-from-class="opacity-0 translate-y-4" enter-to-class="opacity-100 translate-y-0"
                 move-class="transition-transform duration-300">
-                <BlogCard v-for="article in articles" :key="article.id" :article="article" />
+                <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
             </TransitionGroup>
 
-            <BlogCard v-if="loading" v-for="i in BLOG_CONSTANTS.ITEMS_PER_PAGE" :key="`skeleton-${i}`" skeleton />
+            <ArticleCard v-if="loading" v-for="i in ARTICLE_CONSTANTS.ITEMS_PER_PAGE" :key="`skeleton-${i}`" skeleton />
         </div>
 
         <!-- ページネーション -->
@@ -21,14 +21,14 @@
                 <USkeleton class="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
             </div>
             <!-- 実際のページネーション -->
-            <UPagination v-else v-model="currentPage" :total="totalItems" :page-size="BLOG_CONSTANTS.ITEMS_PER_PAGE"
+            <UPagination v-else v-model="currentPage" :total="totalItems" :page-size="ARTICLE_CONSTANTS.ITEMS_PER_PAGE"
                 :ui="{ wrapper: 'flex gap-1' }" />
         </div>
     </section>
 </template>
 
 <script setup lang="ts">
-import { BLOG_CONSTANTS } from '~/constants/blog';
+import { ARTICLE_CONSTANTS } from '~/constants/article';
 
 interface Props {
     articles: IArticle[];
