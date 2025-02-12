@@ -1,15 +1,16 @@
 <template>
-    <div class="min-h-screen bg-white flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
         <TheHeader />
         <main class="flex-grow">
             <ArticleHero v-if="article" :title="article.title" :excerpt="article.excerpt" :author="article.author"
-                :date="formatDate(article.date)" :read-time="article.readTime" />
+                :date="formatDate(article.date)" :read-time="article.readTime"
+                class="bg-white border-b border-gray-200" />
 
             <!-- コンテンツエリア -->
             <div class="max-w-7xl mx-auto px-4 py-12">
                 <div class="flex gap-8">
                     <!-- メインコンテンツ -->
-                    <div class="flex-1">
+                    <div class="flex-1 bg-white rounded-lg shadow-sm p-8">
                         <ArticleContent v-if="markdownToHtml" :content="markdownToHtml" />
                     </div>
 
