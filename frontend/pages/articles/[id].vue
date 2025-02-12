@@ -31,11 +31,11 @@
 import { marked } from 'marked';
 
 const route = useRoute();
-const blogStore = useBlogStore();
+const articleStore = useArticleStore();
 const { formatDate } = useDate();
 
 // 記事データの取得
-const { data: article, pending, error } = await useAsyncData<IArticle | null>(
+const { data: article, pending, error } = await useAsyncData<IArticle>(
     `article-${route.params.id}`,
     async () => {
         if (!blogStore.allArticles.length) {

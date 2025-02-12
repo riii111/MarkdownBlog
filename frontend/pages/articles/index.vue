@@ -3,8 +3,8 @@
         <TheHeader />
         <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
             <h2 class="text-xl mb-6">Blog</h2>
-            <p class="text-gray-600 mb-8">{{ BLOG_MESSAGES.DESCRIPTION }}</p>
-            <BlogGrid :articles="articles" :loading="isLoading" v-model:currentPage="currentPage"
+            <p class="text-gray-600 mb-8">{{ ARTICLE_MESSAGES.DESCRIPTION }}</p>
+            <ArticleGrid :articles="articles" :loading="isLoading" v-model:currentPage="currentPage"
                 :total-items="totalItems" />
         </main>
         <TheFooter class="mt-auto" />
@@ -12,18 +12,18 @@
 </template>
 
 <script setup lang="ts">
-import { BLOG_MESSAGES } from '~/constants/article';
+import { ARTICLE_MESSAGES } from '~/constants/article';
 
-const blogStore = useBlogStore();
-const articles = computed(() => blogStore.articles);
+const articleStore = useArticleStore();
+const articles = computed(() => articleStore.articles);
 const currentPage = computed({
-    get: () => blogStore.currentPage,
-    set: (value) => blogStore.setPage(value)
+    get: () => articleStore.currentPage,
+    set: (value) => articleStore.setPage(value)
 });
-const totalItems = computed(() => blogStore.totalItems);
-const isLoading = computed(() => blogStore.isLoading);
+const totalItems = computed(() => articleStore.totalItems);
+const isLoading = computed(() => articleStore.isLoading);
 
 onMounted(() => {
-    blogStore.fetchArticles();
+    articleStore.fetchArticles();
 });
-</script>~/constants/article
+</script>

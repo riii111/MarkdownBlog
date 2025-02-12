@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
-import { BLOG_CONSTANTS } from "~/constants/article";
+import { ARTICLE_CONSTANTS } from "~/constants/article";
 
-export const useBlogStore = defineStore("blog", () => {
+export const useArticleStore = defineStore("article", () => {
   const _state = reactive({
     articles: [] as readonly IArticle[],
-    currentPage: BLOG_CONSTANTS.DEFAULT_PAGE as number,
-    itemsPerPage: BLOG_CONSTANTS.ITEMS_PER_PAGE,
+    currentPage: ARTICLE_CONSTANTS.DEFAULT_PAGE as number,
+    itemsPerPage: ARTICLE_CONSTANTS.ITEMS_PER_PAGE,
     isLoading: false,
   });
 

@@ -11,12 +11,12 @@ export const SORT_OPTIONS = [
   { label: "Most Popular", value: "popular" },
 ] as const;
 
-export const BLOG_CONSTANTS = {
+export const ARTICLE_CONSTANTS = {
   ITEMS_PER_PAGE: 9,
   DEFAULT_PAGE: 1,
 } as const;
 
-export const BLOG_MESSAGES = {
+export const ARTICLE_MESSAGES = {
   DESCRIPTION:
     "Here, we share development tips, technical guides, and stories that inspire your next project.",
 } as const;
