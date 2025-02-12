@@ -101,6 +101,8 @@ import { marked } from 'marked';
 const route = useRoute();
 const blogStore = useBlogStore();
 
+const { formatDate } = useDate();
+
 const article = computed(() =>
     blogStore.allArticles.find(article => article.id === route.params.id)
 );
@@ -134,15 +136,6 @@ const toc = computed(() => {
 
     return headings;
 });
-
-// 日付フォーマット
-const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('ja-JP', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-};
 
 // 記事データの取得
 onMounted(() => {
