@@ -38,16 +38,31 @@ const { formatDate } = useDate();
 const { data: article, pending, error } = await useAsyncData<IArticle>(
     `article-${route.params.id}`,
     async () => {
-        if (!blogStore.allArticles.length) {
-            await blogStore.fetchArticles();
-        }
+        try {
+            // TODO: 記事詳細取得APIが実装されたら、個別記事取得APIを使用するように変更する
+            // テストデータから該当記事を取得（仮実装）
+            if (!articleStore.allArticles.length) {
+                await articleStore.fetchArticles();
+            }
 
-        const found = blogStore.allArticles.find(article => article.id === route.params.id);
-        if (!found) {
-            throw createError({ statusCode: 404, message: '記事が見つかりません' });
-        }
+            const found = articleStore.allArticles.find(
+                article => article.id === route.params.id
+            );
 
-        return found;
+            if (!found) {
+                throw createError({
+                    statusCode: 404,
+                    message: '記事が見つかりません'
+                });
+            }
+
+            return found;
+        } catch (error: any) {
+            throw createError({
+                statusCode: error.statusCode || 404,
+                message: '記事が見つかりません'
+            });
+        }
     }
 );
 
