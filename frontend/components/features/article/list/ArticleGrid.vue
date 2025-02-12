@@ -4,10 +4,10 @@
             <TransitionGroup v-if="!loading" enter-active-class="transition-all duration-300 ease-out"
                 enter-from-class="opacity-0 translate-y-4" enter-to-class="opacity-100 translate-y-0"
                 move-class="transition-transform duration-300">
-                <BlogCard v-for="article in articles" :key="article.id" :article="article" />
+                <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
             </TransitionGroup>
 
-            <BlogCard v-if="loading" v-for="i in BLOG_CONSTANTS.ITEMS_PER_PAGE" :key="`skeleton-${i}`" skeleton />
+            <ArticleCard v-if="loading" v-for="i in BLOG_CONSTANTS.ITEMS_PER_PAGE" :key="`skeleton-${i}`" skeleton />
         </div>
 
         <!-- ページネーション -->
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { BLOG_CONSTANTS } from '~/constants/blog';
+import { BLOG_CONSTANTS } from '~/constants/article';
 
 interface Props {
     articles: IArticle[];
@@ -49,4 +49,4 @@ const currentPage = computed({
     get: () => props.currentPage,
     set: (value) => emit('update:currentPage', value)
 });
-</script>
+</script>~/constants/article

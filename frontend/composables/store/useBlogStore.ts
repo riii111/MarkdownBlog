@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { BLOG_CONSTANTS } from "~/constants/blog";
+import { BLOG_CONSTANTS } from "~/constants/article";
 
 export const useBlogStore = defineStore("blog", () => {
   const _state = reactive({

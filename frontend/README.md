@@ -29,9 +29,8 @@ frontend/
 │   │   │   └── user/
 │   │   │       ├── types.ts     # 認証関連の型定義
 │   │   │       └── schema.ts    # バリデーションスキーマ
-│   │   └── blog/
-│   │       └── article/
-│   │           ├── types.ts     # ブログ関連の型定義
+│   │   └── article/
+│   │           ├── types.ts     # 記事関連の型定義
 │   │           └── schema.ts    # バリデーションスキーマ
 │   └── store/                   # Pinia stores
 │       ├── api/                 # API関連のcomposables

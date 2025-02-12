@@ -78,7 +78,7 @@ export default defineNuxtConfig({
     markdown: {
       // ProseコンポーネントをNuxt Contentに登録
       components: {
-        code: "ProseCode",
+        code: "ArticleCodeBlock",
       },
     },
   },

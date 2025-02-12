@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { BLOG_MESSAGES } from '~/constants/blog';
+import { BLOG_MESSAGES } from '~/constants/article';
 
 const blogStore = useBlogStore();
 const articles = computed(() => blogStore.articles);
@@ -26,4 +26,4 @@ const isLoading = computed(() => blogStore.isLoading);
 onMounted(() => {
     blogStore.fetchArticles();
 });
-</script>
+</script>~/constants/article
