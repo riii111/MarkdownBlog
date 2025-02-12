@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     ],
     "@nuxt/image",
     "@nuxtjs/color-mode",
+    "@nuxt/content",
   ],
   devtools: { enabled: true },
   ui: {
@@ -46,4 +47,31 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: "2025-01-17",
+
+  content: {
+    // @ts-ignore
+    highlight: {
+      theme: "github-dark",
+      preload: [
+        "json",
+        "js",
+        "ts",
+        "html",
+        "css",
+        "vue",
+        "diff",
+        "shell",
+        "markdown",
+        "yaml",
+        "bash",
+        "ini",
+      ],
+    },
+    markdown: {
+      // ProseコンポーネントをNuxt Contentに登録
+      components: {
+        code: "ProseCode",
+      },
+    },
+  },
 });
