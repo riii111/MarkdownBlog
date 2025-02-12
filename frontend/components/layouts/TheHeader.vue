@@ -19,7 +19,7 @@
                 </div>
             </nav>
         </div>
-        <AuthModal v-model="showAuthModal" :initial-mode="authMode" />
+        <AuthModal ref="authModalRef" v-model="showAuthModal" />
     </header>
 </template>
 
@@ -29,10 +29,9 @@ const getImageUrl = () => {
 }
 
 const showAuthModal = ref(false)
-const authMode = ref<'login' | 'signup'>('login')
+const authModalRef = ref()
 
-const openAuth = (mode: 'login' | 'signup') => {
-    authMode.value = mode
-    showAuthModal.value = true
+const openAuth = (currentMode: 'login' | 'signup') => {
+    authModalRef.value?.openWithMode(currentMode)
 }
 </script>

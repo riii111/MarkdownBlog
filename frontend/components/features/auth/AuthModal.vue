@@ -36,33 +36,22 @@
 <script setup lang="ts">
 import { AUTH_MESSAGES } from '~/constants/auth'
 
-const props = defineProps<{
-    modelValue: boolean
-    initialMode: 'login' | 'signup'
-}>()
-
-const emit = defineEmits<{
-    'update:modelValue': [value: boolean]
-}>()
-
-const toast = useToast()
+const isOpen = defineModel<boolean>('modelValue')
+const currentMode = ref<'login' | 'signup'>('login')
 const loading = ref(false)
-const currentMode = ref(props.initialMode)
+const toast = useToast()
 
-const isOpen = computed({
-    get: () => props.modelValue,
-    set: (value: boolean) => emit('update:modelValue', value)
-})
-
-// モードの切り替え
 const toggleMode = () => {
     currentMode.value = currentMode.value === 'login' ? 'signup' : 'login'
 }
 
 const closeModal = () => {
     isOpen.value = false
-    // モーダルを閉じる時に初期モードに戻す
-    currentMode.value = props.initialMode
+}
+
+const openWithMode = (initialMode: 'login' | 'signup') => {
+    currentMode.value = initialMode
+    isOpen.value = true
 }
 
 const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
@@ -95,4 +84,6 @@ const handleSubmit = async (payload: ILoginRequest | ISignupRequest) => {
         loading.value = false
     }
 }
+
+defineExpose({ openWithMode })
 </script>
