@@ -72,11 +72,5 @@ withDefaults(defineProps<Props>(), {
     skeleton: false
 });
 
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ja-JP', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-};
+const { formatDate } = useDate();
 </script>
