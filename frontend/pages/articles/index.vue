@@ -20,7 +20,6 @@ const currentPage = computed({
     get: () => blogStore.currentPage,
     set: (value) => blogStore.setPage(value)
 });
-const totalPages = computed(() => blogStore.totalPages);
 const totalItems = computed(() => blogStore.totalItems);
 const isLoading = computed(() => blogStore.isLoading);
 
