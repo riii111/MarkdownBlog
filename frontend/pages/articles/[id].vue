@@ -32,38 +32,60 @@ import { marked } from 'marked';
 
 const route = useRoute();
 const blogStore = useBlogStore();
-
 const { formatDate } = useDate();
 
-const article = computed(() =>
-    blogStore.allArticles.find(article => article.id === route.params.id)
+// 記事データの取得
+const { data: article, pending, error } = await useAsyncData<IArticle | null>(
+    `article-${route.params.id}`,
+    async () => {
+        if (!blogStore.allArticles.length) {
+            await blogStore.fetchArticles();
+        }
+
+        const found = blogStore.allArticles.find(article => article.id === route.params.id);
+        if (!found) {
+            throw createError({ statusCode: 404, message: '記事が見つかりません' });
+        }
+
+        return found;
+    }
 );
 
 // マークダウンをHTMLに変換
 const markdownToHtml = computed(() => {
     if (!article.value?.content) return '';
 
-    const renderer = new marked.Renderer();
-    renderer.heading = ({ text, depth }) => {
-        const id = text
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '');
-        return `<h${depth} id="${id}">${text}</h${depth}>`;
-    };
+    try {
+        const renderer = new marked.Renderer();
+        renderer.heading = ({ text, depth }) => {
+            const id = text
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '');
+            return `<h${depth} id="${id}">${text}</h${depth}>`;
+        };
 
-    marked.setOptions({ renderer });
-    return marked.parse(article.value.content); // .parse()を使用して同期的に変換
+        // 画像の遅延読み込み
+        renderer.image = ({ href, title, text }) => {
+            return `<img src="${href}" alt="${text}" title="${title || ''}" loading="lazy" />`;
+        };
+
+        marked.setOptions({ renderer });
+        return marked.parse(article.value.content);
+    } catch (error) {
+        console.error('Markdown parsing error:', error);
+        return '記事の読み込みに失敗しました。';
+    }
 });
 
-// 目次を生成
+// 目次生成
 const toc = computed(() => {
     if (!article.value?.content) return [];
 
     const headings: { id: string; text: string; depth: number }[] = [];
     const lines = article.value.content.split('\n');
 
-    lines.forEach(line => {
+    lines.forEach((line: string) => {
         const match = line.match(/^(#{1,6})\s+(.+)$/);
         if (match) {
             const depth = match[1].length;
@@ -78,12 +100,5 @@ const toc = computed(() => {
     });
 
     return headings;
-});
-
-// 記事データの取得
-onMounted(() => {
-    if (!blogStore.allArticles.length) {
-        blogStore.fetchArticles();
-    }
 });
 </script>
