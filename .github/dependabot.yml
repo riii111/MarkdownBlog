@@ -1,24 +1,29 @@
 version: 2
 updates:
-  # Golangの依存関係管理（バックエンド用）
-  - package-ecosystem: "gomod"
-    directory: "/backend"
-    schedule:
-      interval: "weekly"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    # 更新の設定
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-
   # Node.js（Nuxt.js/Vue）の依存関係管理（フロントエンド用）
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
       interval: "weekly"
+      day: "monday"
       time: "09:00"
       timezone: "Asia/Tokyo"
-    # 更新の設定
-    allow:
-      - dependency-type: "all"
+    open-pull-requests-limit: 10
+    versioning-strategy: auto
+    ignore:
+      # メジャーアップデートは手動レビュー対象
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Golangの依存関係管理（バックエンド用）
+  - package-ecosystem: "gomod"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
