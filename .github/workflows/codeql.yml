@@ -1,0 +1,67 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: ["develop"]
+  pull_request:
+    branches: ["develop"]
+    paths:
+      - "frontend/**"
+      - "backend/**"
+  schedule:
+    - cron: "30 1 * * 0" # 毎週日曜日の1:30 UTCに実行
+
+jobs:
+  analyze-frontend:
+    name: Analyze Frontend
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    if: github.event_name != 'schedule' && contains(github.event.pull_request.files.*.path, 'frontend/')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript, typescript
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:javascript,/language:typescript"
+
+  analyze-backend:
+    name: Analyze Backend
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    if: github.event_name != 'schedule' && contains(github.event.pull_request.files.*.path, 'backend/')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: go
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:go"

@@ -11,9 +11,6 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
-    labels:
-      - "dependencies"
-      - "go"
 
   # Node.js（Nuxt.js/Vue）の依存関係管理（フロントエンド用）
   - package-ecosystem: "npm"
@@ -25,6 +22,3 @@ updates:
     # 更新の設定
     allow:
       - dependency-type: "all"
-    labels:
-      - "dependencies"
-      - "javascript"

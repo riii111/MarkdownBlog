@@ -16,7 +16,7 @@
     "@pinia/nuxt": "0.7.0",
     "marked": "^15.0.7",
     "nuxt": "3.14.0",
-    "pinia": "^2.1.7",
+    "pinia": "^3.0.1",
     "valibot": "1.0.0-beta.14",
     "vue": "latest",
     "vue-router": "latest"
