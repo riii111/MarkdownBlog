@@ -7,12 +7,10 @@ updates:
       interval: "weekly"
       time: "09:00"
       timezone: "Asia/Tokyo"
-    versioning-strategy: "auto"
-    # バージョン更新の範囲を制限
+    # 更新の設定
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
-    # PRにラベルを付与
     labels:
       - "dependencies"
       - "go"
@@ -24,11 +22,9 @@ updates:
       interval: "weekly"
       time: "09:00"
       timezone: "Asia/Tokyo"
-    package-manager: "pnpm"
-    # 開発依存関係とプロダクション依存関係の両方を更新
+    # 更新の設定
     allow:
       - dependency-type: "all"
-    # PRにラベルを付与
     labels:
       - "dependencies"
       - "javascript"
