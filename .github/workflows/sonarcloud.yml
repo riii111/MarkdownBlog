@@ -1,0 +1,43 @@
+name: SonarCloud Analysis
+on:
+  push:
+    branches: ["develop"]
+  pull_request:
+    branches: ["develop"]
+
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # 全履歴を取得（より正確な解析のため）
+
+      # フロントエンドの解析
+      - name: SonarCloud Scan Frontend
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 自動的に提供される
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # 先ほど設定したトークン
+        with:
+          projectBaseDir: frontend
+          args: >
+            -Dsonar.organization=riii111
+            -Dsonar.projectKey=riii111-frontend
+            -Dsonar.sources=.
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+
+      # バックエンドの解析
+      - name: SonarCloud Scan Backend
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: backend
+          args: >
+            -Dsonar.organization=riii111
+            -Dsonar.projectKey=riii111-backend
+            -Dsonar.sources=.
+            -Dsonar.go.coverage.reportPaths=coverage.out
