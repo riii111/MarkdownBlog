@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # Golangの依存関係管理（バックエンド用）
+  - package-ecosystem: "gomod"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    versioning-strategy: "auto"
+    # バージョン更新の範囲を制限
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    # PRにラベルを付与
+    labels:
+      - "dependencies"
+      - "go"
+
+  # Node.js（Nuxt.js/Vue）の依存関係管理（フロントエンド用）
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    package-manager: "pnpm"
+    # 開発依存関係とプロダクション依存関係の両方を更新
+    allow:
+      - dependency-type: "all"
+    # PRにラベルを付与
+    labels:
+      - "dependencies"
+      - "javascript"
