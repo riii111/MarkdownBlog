@@ -14,30 +14,15 @@ jobs:
         with:
           fetch-depth: 0 # 全履歴を取得（より正確な解析のため）
 
-      # フロントエンドの解析
-      - name: SonarCloud Scan Frontend
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 自動的に提供される
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # 先ほど設定したトークン
-        with:
-          projectBaseDir: frontend
-          args: >
-            -Dsonar.organization=riii111
-            -Dsonar.projectKey=riii111-frontend
-            -Dsonar.sources=.
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-
-      # バックエンドの解析
-      - name: SonarCloud Scan Backend
+      - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          projectBaseDir: backend
           args: >
             -Dsonar.organization=riii111
-            -Dsonar.projectKey=riii111-backend
-            -Dsonar.sources=.
-            -Dsonar.go.coverage.reportPaths=coverage.out
+            -Dsonar.projectKey=MarkdownBlog
+            -Dsonar.sources=frontend,backend
+            -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info
+            -Dsonar.go.coverage.reportPaths=backend/coverage.out
