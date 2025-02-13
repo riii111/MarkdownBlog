@@ -22,7 +22,7 @@ jobs:
         with:
           args: >
             -Dsonar.organization=riii111
-            -Dsonar.projectKey=MarkdownBlog
+            -Dsonar.projectKey=riii111_MarkdownBlog
             -Dsonar.sources=frontend,backend
             -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info
             -Dsonar.go.coverage.reportPaths=backend/coverage.out
