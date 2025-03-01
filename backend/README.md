@@ -1,137 +1,131 @@
 # Markdown Blog API
 
-Markdown BlogのバックエンドAPIサーバーです。
+Markdown形式のブログ記事を管理するバックエンドAPI
 
 ## 技術スタック
 
 - Golang
 - Gin Web Framework
-- Air (ホットリロード)
+- PostgreSQL
+- GORM
+- Docker
 
-## プロジェクト構造
+## プロジェクト構成
 
-<https://github.com/golang-standards/project-layout/tree/master>を参考にしつつ、internal配下はレイヤードアーキテクチャを採用。
-
-保守性と拡張性の高いコードベースを目指しています。
-
-```text
-backend/
-├── cmd/                    # アプリケーションのエントリーポイント
-│   └── api/               # APIサーバーのメイン処理
-│   └── migrate/           # 手動マイグレーションのメイン処理
-├── internal/              # プライベートなアプリケーションコード
-│   ├── domain/           # ドメイン層
-│   │   ├── model/       # ドメインモデル
-│   │   └── repository/  # リポジトリ（インターフェースのみ）
-│   ├── handler/         # HTTPハンドラー層
-│   │   ├── dto/         # Data Transfer Objects
-│   │   ├── middleware/  # HTTPミドルウェア
-│   │   ├── endpoint/    # 各APIのエンドポイント
-│   │   └── router.go    # ルーティング設定
-│   ├── infrastructure/ # インフラストラクチャ層
-│   │   └── config/      # internal配下の設定関連の処理
-│   │   └── migration/  # マイグレーション関連の処理
-│   │   └── database/   # データベース関連の処理（リポジトリの実処理など）
-│   └── usecase/        # ユースケース層
-├── pkg/                # 公開可能な再利用可能なコード
-│   └── config/         # 設定関連の処理
-```
-
-## アーキテクチャの説明
-
-### レイヤー構造
-
-1. **Domain Layer** (`internal/domain/`)
-   - ビジネスロジックの中心
-   - モデルとリポジトリインターフェースを定義
-   - 外部依存を持たない純粋なビジネスロジック
-
-2. **UseCase Layer** (`internal/usecase/`)
-   - アプリケーションのユースケースを実装
-   - ドメイン層のロジックを組み合わせてユースケースを実現
-   - トランザクション管理などを担当
-
-3. **Handler Layer** (`internal/handler/`)
-   - HTTPリクエスト/レスポンスの処理
-   - 入力バリデーション
-   - DTOとドメインモデルの変換
-   - ルーティング設定
-
-4. **Infrastructure Layer** (`internal/infrastructure/`)
-   - データベース、外部APIなどの具体的な実装
-   - リポジトリインターフェースの実装
-   - 外部サービスとの統合
-
-### 依存関係の方向
+レイヤードアーキテクチャを採用しています：
 
 ```
 Handler → UseCase → Domain ← Infrastructure
 ```
 
-- 内側のレイヤー（Domain）は外側のレイヤーに依存しない
-- 外側のレイヤーは内側のレイヤーに依存する
-- Infrastructure層はDomain層のインターフェースを実装
-
 ## 開発環境のセットアップ
 
-1. リポジトリのクローン
+### 前提条件
+
+- Docker と Docker Compose がインストールされていること
+- Go の指定のVersionがインストールされていること
+
+### 環境構築手順
+
+1. リポジトリをクローン
 
 ```bash
-git clone <repository-url>
-cd backend
+git clone https://github.com/riii111/markdown-blog-api.git
+cd markdown-blog-api
 ```
 
-2. 依存関係のインストール
+2. 環境変数ファイルの準備
 
 ```bash
-go mod download
+cp .env.example .env
 ```
 
-3. 開発サーバーの起動
+3. Docker Composeでサービスを起動
+
+```bash
+docker-compose up -d
+```
+
+4. マイグレーションの実行
+
+```bash
+go run cmd/migrate/main.go
+```
+
+5. APIサーバーの起動
+
+```bash
+go run cmd/api/main.go
+```
+
+または、ホットリロード機能付きで開発する場合：
 
 ```bash
 air
 ```
 
-サーバーは `http://localhost:8088` で起動します。
+## テスト
 
-### マイグレーション
+### E2Eテストの実行
 
-#### 1. 開発環境の場合
-
-開発環境（`APP_ENV=dev`）では、APIサーバー起動時に自動マイグレーションが実行されます。
-
-**制約事項：**
-
-- 自動マイグレーションは開発環境でのみ動作します
-- カラムの削除や型の変更など、破壊的な変更は自動で適用されません
-- 複雑なマイグレーション（インデックスの追加など）は手動で行う必要があります
-
-#### 2. 本番/ステージング環境の場合
-
-本番環境やステージング環境では、手動でマイグレーションを実行する必要があります：
+E2Eテストは、実際のデータベースを使用せず、テスト用のPostgreSQLコンテナを自動的に起動して実行します。
 
 ```bash
-make migrate
+# 認証系APIのテストを実行
+./tests/run_tests.sh
 ```
 
-#### マイグレーション関連コマンド
+### テストの構成
 
-```bash
-# マイグレーションの実行
-make migrate
+テストは以下のように構成されています：
 
-# マイグレーションの状態確認
-# 各テーブルの存在有無、カラム名、データ型、NULL許可などを表示
-make migrate-status
+- `tests/e2e/setup.go`: テスト環境のセットアップコード
+- `tests/e2e/auth/`: 認証系APIのテスト
+  - `register_test.go`: ユーザー登録APIのテスト
+  - `login_test.go`: ログインAPIのテスト
+  - `logout_test.go`: ログアウトAPIのテスト
 
-# マイグレーションのロールバック
-# 注意: 開発環境でのみ実行可能。全テーブルが削除されます
-make migrate-rollback
+### テスト実装の特徴
+
+- BDDスタイルでテストを記述
+- testcontainersを使用した独立したテスト環境
+- テストの分離性を確保（各テストは独立して実行可能）
+- 効率的なテストヘルパーの活用
+- 十分なアサーションで動作を検証
+
+## API仕様
+
+APIの詳細な仕様は、Swaggerドキュメントで確認できます。開発環境では以下のURLでアクセス可能です：
+
+```
+http://localhost:8080/swagger/index.html
 ```
 
-**注意事項：**
+## ディレクトリ構造
 
-- ロールバックは開発環境でのみ実行可能です
-- ロールバックを実行すると、全てのテーブルが削除されます
-- 本番環境での使用は厳禁です
+```
+.
+├── cmd/                  # エントリーポイント
+│   ├── api/              # APIサーバー
+│   └── migrate/          # マイグレーションツール
+├── docs/                 # Swaggerドキュメント
+├── internal/             # 内部パッケージ
+│   ├── domain/           # ドメインモデルとリポジトリインターフェース
+│   │   └── model/        # エンティティとリポジトリインターフェース
+│   ├── handler/          # HTTPハンドラー
+│   │   ├── dto/          # リクエスト/レスポンスのデータ構造
+│   │   ├── endpoint/     # エンドポイント実装
+│   │   └── middleware/   # ミドルウェア
+│   ├── infrastructure/   # インフラストラクチャ層
+│   │   ├── config/       # 設定
+│   │   ├── database/     # データベース関連
+│   │   └── migration/    # マイグレーション
+│   └── usecase/          # ユースケース層
+├── tests/                # テスト
+│   └── e2e/              # E2Eテスト
+└── traefik/              # Traefik設定
+```
+
+## ライセンス
+
+MIT
