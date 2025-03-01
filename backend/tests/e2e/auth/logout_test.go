@@ -57,4 +57,44 @@ func TestLogoutUser(t *testing.T) {
 		assert.Contains(t, errorResponse, "error", "Response should contain error field")
 		assert.Contains(t, errorResponse["error"], "Unauthorized", "Error message should indicate unauthorized")
 	})
+
+	t.Run("異常系: 無効なセッショントークンでログアウト", func(t *testing.T) {
+		// 無効なセッショントークンでログアウトリクエスト
+		invalidToken := "invalid-session-token"
+		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/logout", nil, invalidToken)
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusUnauthorized, w.Code, "Expected status code 401")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
+		assert.Contains(t, errorResponse["error"], "Unauthorized", "Error message should indicate unauthorized")
+	})
+
+	t.Run("異常系: 既にログアウト済みのセッションで再ログアウト", func(t *testing.T) {
+		// 新しいユーザーとセッションを作成
+		_, sessionToken := e2e.CreateTestUser(t, router)
+
+		// 最初のログアウト
+		w1 := e2e.PerformRequest(router, http.MethodPost, "/api/users/logout", nil, sessionToken)
+		assert.Equal(t, http.StatusNoContent, w1.Code, "First logout should succeed")
+
+		// ログアウト後はセッショントークンが無効化されるため、空のトークンでリクエストを送信
+		w2 := e2e.PerformRequest(router, http.MethodPost, "/api/users/logout", nil, "")
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusUnauthorized, w2.Code, "Expected status code 401 for already logged out session")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w2.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
+		assert.Contains(t, errorResponse["error"], "Unauthorized", "Error message should indicate unauthorized")
+	})
 }
