@@ -235,7 +235,7 @@ func TestGetMeArticles(t *testing.T) {
 }
 
 // タグに紐づく記事一覧取得APIのテスト
-// 注: このテストはタグ機能の実装が必要
+// TODO: このテストはタグ機能の実装が必要
 func TestGetArticlesByTag(t *testing.T) {
 	// テスト環境のセットアップ
 	router, cleanup := e2e.SetupTestEnvironment(t)
