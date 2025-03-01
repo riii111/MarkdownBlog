@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/google/uuid"
@@ -56,7 +55,7 @@ func TestLoginUser(t *testing.T) {
 		cookies := w.Result().Cookies()
 		var sessionCookie *http.Cookie
 		for _, cookie := range cookies {
-			if cookie.Name == os.Getenv("SESSION_NAME") {
+			if cookie.Name == "test-session" {
 				sessionCookie = cookie
 				break
 			}

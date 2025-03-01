@@ -3,7 +3,6 @@ package auth
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/riii111/markdown-blog-api/tests/e2e"
@@ -31,7 +30,7 @@ func TestLogoutUser(t *testing.T) {
 		cookies := w.Result().Cookies()
 		var sessionCookie *http.Cookie
 		for _, cookie := range cookies {
-			if cookie.Name == os.Getenv("SESSION_NAME") {
+			if cookie.Name == "test-session" {
 				sessionCookie = cookie
 				break
 			}
