@@ -1,21 +1,15 @@
 package e2e
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/riii111/markdown-blog-api/internal/handler"
-	"github.com/riii111/markdown-blog-api/internal/handler/dto"
 	"github.com/riii111/markdown-blog-api/internal/handler/endpoint"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/database"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
@@ -141,97 +135,7 @@ func SetupTestEnvironment(t *testing.T) (*gin.Engine, func()) {
 	return router, cleanup
 }
 
-// テスト用ユーザーの作成
-func CreateTestUser(t *testing.T, router *gin.Engine) (dto.RegisterUserResponse, string) {
-	// テスト用ユーザーデータ
-	testUser := dto.RegisterUserRequest{
-		Email:       fmt.Sprintf("test-%s@example.com", uuid.New().String()),
-		Password:    "password123",
-		DisplayName: "Test User",
-	}
 
-	// ユーザー登録リクエスト
-	body, err := json.Marshal(testUser)
-	require.NoError(t, err, "Failed to marshal test user")
-
-	req := httptest.NewRequest(http.MethodPost, "/api/users/register", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-
-	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
-
-	require.Equal(t, http.StatusCreated, w.Code, "Expected status code 201")
-
-	// レスポンスをパース
-	var response dto.RegisterUserResponse
-	err = json.Unmarshal(w.Body.Bytes(), &response)
-	require.NoError(t, err, "Failed to unmarshal response")
-
-	// ログインしてセッショントークンを取得
-	loginReq := dto.LoginRequest{
-		Email:    testUser.Email,
-		Password: testUser.Password,
-	}
-
-	loginBody, err := json.Marshal(loginReq)
-	require.NoError(t, err, "Failed to marshal login request")
-
-	loginReqObj := httptest.NewRequest(http.MethodPost, "/api/users/login", bytes.NewBuffer(loginBody))
-	loginReqObj.Header.Set("Content-Type", "application/json")
-
-	loginW := httptest.NewRecorder()
-	router.ServeHTTP(loginW, loginReqObj)
-
-	require.Equal(t, http.StatusOK, loginW.Code, "Expected status code 200 for login")
-
-	// セッションCookieを取得
-	cookies := loginW.Result().Cookies()
-	var sessionToken string
-	for _, cookie := range cookies {
-		// テスト用のセッション名を使用
-		if cookie.Name == "test-session" {
-			sessionToken = cookie.Value
-			break
-		}
-	}
-
-	require.NotEmpty(t, sessionToken, "Session token should not be empty")
-
-	return response, sessionToken
-}
-
-// HTTPリクエストを実行するヘルパー関数
-func PerformRequest(router *gin.Engine, method, path string, body interface{}, sessionToken string) *httptest.ResponseRecorder {
-	var reqBody *bytes.Buffer
-	if body != nil {
-		jsonBody, _ := json.Marshal(body)
-		reqBody = bytes.NewBuffer(jsonBody)
-	} else {
-		reqBody = bytes.NewBuffer(nil)
-	}
-
-	req := httptest.NewRequest(method, path, reqBody)
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-
-	// セッショントークンがある場合はCookieを設定
-	if sessionToken != "" {
-		req.AddCookie(&http.Cookie{
-			Name:  "test-session",
-			Value: sessionToken,
-		})
-	}
-
-	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
-	return w
-}
-
-// テスト用のコンテキストを作成
-func CreateTestContext() (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), 10*time.Second)
-}
 
 // テストデータのクリーンアップ
 func cleanupTestData(db *gorm.DB) {
