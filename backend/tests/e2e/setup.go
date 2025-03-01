@@ -26,8 +26,8 @@ func setupTestDB(t *testing.T) (*gorm.DB, func(), error) {
 	ctx := context.Background()
 
 	// PostgreSQLコンテナの設定
-	postgresContainer, err := postgres.RunContainer(ctx,
-		testcontainers.WithImage("postgres:15-alpine"),
+	postgresContainer, err := postgres.Run(ctx,
+		"postgres:15-alpine",
 		postgres.WithDatabase("testdb"),
 		postgres.WithUsername("testuser"),
 		postgres.WithPassword("testpass"),
@@ -37,7 +37,7 @@ func setupTestDB(t *testing.T) (*gorm.DB, func(), error) {
 				wait.ForLog("database system is ready to accept connections").WithOccurrence(2),
 				// ポートが利用可能か確認
 				wait.ForListeningPort("5432/tcp"),
-			).WithStartupTimeout(10*time.Second),
+			).WithDeadline(10*time.Second),
 		),
 	)
 	if err != nil {
@@ -79,7 +79,7 @@ func setupTestDB(t *testing.T) (*gorm.DB, func(), error) {
 	// クリーンアップ関数
 	cleanup := func() {
 		// テスト終了後にコンテナを停止
-		if err := postgresContainer.Terminate(ctx); err != nil {
+		if err := testcontainers.TerminateContainer(postgresContainer); err != nil {
 			log.Printf("Failed to terminate container: %v", err)
 		}
 	}
