@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -87,12 +89,56 @@ func TestRegisterUser(t *testing.T) {
 		assert.Contains(t, errorResponse, "error", "Response should contain error field")
 	})
 
+	t.Run("異常系: バリデーションエラー（パスワードが長すぎる）", func(t *testing.T) {
+		// パスワードが長すぎるユーザーデータ
+		invalidUser := dto.RegisterUserRequest{
+			Email:       fmt.Sprintf("test-%s@example.com", uuid.New().String()),
+			Password:    strings.Repeat("a", 100), // 100文字のパスワード
+			DisplayName: "Test User",
+		}
+
+		// リクエスト実行
+		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/register", invalidUser, "")
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusBadRequest, w.Code, "Expected status code 400")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
+	})
+
 	t.Run("異常系: バリデーションエラー（表示名なし）", func(t *testing.T) {
 		// 表示名がないユーザーデータ
 		invalidUser := dto.RegisterUserRequest{
 			Email:       fmt.Sprintf("test-%s@example.com", uuid.New().String()),
 			Password:    "password123",
 			DisplayName: "",
+		}
+
+		// リクエスト実行
+		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/register", invalidUser, "")
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusBadRequest, w.Code, "Expected status code 400")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
+	})
+
+	t.Run("異常系: バリデーションエラー（表示名が長すぎる）", func(t *testing.T) {
+		// 表示名が長すぎるユーザーデータ
+		invalidUser := dto.RegisterUserRequest{
+			Email:       fmt.Sprintf("test-%s@example.com", uuid.New().String()),
+			Password:    "password123",
+			DisplayName: strings.Repeat("a", 150), // 150文字の表示名
 		}
 
 		// リクエスト実行
@@ -130,6 +176,42 @@ func TestRegisterUser(t *testing.T) {
 		// エラーレスポンスの検証
 		var errorResponse map[string]string
 		err := json.Unmarshal(w2.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
+	})
+
+	t.Run("異常系: 空のリクエストボディ", func(t *testing.T) {
+		// 空のリクエストボディで登録試行
+		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/register", nil, "")
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusBadRequest, w.Code, "Expected status code 400")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
+	})
+
+	t.Run("異常系: 不正なJSONフォーマット", func(t *testing.T) {
+		// 不正なJSONフォーマットでリクエスト
+		invalidJSON := `{"email": "test@example.com", "password": missing_quotes, "display_name": "Test User"}`
+
+		// カスタムリクエスト実行
+		req := httptest.NewRequest(http.MethodPost, "/api/users/register", strings.NewReader(invalidJSON))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusBadRequest, w.Code, "Expected status code 400")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
 		require.NoError(t, err, "Failed to unmarshal error response")
 
 		assert.Contains(t, errorResponse, "error", "Response should contain error field")

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -105,5 +107,81 @@ func TestLoginUser(t *testing.T) {
 
 		assert.Contains(t, errorResponse, "error", "Response should contain error field")
 		assert.Contains(t, errorResponse["error"], "Invalid credentials", "Error message should indicate invalid credentials")
+	})
+
+	t.Run("異常系: 空のリクエストボディ", func(t *testing.T) {
+		// 空のリクエストボディでログイン試行
+		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/login", nil, "")
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusBadRequest, w.Code, "Expected status code 400")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
+	})
+
+	t.Run("異常系: 不正なJSONフォーマット", func(t *testing.T) {
+		// 不正なJSONフォーマットでリクエスト
+		invalidJSON := `{"email": "test@example.com", "password": missing_quotes}`
+
+		// カスタムリクエスト実行（PerformRequestを使わず直接リクエスト作成）
+		req := httptest.NewRequest(http.MethodPost, "/api/users/login", strings.NewReader(invalidJSON))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusBadRequest, w.Code, "Expected status code 400")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
+	})
+
+	t.Run("異常系: メールアドレスのみ提供（パスワード欠落）", func(t *testing.T) {
+		// パスワードが欠落したリクエスト
+		incompleteReq := map[string]string{
+			"email": testUser.Email,
+		}
+
+		// リクエスト実行
+		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/login", incompleteReq, "")
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusBadRequest, w.Code, "Expected status code 400")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
+	})
+
+	t.Run("異常系: パスワードのみ提供（メールアドレス欠落）", func(t *testing.T) {
+		// メールアドレスが欠落したリクエスト
+		incompleteReq := map[string]string{
+			"password": testUser.Password,
+		}
+
+		// リクエスト実行
+		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/login", incompleteReq, "")
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusBadRequest, w.Code, "Expected status code 400")
+
+		// エラーレスポンスの検証
+		var errorResponse map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+		require.NoError(t, err, "Failed to unmarshal error response")
+
+		assert.Contains(t, errorResponse, "error", "Response should contain error field")
 	})
 }
