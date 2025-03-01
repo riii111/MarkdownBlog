@@ -12,11 +12,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/riii111/markdown-blog-api/internal/handler"
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
 	"github.com/riii111/markdown-blog-api/internal/handler/endpoint"
+	"github.com/riii111/markdown-blog-api/internal/handler/middleware"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/database"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
 	"github.com/riii111/markdown-blog-api/internal/usecase"
@@ -72,7 +76,8 @@ func setupTestDB(t *testing.T) (*gorm.DB, func(), error) {
 		return nil, nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	// マイグレーションを実行
+	// テスト用にAPP_ENV環境変数を設定してマイグレーションを実行
+	os.Setenv("APP_ENV", "dev")
 	if err := migration.Migrate(db); err != nil {
 		return nil, nil, fmt.Errorf("failed to run migrations: %w", err)
 	}
@@ -86,6 +91,90 @@ func setupTestDB(t *testing.T) (*gorm.DB, func(), error) {
 	}
 
 	return db, cleanup, nil
+}
+
+// テスト用のルーターをセットアップ
+func setupTestRouter(userHandler *endpoint.UserHandler, articleHandler *endpoint.ArticleHandler) *gin.Engine {
+	r := gin.Default()
+
+	// テスト用のセッション設定
+	sessionKey := []byte("test-session-secret-key-for-testing-only")
+	store := cookie.NewStore(sessionKey)
+	store.Options(sessions.Options{
+		Path:     "/",
+		Domain:   "localhost",
+		MaxAge:   86400,
+		Secure:   false,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	// セッション名を環境変数から取得、設定されていない場合はデフォルト値を使用
+	sessionName := os.Getenv("SESSION_NAME")
+	if sessionName == "" {
+		sessionName = "markdown-blog-session"
+		// テスト用に環境変数を設定
+		os.Setenv("SESSION_NAME", sessionName)
+	}
+
+	// セッションミドルウェアを設定
+	r.Use(sessions.Sessions(sessionName, store))
+
+	// セキュリティミドルウェア
+	r.Use(middleware.NewSecurityMiddleware())
+
+	// テスト用のCORS設定
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	// タイムアウトミドルウェア
+	r.Use(middleware.TimeoutMiddleware())
+
+	// 認証不要のエンドポイント
+	public := r.Group("/api")
+	{
+		users := public.Group("/users")
+		{
+			users.POST("/register", userHandler.Register)
+			users.POST("/login", userHandler.Login)
+		}
+
+		articles := public.Group("/articles")
+		{
+			articles.GET("", articleHandler.GetArticles)
+			articles.GET("/:slug", articleHandler.GetArticleBySlug)
+		}
+	}
+
+	// 認証が必要なエンドポイント
+	protected := r.Group("/api")
+	protected.Use(middleware.CSRF())
+	protected.Use(middleware.AuthMiddleware())
+	{
+		users := protected.Group("/users")
+		{
+			users.POST("/logout", userHandler.Logout)
+		}
+
+		articles := protected.Group("/articles")
+		{
+			articles.GET("/me", articleHandler.GetMeArticles)
+			articles.POST("", articleHandler.CreateArticle)
+			articles.DELETE("/:slug", articleHandler.DeleteArticle)
+		}
+	}
+
+	// ヘルスチェック
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	return r
 }
 
 // テスト環境のセットアップ
