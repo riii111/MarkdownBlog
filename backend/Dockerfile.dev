@@ -1,5 +1,5 @@
 # 軽量なベースイメージを使用
-FROM golang:1.22.1-bullseye
+FROM golang:1.23.6-bullseye
 
 # 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \

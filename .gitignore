@@ -1,7 +1,9 @@
 開発フェーズ.md
 要件定義書_Phase1.md
-backend/テーブル設計書_Phase1.md
+backend/table_docs_phase1.md
 backend/API設計.md
+backend/.cline/*
+backend/.clinerules
 
 # ログ
 traefik-logs/access.log
@@ -11,3 +13,4 @@ backend/tmp
 
 # 環境変数
 backend/.env
+
