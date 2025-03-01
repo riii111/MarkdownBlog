@@ -75,7 +75,7 @@ func main() {
 	articleHandler := endpoint.NewArticleHandler(articleUsecase)
 
 	// ルーターのセットアップ
-	router := handler.SetupRouter(userHandler, articleHandler)
+	router := handler.SetupRouter(userHandler, articleHandler, handler.DefaultRouterConfig())
 
 	// サーバーの起動
 	log.Println("Server starting on :8088")

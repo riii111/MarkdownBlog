@@ -12,15 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/riii111/markdown-blog-api/internal/handler"
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
 	"github.com/riii111/markdown-blog-api/internal/handler/endpoint"
-	"github.com/riii111/markdown-blog-api/internal/handler/middleware"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/database"
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
 	"github.com/riii111/markdown-blog-api/internal/usecase"
@@ -93,88 +89,10 @@ func setupTestDB(t *testing.T) (*gorm.DB, func(), error) {
 	return db, cleanup, nil
 }
 
-// テスト用のルーターをセットアップ
-func setupTestRouter(userHandler *endpoint.UserHandler, articleHandler *endpoint.ArticleHandler) *gin.Engine {
-	r := gin.Default()
-
-	// テスト用のセッション設定
-	sessionKey := []byte("test-session-secret-key-for-testing-only")
-	store := cookie.NewStore(sessionKey)
-	store.Options(sessions.Options{
-		Path:     "/",
-		Domain:   "localhost",
-		MaxAge:   86400,
-		Secure:   false,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	})
-
-	// セッション名を環境変数から取得、設定されていない場合はデフォルト値を使用
-	sessionName := os.Getenv("SESSION_NAME")
-	if sessionName == "" {
-		sessionName = "markdown-blog-session"
-		// テスト用に環境変数を設定
-		os.Setenv("SESSION_NAME", sessionName)
-	}
-
-	// セッションミドルウェアを設定
-	r.Use(sessions.Sessions(sessionName, store))
-
-	// セキュリティミドルウェア
-	r.Use(middleware.NewSecurityMiddleware())
-
-	// テスト用のCORS設定
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
-
-	// タイムアウトミドルウェア
-	r.Use(middleware.TimeoutMiddleware())
-
-	// 認証不要のエンドポイント
-	public := r.Group("/api")
-	{
-		users := public.Group("/users")
-		{
-			users.POST("/register", userHandler.Register)
-			users.POST("/login", userHandler.Login)
-		}
-
-		articles := public.Group("/articles")
-		{
-			articles.GET("", articleHandler.GetArticles)
-			articles.GET("/:slug", articleHandler.GetArticleBySlug)
-		}
-	}
-
-	// 認証が必要なエンドポイント
-	protected := r.Group("/api")
-	protected.Use(middleware.CSRF())
-	protected.Use(middleware.AuthMiddleware())
-	{
-		users := protected.Group("/users")
-		{
-			users.POST("/logout", userHandler.Logout)
-		}
-
-		articles := protected.Group("/articles")
-		{
-			articles.GET("/me", articleHandler.GetMeArticles)
-			articles.POST("", articleHandler.CreateArticle)
-			articles.DELETE("/:slug", articleHandler.DeleteArticle)
-		}
-	}
-
-	// ヘルスチェック
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
-	})
-
-	return r
+// テスト用のルーター設定を取得
+func getTestRouterConfig() handler.RouterConfig {
+	// テスト用の設定を返す
+	return handler.TestRouterConfig()
 }
 
 // テスト環境のセットアップ
@@ -206,10 +124,12 @@ func SetupTestEnvironment(t *testing.T) (*gin.Engine, func()) {
 	articleHandler := endpoint.NewArticleHandler(articleUsecase)
 
 	// テスト用のルーターをセットアップ
-	router := setupTestRouter(userHandler, articleHandler)
+	router := handler.SetupRouter(userHandler, articleHandler, getTestRouterConfig())
 
 	// クリーンアップ関数
 	cleanup := func() {
+		// テストデータをクリーンアップ
+		cleanupTestData(db)
 		// テスト終了後にDBコンテナを停止
 		dbCleanup()
 	}
@@ -264,7 +184,8 @@ func CreateTestUser(t *testing.T, router *gin.Engine) (dto.RegisterUserResponse,
 	cookies := loginW.Result().Cookies()
 	var sessionToken string
 	for _, cookie := range cookies {
-		if cookie.Name == os.Getenv("SESSION_NAME") {
+		// テスト用のセッション名を使用
+		if cookie.Name == "test-session" {
 			sessionToken = cookie.Value
 			break
 		}
@@ -293,7 +214,7 @@ func PerformRequest(router *gin.Engine, method, path string, body interface{}, s
 	// セッショントークンがある場合はCookieを設定
 	if sessionToken != "" {
 		req.AddCookie(&http.Cookie{
-			Name:  os.Getenv("SESSION_NAME"),
+			Name:  "test-session",
 			Value: sessionToken,
 		})
 	}
@@ -305,5 +226,13 @@ func PerformRequest(router *gin.Engine, method, path string, body interface{}, s
 
 // テスト用のコンテキストを作成
 func CreateTestContext() (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), 5000)
+	return context.WithTimeout(context.Background(), 5*time.Second)
+}
+
+// テストデータのクリーンアップ
+func cleanupTestData(db *gorm.DB) {
+	// テスト後にデータをクリーンアップ
+	db.Exec("DELETE FROM articles")
+	db.Exec("DELETE FROM sessions")
+	db.Exec("DELETE FROM users")
 }
