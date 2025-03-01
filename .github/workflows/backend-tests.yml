@@ -41,10 +41,9 @@ jobs:
 
       - name: Run E2E tests
         run: |
-          # run_tests.shは簡易的なローカルテスト用なので、CI/CDでは使わない
           cd backend
-          go test -v -cover ./tests/e2e/... -count=1
-
+          chmod +x ./tests/run_tests.sh
+          ./tests/run_tests.sh
       - name: Upload test logs
         if: always()
         uses: actions/upload-artifact@v4
