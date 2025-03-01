@@ -38,9 +38,13 @@ func setupTestDB(t *testing.T) (*gorm.DB, func(), error) {
 		postgres.WithUsername("testuser"),
 		postgres.WithPassword("testpass"),
 		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second)),
+			wait.ForAll(
+				// ログメッセージを確認
+				wait.ForLog("database system is ready to accept connections").WithOccurrence(2),
+				// ポートが利用可能か確認
+				wait.ForListeningPort("5432/tcp"),
+			).WithStartupTimeout(10*time.Second),
+		),
 	)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to start postgres container: %w", err)
@@ -226,13 +230,17 @@ func PerformRequest(router *gin.Engine, method, path string, body interface{}, s
 
 // テスト用のコンテキストを作成
 func CreateTestContext() (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), 5*time.Second)
+	return context.WithTimeout(context.Background(), 10*time.Second)
 }
 
 // テストデータのクリーンアップ
 func cleanupTestData(db *gorm.DB) {
-	// テスト後にデータをクリーンアップ
-	db.Exec("DELETE FROM articles")
-	db.Exec("DELETE FROM sessions")
-	db.Exec("DELETE FROM users")
+	// トランザクションを使用してデータをクリーンアップ
+	db.Transaction(func(tx *gorm.DB) error {
+		// 外部キー制約を考慮して削除順序を設定
+		tx.Exec("DELETE FROM articles")
+		tx.Exec("DELETE FROM sessions")
+		tx.Exec("DELETE FROM users")
+		return nil
+	})
 }
