@@ -1,13 +1,11 @@
 package auth
 
 import (
-	"encoding/json"
 	"net/http"
 	"testing"
 
 	"github.com/riii111/markdown-blog-api/tests/e2e"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // ログアウトAPIのテスト
@@ -17,7 +15,7 @@ func TestLogoutUser(t *testing.T) {
 	defer cleanup()
 
 	// テスト用ユーザーの作成とログイン
-	_, sessionToken := e2e.CreateTestUser(t, router)
+	_, sessionToken, _ := e2e.CreateAndLoginTestUser(t, router)
 
 	t.Run("正常系: ログアウト成功", func(t *testing.T) {
 		// ログアウトリクエスト
@@ -46,16 +44,8 @@ func TestLogoutUser(t *testing.T) {
 		// 認証なしでログアウトリクエスト
 		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/logout", nil, "")
 
-		// ステータスコードの検証
-		assert.Equal(t, http.StatusUnauthorized, w.Code, "Expected status code 401")
-
 		// エラーレスポンスの検証
-		var errorResponse map[string]string
-		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
-		require.NoError(t, err, "Failed to unmarshal error response")
-
-		assert.Contains(t, errorResponse, "error", "Response should contain error field")
-		assert.Contains(t, errorResponse["error"], "Unauthorized", "Error message should indicate unauthorized")
+		e2e.AssertErrorResponse(t, w, http.StatusUnauthorized, "Unauthorized")
 	})
 
 	t.Run("異常系: 無効なセッショントークンでログアウト", func(t *testing.T) {
@@ -63,21 +53,13 @@ func TestLogoutUser(t *testing.T) {
 		invalidToken := "invalid-session-token"
 		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/logout", nil, invalidToken)
 
-		// ステータスコードの検証
-		assert.Equal(t, http.StatusUnauthorized, w.Code, "Expected status code 401")
-
 		// エラーレスポンスの検証
-		var errorResponse map[string]string
-		err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
-		require.NoError(t, err, "Failed to unmarshal error response")
-
-		assert.Contains(t, errorResponse, "error", "Response should contain error field")
-		assert.Contains(t, errorResponse["error"], "Unauthorized", "Error message should indicate unauthorized")
+		e2e.AssertErrorResponse(t, w, http.StatusUnauthorized, "Unauthorized")
 	})
 
 	t.Run("異常系: 既にログアウト済みのセッションで再ログアウト", func(t *testing.T) {
 		// 新しいユーザーとセッションを作成
-		_, sessionToken := e2e.CreateTestUser(t, router)
+		_, sessionToken, _ := e2e.CreateAndLoginTestUser(t, router)
 
 		// 最初のログアウト
 		w1 := e2e.PerformRequest(router, http.MethodPost, "/api/users/logout", nil, sessionToken)
@@ -86,15 +68,7 @@ func TestLogoutUser(t *testing.T) {
 		// ログアウト後はセッショントークンが無効化されるため、空のトークンでリクエストを送信
 		w2 := e2e.PerformRequest(router, http.MethodPost, "/api/users/logout", nil, "")
 
-		// ステータスコードの検証
-		assert.Equal(t, http.StatusUnauthorized, w2.Code, "Expected status code 401 for already logged out session")
-
 		// エラーレスポンスの検証
-		var errorResponse map[string]string
-		err := json.Unmarshal(w2.Body.Bytes(), &errorResponse)
-		require.NoError(t, err, "Failed to unmarshal error response")
-
-		assert.Contains(t, errorResponse, "error", "Response should contain error field")
-		assert.Contains(t, errorResponse["error"], "Unauthorized", "Error message should indicate unauthorized")
+		e2e.AssertErrorResponse(t, w2, http.StatusUnauthorized, "Unauthorized")
 	})
 }
