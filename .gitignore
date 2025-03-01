@@ -2,8 +2,8 @@
 要件定義書_Phase1.md
 backend/table_docs_phase1.md
 backend/API設計.md
-.cline/*
-.clinerules
+backend/.cline/*
+backend/.clinerules
 
 # ログ
 traefik-logs/access.log
