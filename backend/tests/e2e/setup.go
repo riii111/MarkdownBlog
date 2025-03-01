@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -20,45 +21,71 @@ import (
 	"github.com/riii111/markdown-blog-api/internal/infrastructure/migration"
 	"github.com/riii111/markdown-blog-api/internal/usecase"
 	"github.com/stretchr/testify/require"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/wait"
 	"gorm.io/gorm"
 )
 
 // テスト用のデータベース設定
-func setupTestDB() (*gorm.DB, error) {
-	// テスト用のデータベース設定
+func setupTestDB(t *testing.T) (*gorm.DB, func(), error) {
+	ctx := context.Background()
+
+	// PostgreSQLコンテナの設定
+	postgresContainer, err := postgres.RunContainer(ctx,
+		testcontainers.WithImage("postgres:15-alpine"),
+		postgres.WithDatabase("testdb"),
+		postgres.WithUsername("testuser"),
+		postgres.WithPassword("testpass"),
+		testcontainers.WithWaitStrategy(
+			wait.ForLog("database system is ready to accept connections").
+				WithOccurrence(2).
+				WithStartupTimeout(5*time.Second)),
+	)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to start postgres container: %w", err)
+	}
+
+	// コンテナのホストとポートを取得
+	host, err := postgresContainer.Host(ctx)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get container host: %w", err)
+	}
+
+	port, err := postgresContainer.MappedPort(ctx, "5432")
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get container port: %w", err)
+	}
+
+	// データベース設定
 	config := &database.Config{
-		Host:     os.Getenv("POSTGRES_HOST"),
-		Port:     os.Getenv("POSTGRES_PORT"),
-		DBName:   os.Getenv("TEST_DB_NAME"), // テスト用DBを使用
-		User:     os.Getenv("POSTGRES_USER"),
-		Password: os.Getenv("POSTGRES_PASSWORD"),
+		Host:     host,
+		Port:     port.Port(),
+		DBName:   "testdb",
+		User:     "testuser",
+		Password: "testpass",
 	}
 
-	// 環境変数が設定されていない場合はデフォルト値を使用
-	if config.Host == "" {
-		config.Host = "localhost"
-	}
-	if config.Port == "" {
-		config.Port = "5432"
-	}
-	if config.DBName == "" {
-		config.DBName = "markdown_blog_test"
-	}
-	if config.User == "" {
-		config.User = "postgres"
-	}
-
+	// データベースに接続
 	db, err := database.NewDB(config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to test database: %w", err)
+		return nil, nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
 	// マイグレーションを実行
 	if err := migration.Migrate(db); err != nil {
-		return nil, fmt.Errorf("failed to run migrations: %w", err)
+		return nil, nil, fmt.Errorf("failed to run migrations: %w", err)
 	}
 
-	return db, nil
+	// クリーンアップ関数
+	cleanup := func() {
+		// テスト終了後にコンテナを停止
+		if err := postgresContainer.Terminate(ctx); err != nil {
+			log.Printf("Failed to terminate container: %v", err)
+		}
+	}
+
+	return db, cleanup, nil
 }
 
 // テスト環境のセットアップ
@@ -73,7 +100,7 @@ func SetupTestEnvironment(t *testing.T) (*gin.Engine, func()) {
 	require.NoError(t, err, "Failed to register custom validations")
 
 	// テスト用DBの設定
-	db, err := setupTestDB()
+	db, dbCleanup, err := setupTestDB(t)
 	require.NoError(t, err, "Failed to setup test database")
 
 	// リポジトリの初期化
@@ -89,18 +116,13 @@ func SetupTestEnvironment(t *testing.T) (*gin.Engine, func()) {
 	userHandler := endpoint.NewUserHandler(userUsecase)
 	articleHandler := endpoint.NewArticleHandler(articleUsecase)
 
-	// ルーターのセットアップ
-	router := handler.SetupRouter(userHandler, articleHandler)
+	// テスト用のルーターをセットアップ
+	router := setupTestRouter(userHandler, articleHandler)
 
 	// クリーンアップ関数
 	cleanup := func() {
-		// テスト終了後にテーブルをクリーンアップ
-		sqlDB, err := db.DB()
-		if err != nil {
-			log.Printf("Failed to get DB instance: %v", err)
-			return
-		}
-		sqlDB.Close()
+		// テスト終了後にDBコンテナを停止
+		dbCleanup()
 	}
 
 	return router, cleanup
