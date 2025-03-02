@@ -14,13 +14,6 @@ type CreateArticleResponse struct {
 	Slug string `json:"slug" example:"slug"`
 }
 
-// 記事更新用のリクエスト構造体
-type UpdateArticleRequest struct {
-	Title   string `json:"title,omitempty"`
-	Content string `json:"content,omitempty"`
-	Status  string `json:"status,omitempty" binding:"omitempty,oneof=draft published"`
-}
-
 // カーソルベースページネーション用のメタ情報
 type CursorPaginationMeta struct {
 	NextCursor   *string `json:"next_cursor,omitempty"`

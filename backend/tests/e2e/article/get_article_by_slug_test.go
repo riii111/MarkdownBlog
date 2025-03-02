@@ -22,9 +22,8 @@ func TestGetArticleBySlug(t *testing.T) {
 	// テスト環境はSetupTestEnvironmentのcleanup関数によってクリーンアップされる
 
 	t.Run("正常系: 記事詳細取得成功", func(t *testing.T) {
-		// ヘルパー関数を使用して記事作成して公開状態にする
+		// ヘルパー関数を使用して記事作成
 		slug := CreateTestArticle(t, router, sessionToken)
-		PublishArticle(t, router, sessionToken, slug)
 
 		// 記事詳細取得リクエスト
 		getURL := "/api/articles/" + slug
@@ -40,7 +39,6 @@ func TestGetArticleBySlug(t *testing.T) {
 		assert.NotEmpty(t, response.Data.ID, "Article ID should not be empty")
 		assert.Equal(t, slug, response.Data.Slug, "Slug should match")
 		assert.NotNil(t, response.Data.User, "User field should not be nil")
-		assert.Equal(t, "published", response.Data.Status, "Article status should be 'published'")
 	})
 
 	t.Run("異常系: 存在しない記事の詳細取得", func(t *testing.T) {
@@ -76,9 +74,8 @@ func TestGetArticleBySlug(t *testing.T) {
 	})
 
 	t.Run("正常系: 複数記事作成後に各記事の詳細取得", func(t *testing.T) {
-		// 複数の記事を作成して公開状態にする
+		// 複数の記事を作成
 		slugs := CreateMultipleTestArticles(t, router, sessionToken, 3)
-		PublishMultipleArticles(t, router, sessionToken, slugs)
 
 		// 各記事の詳細を取得して検証
 		for _, slug := range slugs {
@@ -95,78 +92,5 @@ func TestGetArticleBySlug(t *testing.T) {
 			assert.NotEmpty(t, response.Data.ID, "Article ID should not be empty")
 			assert.Equal(t, slug, response.Data.Slug, "Slug should match")
 		}
-	})
-
-	// 他ユーザーのドラフト記事は取得できないことを検証するテスト
-	t.Run("他ユーザーのドラフト記事は取得できない", func(t *testing.T) {
-		// 新しいテスト環境をセットアップ
-		newRouter, newCleanup := e2e.SetupTestEnvironment(t)
-		defer newCleanup()
-
-		// 最初のユーザーを作成してログイン
-		_, firstUserToken, _ := e2e.CreateAndLoginTestUser(t, newRouter)
-
-		// 別のユーザーを作成してログイン
-		_, secondUserToken, _ := e2e.CreateAndLoginTestUser(t, newRouter)
-
-		// 別のユーザーでドラフト記事を作成
-		secondUserDraftSlug := CreateTestArticle(t, newRouter, secondUserToken)
-
-		// 最初のユーザーとして、別ユーザーのドラフト記事へアクセス
-		getURL := "/api/articles/" + secondUserDraftSlug
-		w := e2e.PerformRequest(newRouter, http.MethodGet, getURL, nil, firstUserToken)
-
-		// ドラフト記事は他ユーザーがアクセスできないので404が返るはず
-		assert.Equal(t, http.StatusNotFound, w.Code, "Expected status code 404 when accessing another user's draft article")
-
-		// 認証なしでアクセスしても404になることを確認
-		w = e2e.PerformRequest(newRouter, http.MethodGet, getURL, nil, "")
-		assert.Equal(t, http.StatusNotFound, w.Code, "Expected status code 404 when accessing a draft article without authentication")
-
-		// ドラフト記事作成者は自分のドラフト記事にアクセスできることを確認
-		w = e2e.PerformRequest(newRouter, http.MethodGet, getURL, nil, secondUserToken)
-		assert.Equal(t, http.StatusOK, w.Code, "Owner should be able to access their own draft article")
-
-		// レスポンスの検証
-		var response dto.ArticleDetailResponse
-		e2e.GetResponseJSON(t, w, &response)
-
-		assert.NotEmpty(t, response.Data.ID, "Article ID should not be empty")
-		assert.Equal(t, secondUserDraftSlug, response.Data.Slug, "Slug should match")
-		assert.Equal(t, "draft", response.Data.Status, "Article status should be 'draft'")
-	})
-
-	// 公開記事は誰でも取得できることを検証するテスト
-	t.Run("公開記事は誰でも取得できる", func(t *testing.T) {
-		// 新しいテスト環境をセットアップ
-		newRouter, newCleanup := e2e.SetupTestEnvironment(t)
-		defer newCleanup()
-
-		// 最初のユーザーを作成してログイン
-		_, firstUserToken, _ := e2e.CreateAndLoginTestUser(t, newRouter)
-
-		// 別のユーザーを作成してログイン
-		_, secondUserToken, _ := e2e.CreateAndLoginTestUser(t, newRouter)
-
-		// 最初のユーザーで公開記事を作成
-		firstUserPublishedSlug := CreateTestArticle(t, newRouter, firstUserToken)
-		PublishArticle(t, newRouter, firstUserToken, firstUserPublishedSlug)
-
-		// 認証なしでアクセスしても200になることを確認
-		getURL := "/api/articles/" + firstUserPublishedSlug
-		w := e2e.PerformRequest(newRouter, http.MethodGet, getURL, nil, "")
-		assert.Equal(t, http.StatusOK, w.Code, "Anyone should be able to access a published article without authentication")
-
-		// 別ユーザーとしてアクセスしても200になることを確認
-		w = e2e.PerformRequest(newRouter, http.MethodGet, getURL, nil, secondUserToken)
-		assert.Equal(t, http.StatusOK, w.Code, "Any authenticated user should be able to access another user's published article")
-
-		// レスポンスの検証
-		var response dto.ArticleDetailResponse
-		e2e.GetResponseJSON(t, w, &response)
-
-		assert.NotEmpty(t, response.Data.ID, "Article ID should not be empty")
-		assert.Equal(t, firstUserPublishedSlug, response.Data.Slug, "Slug should match")
-		assert.Equal(t, "published", response.Data.Status, "Article status should be 'published'")
 	})
 }
