@@ -33,8 +33,6 @@ func AssertErrorResponse(t *testing.T, w *httptest.ResponseRecorder, expectedSta
 	}
 }
 
-
-
 // ユーザー作成＋ログインのワークフローを簡略化するヘルパー関数
 // テストユーザーを作成し、そのままログインまで行う
 func CreateAndLoginTestUser(t *testing.T, router *gin.Engine) (dto.RegisterUserResponse, string, string) {
