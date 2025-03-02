@@ -19,8 +19,6 @@ func TestGetMeArticles(t *testing.T) {
 	// テスト用ユーザーの作成とログイン
 	_, sessionToken, _ := e2e.CreateAndLoginTestUser(t, router)
 
-	// テスト環境はSetupTestEnvironmentのcleanup関数によってクリーンアップされる
-
 	t.Run("正常系: 自分の記事一覧取得（記事なし）", func(t *testing.T) {
 		// 自分の記事一覧取得リクエスト
 		w := e2e.PerformRequest(router, http.MethodGet, "/api/articles/me", nil, sessionToken)

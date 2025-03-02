@@ -17,8 +17,6 @@ func TestDeleteArticle(t *testing.T) {
 	// テスト用ユーザーの作成とログイン
 	_, sessionToken, _ := e2e.CreateAndLoginTestUser(t, router)
 
-	// テスト環境はSetupTestEnvironmentのcleanup関数によってクリーンアップされる
-
 	t.Run("正常系: 記事削除成功", func(t *testing.T) {
 		// ヘルパー関数を使用して記事作成
 		slug := CreateTestArticle(t, router, sessionToken)
@@ -113,7 +111,6 @@ func TestDeleteArticle(t *testing.T) {
 		// 同じ記事を再度削除
 		w = e2e.PerformRequest(router, http.MethodDelete, deleteURL, nil, sessionToken)
 
-		// 記事が既に存在しないため404が返るはず
 		e2e.AssertErrorResponse(t, w, http.StatusNotFound, "Article not found")
 	})
 }

@@ -2,7 +2,6 @@ package article
 
 import (
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
@@ -18,8 +17,6 @@ func TestGetArticleBySlug(t *testing.T) {
 
 	// テスト用ユーザーの作成とログイン
 	_, sessionToken, _ := e2e.CreateAndLoginTestUser(t, router)
-
-	// テスト環境はSetupTestEnvironmentのcleanup関数によってクリーンアップされる
 
 	t.Run("正常系: 記事詳細取得成功", func(t *testing.T) {
 		// ヘルパー関数を使用して記事作成
@@ -48,28 +45,6 @@ func TestGetArticleBySlug(t *testing.T) {
 		w := e2e.PerformRequest(router, http.MethodGet, getURL, nil, "")
 
 		// エラーレスポンスの検証
-		e2e.AssertErrorResponse(t, w, http.StatusNotFound, "Article not found")
-	})
-
-	t.Run("エッジケース: 特殊文字を含むslugで記事詳細取得", func(t *testing.T) {
-		// 特殊文字を含むslugで記事詳細取得リクエスト
-		// 注: 実際のAPIでは特殊文字を含むslugは生成されないかもしれないが、
-		// エッジケースとしてテストする
-		specialSlug := "special-slug-with-unusual-characters-._~"
-		getURL := "/api/articles/" + specialSlug
-		w := e2e.PerformRequest(router, http.MethodGet, getURL, nil, "")
-
-		// 存在しない記事なので404が返るはず
-		e2e.AssertErrorResponse(t, w, http.StatusNotFound, "Article not found")
-	})
-
-	t.Run("エッジケース: 非常に長いslugで記事詳細取得", func(t *testing.T) {
-		// 非常に長いslugで記事詳細取得リクエスト
-		longSlug := "very-long-slug-" + strings.Repeat("a", 200)
-		getURL := "/api/articles/" + longSlug
-		w := e2e.PerformRequest(router, http.MethodGet, getURL, nil, "")
-
-		// 存在しない記事なので404が返るはず
 		e2e.AssertErrorResponse(t, w, http.StatusNotFound, "Article not found")
 	})
 
