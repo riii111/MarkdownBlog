@@ -51,7 +51,7 @@ func TestGetArticlesByTag(t *testing.T) {
 		getURL := "/api/tags/" + testTagSlug + "/articles"
 		w := e2e.PerformRequest(router, http.MethodGet, getURL, nil, "")
 
-		// タグに紐づく記事がない場合は404が返されます
+		// タグに紐づく記事がない場合は404が返される
 		if w.Code == http.StatusNotFound {
 			// この場合はテストをスキップ
 			t.Skip("記事とタグの関連付けが反映されていない可能性があります")

@@ -46,14 +46,14 @@ func CreateMultipleTestArticles(t *testing.T, router *gin.Engine, sessionToken s
 }
 
 // テスト用のタグを作成するヘルパー関数
-// このテストではダミーのタグスラグを使用します
+// このテストではダミーのタグスラグを使用する
 func CreateTestTag(t *testing.T, router *gin.Engine, name string) string {
-	// ダミーのスラグを返します
+	// ダミーのスラグを返す
 	return fmt.Sprintf("test-tag-%s", uuid.New().String()[:8])
 }
 
 // テスト用のタグ付き記事を作成するヘルパー関数
-// このテストではタグ付き記事のシミュレーションを行います
+// このテストではタグ付き記事のシミュレーションを行う
 func CreateArticleWithTag(t *testing.T, router *gin.Engine, sessionToken string, tagSlug string) string {
 	// 記事作成
 	slug := CreateTestArticle(t, router, sessionToken)
