@@ -22,6 +22,11 @@ echo "========================================"
 # テストフォルダを取得
 TEST_DIRS=$(find "$TEST_BASE_PATH" -type d -name "*_test.go" -prune -o -type d -not -path "*/\.*" -print | sort)
 
+if [ -z "$TEST_DIRS" ]; then
+  echo -e "${RED}テストディレクトリの取得に失敗しました${NC}"
+  exit 1
+fi
+
 # テスト実行
 for dir in $TEST_DIRS; do
   # ベースパスからの相対パスを取得
