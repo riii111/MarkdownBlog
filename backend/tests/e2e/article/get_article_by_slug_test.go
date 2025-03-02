@@ -2,6 +2,7 @@ package article
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/riii111/markdown-blog-api/internal/handler/dto"
@@ -18,20 +19,15 @@ func TestGetArticleBySlug(t *testing.T) {
 	// テスト用ユーザーの作成とログイン
 	_, sessionToken, _ := e2e.CreateAndLoginTestUser(t, router)
 
-	t.Run("正常系: 記事詳細取得成功", func(t *testing.T) {
-		// 記事作成
-		createReq := dto.CreateArticleRequest{}
-		w := e2e.PerformRequest(router, http.MethodPost, "/api/articles", createReq, sessionToken)
-		assert.Equal(t, http.StatusCreated, w.Code, "Article creation should succeed")
+	// テスト環境はSetupTestEnvironmentのcleanup関数によってクリーンアップされる
 
-		// 作成した記事のslugを取得
-		var createResp dto.CreateArticleResponse
-		e2e.GetResponseJSON(t, w, &createResp)
-		slug := createResp.Slug
+	t.Run("正常系: 記事詳細取得成功", func(t *testing.T) {
+		// ヘルパー関数を使用して記事作成
+		slug := CreateTestArticle(t, router, sessionToken)
 
 		// 記事詳細取得リクエスト
 		getURL := "/api/articles/" + slug
-		w = e2e.PerformRequest(router, http.MethodGet, getURL, nil, "")
+		w := e2e.PerformRequest(router, http.MethodGet, getURL, nil, "")
 
 		// ステータスコードの検証
 		assert.Equal(t, http.StatusOK, w.Code, "Expected status code 200")
@@ -42,6 +38,7 @@ func TestGetArticleBySlug(t *testing.T) {
 
 		assert.NotEmpty(t, response.Data.ID, "Article ID should not be empty")
 		assert.Equal(t, slug, response.Data.Slug, "Slug should match")
+		assert.NotNil(t, response.Data.User, "User field should not be nil")
 	})
 
 	t.Run("異常系: 存在しない記事の詳細取得", func(t *testing.T) {
@@ -58,7 +55,7 @@ func TestGetArticleBySlug(t *testing.T) {
 		// 特殊文字を含むslugで記事詳細取得リクエスト
 		// 注: 実際のAPIでは特殊文字を含むslugは生成されないかもしれないが、
 		// エッジケースとしてテストする
-		specialSlug := "special-slug-with-unusual-characters"
+		specialSlug := "special-slug-with-unusual-characters-._~"
 		getURL := "/api/articles/" + specialSlug
 		w := e2e.PerformRequest(router, http.MethodGet, getURL, nil, "")
 
@@ -68,14 +65,32 @@ func TestGetArticleBySlug(t *testing.T) {
 
 	t.Run("エッジケース: 非常に長いslugで記事詳細取得", func(t *testing.T) {
 		// 非常に長いslugで記事詳細取得リクエスト
-		longSlug := "very-long-slug-"
-		for i := 0; i < 200; i++ {
-			longSlug += "a"
-		}
+		longSlug := "very-long-slug-" + strings.Repeat("a", 200)
 		getURL := "/api/articles/" + longSlug
 		w := e2e.PerformRequest(router, http.MethodGet, getURL, nil, "")
 
 		// 存在しない記事なので404が返るはず
 		e2e.AssertErrorResponse(t, w, http.StatusNotFound, "Article not found")
+	})
+
+	t.Run("正常系: 複数記事作成後に各記事の詳細取得", func(t *testing.T) {
+		// 複数の記事を作成
+		slugs := CreateMultipleTestArticles(t, router, sessionToken, 3)
+
+		// 各記事の詳細を取得して検証
+		for _, slug := range slugs {
+			getURL := "/api/articles/" + slug
+			w := e2e.PerformRequest(router, http.MethodGet, getURL, nil, "")
+
+			// ステータスコードの検証
+			assert.Equal(t, http.StatusOK, w.Code, "Expected status code 200")
+
+			// レスポンスの検証
+			var response dto.ArticleDetailResponse
+			e2e.GetResponseJSON(t, w, &response)
+
+			assert.NotEmpty(t, response.Data.ID, "Article ID should not be empty")
+			assert.Equal(t, slug, response.Data.Slug, "Slug should match")
+		}
 	})
 }

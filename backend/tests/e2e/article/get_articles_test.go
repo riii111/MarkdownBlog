@@ -15,6 +15,11 @@ func TestGetArticles(t *testing.T) {
 	router, cleanup := e2e.SetupTestEnvironment(t)
 	defer cleanup()
 
+	// テスト用ユーザーの作成とログイン
+	_, sessionToken, _ := e2e.CreateAndLoginTestUser(t, router)
+
+	CreateTestArticle(t, router, sessionToken)
+
 	t.Run("正常系: 記事一覧取得", func(t *testing.T) {
 		// リクエスト実行
 		w := e2e.PerformRequest(router, http.MethodGet, "/api/articles", nil, "")
@@ -26,7 +31,6 @@ func TestGetArticles(t *testing.T) {
 		var response dto.ArticleListResponse
 		e2e.GetResponseJSON(t, w, &response)
 
-		// 初期状態では記事がない可能性があるが、レスポンス構造は正しいはず
 		assert.NotNil(t, response.Data, "Data field should not be nil")
 		assert.NotNil(t, response.Pagination, "Pagination field should not be nil")
 	})
@@ -45,26 +49,40 @@ func TestGetArticles(t *testing.T) {
 		assert.Equal(t, 5, response.Pagination.ItemsPerPage, "Items per page should be 5")
 	})
 
-	t.Run("エッジケース: 無効なcursor指定で記事一覧取得", func(t *testing.T) {
-		// 無効なcursorパラメータ付きでリクエスト実行
-		w := e2e.PerformRequest(router, http.MethodGet, "/api/articles?cursor=invalid-cursor", nil, "")
+	t.Run("正常系: 複数記事作成後の一覧取得", func(t *testing.T) {
+		// 複数の記事を作成
+		CreateMultipleTestArticles(t, router, sessionToken, 3)
 
-		// APIの実装によっては500エラーが返る場合もある
-		if w.Code == http.StatusInternalServerError {
-			assert.Equal(t, http.StatusInternalServerError, w.Code, "Expected status code 500 for invalid cursor")
-			return
-		}
+		// リクエスト実行
+		w := e2e.PerformRequest(router, http.MethodGet, "/api/articles", nil, "")
 
-		// または、無効なcursorを無視して200が返る場合もある
+		// ステータスコードの検証
 		assert.Equal(t, http.StatusOK, w.Code, "Expected status code 200")
 
 		// レスポンスの検証
 		var response dto.ArticleListResponse
 		e2e.GetResponseJSON(t, w, &response)
 
+		// 注: 作成した記事はドラフト状態のため公開記事一覧には含まれない
 		assert.NotNil(t, response.Data, "Data field should not be nil")
 	})
 
+	t.Run("エッジケース: 無効なcursor指定で記事一覧取得", func(t *testing.T) {
+		// 無効なcursorパラメータ付きでリクエスト実行
+		w := e2e.PerformRequest(router, http.MethodGet, "/api/articles?cursor=invalid-cursor", nil, "")
+
+		// 無効なcursorの場合は500エラーが返される
+		if w.Code == http.StatusInternalServerError {
+			// 500エラーの場合はエラーレスポンスを検証
+			e2e.AssertErrorResponse(t, w, http.StatusInternalServerError, "Failed to fetch articles")
+			return
+		}
+
+		// このケースは発生しないはずだが、念のため検証
+		t.Errorf("無効なcursorの場合は500エラーが返されるはずですが、200が返されました")
+	})
+
+	// 境界値テスト
 	t.Run("エッジケース: 不正なlimit値で記事一覧取得", func(t *testing.T) {
 		// 不正なlimit値でリクエスト実行
 		w := e2e.PerformRequest(router, http.MethodGet, "/api/articles?limit=-1", nil, "")
@@ -77,7 +95,7 @@ func TestGetArticles(t *testing.T) {
 		e2e.GetResponseJSON(t, w, &response)
 
 		// デフォルト値（usecaseで定義されている9）が使用されるはず
-		assert.Equal(t, 9, response.Pagination.ItemsPerPage, "Items per page should be default (9)")
+		assert.Equal(t, DefaultArticleLimit, response.Pagination.ItemsPerPage, "Items per page should be default (9)")
 	})
 
 	t.Run("エッジケース: 過大なlimit値で記事一覧取得", func(t *testing.T) {
@@ -92,6 +110,28 @@ func TestGetArticles(t *testing.T) {
 		e2e.GetResponseJSON(t, w, &response)
 
 		// 最大値（usecaseで定義されている9）が使用されるはず
-		assert.Equal(t, 9, response.Pagination.ItemsPerPage, "Items per page should be max (9)")
+		assert.Equal(t, DefaultArticleLimit, response.Pagination.ItemsPerPage, "Items per page should be max (9)")
+	})
+
+	t.Run("エッジケース: 複数パラメータ指定で記事一覧取得", func(t *testing.T) {
+		// 複数パラメータ付きでリクエスト実行
+		w := e2e.PerformRequest(router, http.MethodGet, "/api/articles?limit=3&cursor=test", nil, "")
+
+		// 無効なcursorの場合は500エラーが返される
+		if w.Code == http.StatusInternalServerError {
+			// 500エラーの場合はエラーレスポンスを検証
+			e2e.AssertErrorResponse(t, w, http.StatusInternalServerError, "Failed to fetch articles")
+			return
+		}
+
+		// 正常に処理された場合
+		assert.Equal(t, http.StatusOK, w.Code, "Expected status code 200")
+
+		// レスポンスの検証
+		var response dto.ArticleListResponse
+		e2e.GetResponseJSON(t, w, &response)
+
+		assert.NotNil(t, response.Data, "Data field should not be nil")
+		assert.Equal(t, 3, response.Pagination.ItemsPerPage, "Items per page should be 3")
 	})
 }
