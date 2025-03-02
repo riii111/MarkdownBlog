@@ -96,7 +96,7 @@ func TestLoginUser(t *testing.T) {
 		w := e2e.PerformRequest(router, http.MethodPost, "/api/users/login", nil, "")
 
 		// エラーレスポンスの検証
-		e2e.AssertErrorResponse(t, w, http.StatusBadRequest, "")
+		e2e.AssertErrorResponse(t, w, http.StatusBadRequest, "Invalid request")
 	})
 
 	t.Run("異常系: 不正なJSONフォーマット", func(t *testing.T) {
