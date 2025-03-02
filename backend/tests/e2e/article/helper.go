@@ -45,6 +45,27 @@ func CreateMultipleTestArticles(t *testing.T, router *gin.Engine, sessionToken s
 	return slugs
 }
 
+// 記事のステータスを公開状態に変更するヘルパー関数
+// 記事のslugを受け取り、その記事を公開状態に変更する
+func PublishArticle(t *testing.T, router *gin.Engine, sessionToken string, slug string) {
+	// 記事更新用のリクエスト
+	updateReq := dto.UpdateArticleRequest{
+		Status: "published",
+	}
+	
+	// 記事更新リクエストを実行
+	updateURL := fmt.Sprintf("/api/articles/%s", slug)
+	w := e2e.PerformRequest(router, http.MethodPut, updateURL, updateReq, sessionToken)
+	require.Equal(t, http.StatusOK, w.Code, "Article status update should succeed")
+}
+
+// 複数の記事を公開状態に変更するヘルパー関数
+func PublishMultipleArticles(t *testing.T, router *gin.Engine, sessionToken string, slugs []string) {
+	for _, slug := range slugs {
+		PublishArticle(t, router, sessionToken, slug)
+	}
+}
+
 // テスト用のタグを作成するヘルパー関数
 // このテストではダミーのタグスラグを使用します
 func CreateTestTag(t *testing.T, router *gin.Engine, name string) string {

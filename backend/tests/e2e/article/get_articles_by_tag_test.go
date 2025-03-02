@@ -44,8 +44,9 @@ func TestGetArticlesByTag(t *testing.T) {
 	})
 
 	t.Run("正常系: タグに紐づく記事一覧取得（記事あり）", func(t *testing.T) {
-		// テスト用のタグ付き記事を作成
-		CreateArticleWithTag(t, router, sessionToken, testTagSlug)
+		// テスト用のタグ付き記事を作成して公開状態にする
+		slug := CreateArticleWithTag(t, router, sessionToken, testTagSlug)
+		PublishArticle(t, router, sessionToken, slug)
 
 		// タグに紐づく記事一覧取得リクエスト
 		getURL := "/api/tags/" + testTagSlug + "/articles"
@@ -68,6 +69,11 @@ func TestGetArticlesByTag(t *testing.T) {
 		assert.NotNil(t, response.Pagination, "Pagination field should not be nil")
 		// 少なくとも1つの記事があるはず
 		assert.NotEmpty(t, response.Data, "Articles data should not be empty")
+		
+		// すべての記事が公開状態であることを検証
+		for _, article := range response.Data {
+			assert.Equal(t, "published", article.Status, "All articles should have 'published' status")
+		}
 	})
 
 	t.Run("正常系: ページネーションパラメータ指定でタグに紐づく記事一覧取得", func(t *testing.T) {
@@ -171,5 +177,69 @@ func TestGetArticlesByTag(t *testing.T) {
 
 		// このケースは発生しないはずだが、念のため検証
 		t.Errorf("無効なcursorの場合は404または500エラーが返されるはずですが、%dが返されました", w.Code)
+	})
+
+	// 他ユーザーのドラフト記事が含まれないことを確認するテスト
+	t.Run("他ユーザーのドラフト記事はタグに紐づく記事一覧に含まれない", func(t *testing.T) {
+		// 新しいテスト環境をセットアップ
+		newRouter, newCleanup := e2e.SetupTestEnvironment(t)
+		defer newCleanup()
+
+		// テスト用のタグを作成
+		tagSlug := CreateTestTag(t, newRouter, "テストタグ")
+
+		// 最初のユーザーを作成してログイン
+		_, firstUserToken, _ := e2e.CreateAndLoginTestUser(t, newRouter)
+
+		// 最初のユーザーで公開記事を作成し、タグ付け
+		firstUserPublishedSlug := CreateTestArticle(t, newRouter, firstUserToken)
+		AttachTagToArticle(t, newRouter, firstUserToken, firstUserPublishedSlug, tagSlug)
+		PublishArticle(t, newRouter, firstUserToken, firstUserPublishedSlug)
+
+		// 最初のユーザーでドラフト記事を作成、タグ付け
+		firstUserDraftSlug := CreateTestArticle(t, newRouter, firstUserToken)
+		AttachTagToArticle(t, newRouter, firstUserToken, firstUserDraftSlug, tagSlug)
+
+		// 別のユーザーを作成してログイン
+		_, secondUserToken, _ := e2e.CreateAndLoginTestUser(t, newRouter)
+
+		// 別のユーザーで公開記事を作成、タグ付け
+		secondUserPublishedSlug := CreateTestArticle(t, newRouter, secondUserToken)
+		AttachTagToArticle(t, newRouter, secondUserToken, secondUserPublishedSlug, tagSlug)
+		PublishArticle(t, newRouter, secondUserToken, secondUserPublishedSlug)
+
+		// 別のユーザーでドラフト記事を作成、タグ付け
+		secondUserDraftSlug := CreateTestArticle(t, newRouter, secondUserToken)
+		AttachTagToArticle(t, newRouter, secondUserToken, secondUserDraftSlug, tagSlug)
+
+		// リクエスト実行（認証なし）
+		getURL := "/api/tags/" + tagSlug + "/articles"
+		w := e2e.PerformRequest(newRouter, http.MethodGet, getURL, nil, "")
+
+		// ステータスコードの検証
+		assert.Equal(t, http.StatusOK, w.Code, "Expected status code 200")
+
+		// レスポンスの検証
+		var response dto.ArticleListResponse
+		e2e.GetResponseJSON(t, w, &response)
+
+		// 公開記事のみが含まれるはず
+		assert.NotEmpty(t, response.Data, "Articles data should not be empty")
+
+		// ドラフト記事のSlugが含まれないことを検証
+		for _, article := range response.Data {
+			assert.NotEqual(t, firstUserDraftSlug, article.Slug, "First user's draft article should not be included")
+			assert.NotEqual(t, secondUserDraftSlug, article.Slug, "Second user's draft article should not be included")
+			// すべての記事が公開状態であることを確認
+			assert.Equal(t, "published", article.Status, "All articles should have 'published' status")
+		}
+
+		// 公開記事のSlugが含まれることを検証
+		slugsFound := make(map[string]bool)
+		for _, article := range response.Data {
+			slugsFound[article.Slug] = true
+		}
+		assert.True(t, slugsFound[firstUserPublishedSlug], "First user's published article should be included")
+		assert.True(t, slugsFound[secondUserPublishedSlug], "Second user's published article should be included")
 	})
 }
