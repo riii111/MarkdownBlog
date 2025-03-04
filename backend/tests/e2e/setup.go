@@ -135,8 +135,6 @@ func SetupTestEnvironment(t *testing.T) (*gin.Engine, func()) {
 	return router, cleanup
 }
 
-
-
 // テストデータのクリーンアップ
 func cleanupTestData(db *gorm.DB) {
 	// トランザクションを使用してデータをクリーンアップ

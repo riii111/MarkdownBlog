@@ -17,7 +17,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// エラーレスポンス検証ヘルパー
 // テスト内でのエラーレスポンスの検証を簡略化するためのヘルパー関数
 func AssertErrorResponse(t *testing.T, w *httptest.ResponseRecorder, expectedStatus int, errorMsgContains string) {
 	assert.Equal(t, expectedStatus, w.Code, fmt.Sprintf("Expected status code %d", expectedStatus))
@@ -33,8 +32,7 @@ func AssertErrorResponse(t *testing.T, w *httptest.ResponseRecorder, expectedSta
 	}
 }
 
-// ユーザー作成＋ログインのワークフローを簡略化するヘルパー関数
-// テストユーザーを作成し、そのままログインまで行う
+// テストユーザーを作成し、そのままログインまで行うヘルパー関数
 func CreateAndLoginTestUser(t *testing.T, router *gin.Engine) (dto.RegisterUserResponse, string, string) {
 	// テストユーザーデータ
 	testEmail := fmt.Sprintf("test-%s@example.com", uuid.New().String())
@@ -123,7 +121,7 @@ func PerformRequest(router *gin.Engine, method, path string, body interface{}, s
 	return w
 }
 
-// テスト用のコンテキストを作成
+// テスト用のコンテキストを作成するヘルパー関数
 func CreateTestContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), 10*time.Second)
 }
