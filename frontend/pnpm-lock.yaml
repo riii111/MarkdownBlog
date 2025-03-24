@@ -12,8 +12,8 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0(magicast@0.3.5)(typescript@5.8.2)
       '@nuxt/image':
-        specifier: 1.9.0
-        version: 1.9.0(db0@0.3.1(better-sqlite3@11.8.1))(ioredis@5.6.0)(magicast@0.3.5)(rollup@4.37.0)
+        specifier: 1.10.0
+        version: 1.10.0(db0@0.3.1(better-sqlite3@11.8.1))(ioredis@5.6.0)(magicast@0.3.5)
       '@nuxt/ui':
         specifier: ^2.21.1
         version: 2.21.1(change-case@5.4.4)(magicast@0.3.5)(typescript@5.8.2)(vite@6.2.2(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.13(typescript@5.8.2))
@@ -525,13 +525,9 @@ packages:
   '@nuxt/icon@1.10.3':
     resolution: {integrity: sha512-ESIiSIpETLLcn5p4U8S0F3AQ5Mox0MoHAVKczamY4STh3Dwrc8labLhtN6lunwpQEv6UGuiutdvfkJ88zu44Ew==}
 
-  '@nuxt/image@1.9.0':
-    resolution: {integrity: sha512-kuuePx/jtlmsuG/G8mTMELntw4p8MLD4tu9f4A064xor/ks29oEoBmFRzvfFwxqZ7cqfG2M4LZfTZFjQz5St+Q==}
-    engines: {node: '>=18.20.5'}
-
-  '@nuxt/kit@3.15.2':
-    resolution: {integrity: sha512-nxiPJVz2fICcyBKlN5pL1IgZVejyArulREsS5HvAk07hijlYuZ5toRM8soLt51VQNpFd/PedL+Z1AlYu/bQCYQ==}
-    engines: {node: '>=18.0.0'}
+  '@nuxt/image@1.10.0':
+    resolution: {integrity: sha512-/B58GeEmme7bkmQUrXzEw8P9sJb9BkMaYZqLDtq8ZdDLEddE3P4nVya8RQPB+p4b7EdqWajpPqdy1A2ZPLev/A==}
+    engines: {node: '>=18.20.6'}
 
   '@nuxt/kit@3.15.4':
     resolution: {integrity: sha512-dr7I7eZOoRLl4uxdxeL2dQsH0OrbEiVPIyBHnBpA4co24CBnoJoF+JINuP9l3PAM3IhUzc5JIVq3/YY3lEc3Hw==}
@@ -544,10 +540,6 @@ packages:
   '@nuxt/kit@3.16.1':
     resolution: {integrity: sha512-Perby8hJGUeCWad5oTVXb/Ibvp18ZCUC5PxHHu+acMDmVfnxSo48yqk7qNd09VkTF3LEzoEjNZpmW2ZWN0ry7A==}
     engines: {node: '>=18.12.0'}
-
-  '@nuxt/schema@3.15.2':
-    resolution: {integrity: sha512-cTHGbLTbrQ83B+7Mh0ggc5MzIp74o8KciA0boCiBJyK5uImH9QQNK6VgfwRWcTD5sj3WNKiIB1luOMom3LHgVw==}
-    engines: {node: ^14.18.0 || >=16.10.0}
 
   '@nuxt/schema@3.16.1':
     resolution: {integrity: sha512-Ri8bmT6MljpVR4DlXf9+acfgGaI4OTEdAzJU5aF2rJS78abtpnBxjXBG65kuhoL1LUlfKppDl8fTkUw5LM2JXQ==}
@@ -1346,15 +1338,15 @@ packages:
     resolution: {integrity: sha512-ilQs4fm/l9eMfWY2dY0WCIUplSUp7U0CT1vrqMg1MUdeZl4fypu5UP0XcDBK5WBQPJAKP1b7XEodISmekH/CEg==}
     engines: {bare: '>=1.7.0'}
 
-  bare-os@3.4.0:
-    resolution: {integrity: sha512-9Ous7UlnKbe3fMi7Y+qh0DwAup6A1JkYgPnjvMDNOlmnxNRQvQ/7Nst+OnUQKzk0iAT0m9BisbDVp9gCv8+ETA==}
-    engines: {bare: '>=1.6.0'}
+  bare-os@3.6.0:
+    resolution: {integrity: sha512-BUrFS5TqSBdA0LwHop4OjPJwisqxGy6JsWVqV6qaFoe965qqtaKfDzHY5T2YA1gUL0ZeeQeA+4BBc1FJTcHiPw==}
+    engines: {bare: '>=1.14.0'}
 
   bare-path@3.0.0:
     resolution: {integrity: sha512-tyfW2cQcB5NN8Saijrhqn0Zh7AnFNsnczRcuWODH0eYAXBsJ5gVxAUuNr7tsHSC6IZ77cA0SitzT+s47kot8Mw==}
 
-  bare-stream@2.6.4:
-    resolution: {integrity: sha512-G6i3A74FjNq4nVrrSTUz5h3vgXzBJnjmWAVlBWaZETkgu+LgKd7AiyOml3EDJY1AHlIbBHKDXE+TUT53Ff8OaA==}
+  bare-stream@2.6.5:
+    resolution: {integrity: sha512-jSmxKJNJmHySi6hC42zlZnq00rga4jjxcgNZjY9N5WlOe/iOoGRtdwGsHzQv2RlH2KOYMwGUXhf2zXd32BA9RA==}
     peerDependencies:
       bare-buffer: '*'
       bare-events: '*'
@@ -1640,9 +1632,6 @@ packages:
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
-
-  crossws@0.3.1:
-    resolution: {integrity: sha512-HsZgeVYaG+b5zA+9PbIPGq4+J/CJynJuearykPsXx4V/eMhyQ5EDVg3Ak2FBZtVXCiOLu/U7IiwDHTr9MA+IKw==}
 
   crossws@0.3.4:
     resolution: {integrity: sha512-uj0O1ETYX1Bh6uSgktfPvwDiPYGQ3aI4qVsaC/LWpkIzGj1nUYm5FK3K+t11oOlpN01lGbprFCH4wBlKdJjVgw==}
@@ -2172,9 +2161,6 @@ packages:
   gzip-size@7.0.0:
     resolution: {integrity: sha512-O1Ld7Dr+nqPnmGpdhzLmMTQ4vAsD+rHwMm1NLUmoUFFymBOMKxCCrtDxqdBRYXdeEPEi3SyoR4TizJLQrnKBNA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
-  h3@1.13.1:
-    resolution: {integrity: sha512-u/z6Z4YY+ANZ05cRRfsFJadTBrNA6e3jxdU+AN5UCbZSZEUwgHiwjvUEe0k1NoQmAvQmETwr+xB5jd7mhCJuIQ==}
 
   h3@1.15.1:
     resolution: {integrity: sha512-+ORaOBttdUm1E2Uu/obAyCguiI7MbBvsLTndc3gyK3zU+SYLoZXlyCP9Xgy0gikkGufFLTZXCXD6+4BsufnmHA==}
@@ -3023,9 +3009,6 @@ packages:
   ofetch@1.4.1:
     resolution: {integrity: sha512-QZj2DfGplQAr2oj9KzceK9Hwz6Whxazmn85yYeVuS3u9XTMOGMRx0kO95MQ+vLsj/S/NwBDMMLU5hpxvI6Tklw==}
 
-  ohash@1.1.4:
-    resolution: {integrity: sha512-FlDryZAahJmEF3VR3w1KogSEdWX3WhA5GPakFx4J81kEAiHyLMpdLLElS8n8dfNadMgAne/MywcvmogzscVt4g==}
-
   ohash@1.1.6:
     resolution: {integrity: sha512-TBu7PtV8YkAZn0tSxobKY2n2aAQva936lhRrj6957aDaCf9IEtqsKbgMzXE/F/sjqYOwmrukeORHNLe5glk7Cg==}
 
@@ -3140,9 +3123,6 @@ packages:
 
   pathe@1.1.2:
     resolution: {integrity: sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ==}
-
-  pathe@2.0.2:
-    resolution: {integrity: sha512-15Ztpk+nov8DR524R4BF7uEuzESgzUEAV4Ah7CUMNGXdE5ELuvxElxGXndBl32vMSsWa1jpNf22Z+Er3sKwq+w==}
 
   pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
@@ -3755,9 +3735,6 @@ packages:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
 
-  std-env@3.8.0:
-    resolution: {integrity: sha512-Bc3YwwCB+OzldMxOXJIIvC6cPRWr/LxOp48CdQTOkPyk/t4JWWJbrilwBd7RJzKV8QW7tJkcgAmeuLLJugl5/w==}
-
   std-env@3.8.1:
     resolution: {integrity: sha512-vj5lIj3Mwf9D79hBkltk5qmkFI+biIKWS2IBxEyEU3AX1tUf7AoL8nSazCOiiqQsGKIq01SClsKEzweu34uwvA==}
 
@@ -3796,9 +3773,6 @@ packages:
   strip-json-comments@2.0.1:
     resolution: {integrity: sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==}
     engines: {node: '>=0.10.0'}
-
-  strip-literal@2.1.1:
-    resolution: {integrity: sha512-631UJ6O00eNGfMiWG78ck80dfBab8X6IVFB51jZK5Icd7XAs60Z5y7QdSd/wGIklnWvRbUNloVzhOKKmutxQ6Q==}
 
   strip-literal@3.0.0:
     resolution: {integrity: sha512-TcccoMhJOM3OebGhSBEmp3UZ2SfDMZUEBdRA/9ynfLi8yYajyWX3JiXArcJt4Umh4vISpspkQIY8ZZoCqjbviA==}
@@ -3976,9 +3950,6 @@ packages:
   undici-types@6.20.0:
     resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
 
-  unenv@1.10.0:
-    resolution: {integrity: sha512-wY5bskBQFL9n3Eca5XnhH6KbUo/tfvkwm9OpcdCvLaeA7piBNbavbOKJySEwQ1V0RH6HvNlSAFRTpvTqgKRQXQ==}
-
   unenv@2.0.0-rc.15:
     resolution: {integrity: sha512-J/rEIZU8w6FOfLNz/hNKsnY+fFHWnu9MH4yRbSZF3xbbGHovcetXPs7sD+9p8L6CeNC//I9bhRYAOsBt2u7/OA==}
 
@@ -3995,9 +3966,6 @@ packages:
 
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
-
-  unimport@3.14.6:
-    resolution: {integrity: sha512-CYvbDaTT04Rh8bmD8jz3WPmHYZRG/NnvYVzwD6V1YAlvvKROlAeNDUBhkBGzNav2RKaeuXvlWYaa1V4Lfi/O0g==}
 
   unimport@4.1.2:
     resolution: {integrity: sha512-oVUL7PSlyVV3QRhsdcyYEMaDX8HJyS/CnUonEJTYA3//bWO+o/4gG8F7auGWWWkrrxBQBYOO8DKe+C53ktpRXw==}
@@ -5080,7 +5048,7 @@ snapshots:
       '@iconify/utils': 2.3.0
       '@iconify/vue': 4.3.0(vue@3.5.13(typescript@5.8.2))
       '@nuxt/devtools-kit': 1.7.0(magicast@0.3.5)(vite@6.2.2(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))
-      '@nuxt/kit': 3.16.0(magicast@0.3.5)
+      '@nuxt/kit': 3.16.1(magicast@0.3.5)
       consola: 3.4.2
       local-pkg: 0.5.1
       mlly: 1.7.4
@@ -5095,16 +5063,17 @@ snapshots:
       - vite
       - vue
 
-  '@nuxt/image@1.9.0(db0@0.3.1(better-sqlite3@11.8.1))(ioredis@5.6.0)(magicast@0.3.5)(rollup@4.37.0)':
+  '@nuxt/image@1.10.0(db0@0.3.1(better-sqlite3@11.8.1))(ioredis@5.6.0)(magicast@0.3.5)':
     dependencies:
-      '@nuxt/kit': 3.15.2(magicast@0.3.5)(rollup@4.37.0)
-      consola: 3.4.0
+      '@nuxt/kit': 3.16.1(magicast@0.3.5)
+      consola: 3.4.2
       defu: 6.1.4
-      h3: 1.13.1
+      h3: 1.15.1
       image-meta: 0.2.1
-      ohash: 1.1.4
-      pathe: 2.0.2
-      std-env: 3.8.0
+      knitwork: 1.2.0
+      ohash: 2.0.11
+      pathe: 2.0.3
+      std-env: 3.8.1
       ufo: 1.5.4
     optionalDependencies:
       ipx: 2.1.0(db0@0.3.1(better-sqlite3@11.8.1))(ioredis@5.6.0)
@@ -5128,37 +5097,7 @@ snapshots:
       - idb-keyval
       - ioredis
       - magicast
-      - rollup
-      - supports-color
       - uploadthing
-
-  '@nuxt/kit@3.15.2(magicast@0.3.5)(rollup@4.37.0)':
-    dependencies:
-      '@nuxt/schema': 3.15.2
-      c12: 2.0.4(magicast@0.3.5)
-      consola: 3.4.0
-      defu: 6.1.4
-      destr: 2.0.3
-      globby: 14.1.0
-      ignore: 7.0.3
-      jiti: 2.4.2
-      klona: 2.0.6
-      knitwork: 1.2.0
-      mlly: 1.7.4
-      ohash: 1.1.4
-      pathe: 2.0.2
-      pkg-types: 1.3.1
-      scule: 1.3.0
-      semver: 7.7.1
-      std-env: 3.8.0
-      ufo: 1.5.4
-      unctx: 2.4.1
-      unimport: 3.14.6(rollup@4.37.0)
-      untyped: 1.5.2
-    transitivePeerDependencies:
-      - magicast
-      - rollup
-      - supports-color
 
   '@nuxt/kit@3.15.4(magicast@0.3.5)':
     dependencies:
@@ -5239,13 +5178,6 @@ snapshots:
       untyped: 2.0.0
     transitivePeerDependencies:
       - magicast
-
-  '@nuxt/schema@3.15.2':
-    dependencies:
-      consola: 3.4.2
-      defu: 6.1.4
-      pathe: 2.0.3
-      std-env: 3.8.1
 
   '@nuxt/schema@3.16.1':
     dependencies:
@@ -5377,7 +5309,7 @@ snapshots:
 
   '@nuxtjs/color-mode@3.5.2(magicast@0.3.5)':
     dependencies:
-      '@nuxt/kit': 3.16.0(magicast@0.3.5)
+      '@nuxt/kit': 3.16.1(magicast@0.3.5)
       pathe: 1.1.2
       pkg-types: 1.3.1
       semver: 7.7.1
@@ -5433,7 +5365,7 @@ snapshots:
 
   '@nuxtjs/tailwindcss@6.13.1(magicast@0.3.5)':
     dependencies:
-      '@nuxt/kit': 3.16.0(magicast@0.3.5)
+      '@nuxt/kit': 3.16.1(magicast@0.3.5)
       autoprefixer: 10.4.21(postcss@8.5.3)
       c12: 2.0.4(magicast@0.3.5)
       consola: 3.4.2
@@ -6190,20 +6122,20 @@ snapshots:
     dependencies:
       bare-events: 2.5.4
       bare-path: 3.0.0
-      bare-stream: 2.6.4(bare-events@2.5.4)
+      bare-stream: 2.6.5(bare-events@2.5.4)
     transitivePeerDependencies:
       - bare-buffer
     optional: true
 
-  bare-os@3.4.0:
+  bare-os@3.6.0:
     optional: true
 
   bare-path@3.0.0:
     dependencies:
-      bare-os: 3.4.0
+      bare-os: 3.6.0
     optional: true
 
-  bare-stream@2.6.4(bare-events@2.5.4):
+  bare-stream@2.6.5(bare-events@2.5.4):
     dependencies:
       streamx: 2.22.0
     optionalDependencies:
@@ -6489,10 +6421,6 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
-
-  crossws@0.3.1:
-    dependencies:
-      uncrypto: 0.1.3
 
   crossws@0.3.4:
     dependencies:
@@ -7008,19 +6936,6 @@ snapshots:
     dependencies:
       duplexer: 0.1.2
 
-  h3@1.13.1:
-    dependencies:
-      cookie-es: 1.2.2
-      crossws: 0.3.1
-      defu: 6.1.4
-      destr: 2.0.3
-      iron-webcrypto: 1.2.1
-      ohash: 1.1.4
-      radix3: 1.1.2
-      ufo: 1.5.4
-      uncrypto: 0.1.3
-      unenv: 1.10.0
-
   h3@1.15.1:
     dependencies:
       cookie-es: 1.2.2
@@ -7287,11 +7202,11 @@ snapshots:
     dependencies:
       '@fastify/accept-negotiator': 1.1.0
       citty: 0.1.6
-      consola: 3.4.0
+      consola: 3.4.2
       defu: 6.1.4
       destr: 2.0.3
       etag: 1.8.1
-      h3: 1.13.1
+      h3: 1.15.1
       image-meta: 0.2.1
       listhen: 1.9.0
       ofetch: 1.4.1
@@ -8345,8 +8260,6 @@ snapshots:
       node-fetch-native: 1.6.6
       ufo: 1.5.4
 
-  ohash@1.1.4: {}
-
   ohash@1.1.6: {}
 
   ohash@2.0.11: {}
@@ -8480,8 +8393,6 @@ snapshots:
   path-type@6.0.0: {}
 
   pathe@1.1.2: {}
-
-  pathe@2.0.2: {}
 
   pathe@2.0.3: {}
 
@@ -9204,8 +9115,6 @@ snapshots:
 
   statuses@2.0.1: {}
 
-  std-env@3.8.0: {}
-
   std-env@3.8.1: {}
 
   streamx@2.22.0:
@@ -9251,10 +9160,6 @@ snapshots:
   strip-final-newline@3.0.0: {}
 
   strip-json-comments@2.0.1: {}
-
-  strip-literal@2.1.1:
-    dependencies:
-      js-tokens: 9.0.1
 
   strip-literal@3.0.0:
     dependencies:
@@ -9479,14 +9384,6 @@ snapshots:
   undici-types@6.20.0:
     optional: true
 
-  unenv@1.10.0:
-    dependencies:
-      consola: 3.4.2
-      defu: 6.1.4
-      mime: 3.0.0
-      node-fetch-native: 1.6.6
-      pathe: 1.1.2
-
   unenv@2.0.0-rc.15:
     dependencies:
       defu: 6.1.4
@@ -9512,25 +9409,6 @@ snapshots:
       is-plain-obj: 4.1.0
       trough: 2.2.0
       vfile: 6.0.3
-
-  unimport@3.14.6(rollup@4.37.0):
-    dependencies:
-      '@rollup/pluginutils': 5.1.4(rollup@4.37.0)
-      acorn: 8.14.1
-      escape-string-regexp: 5.0.0
-      estree-walker: 3.0.3
-      fast-glob: 3.3.3
-      local-pkg: 1.1.1
-      magic-string: 0.30.17
-      mlly: 1.7.4
-      pathe: 2.0.3
-      picomatch: 4.0.2
-      pkg-types: 1.3.1
-      scule: 1.3.0
-      strip-literal: 2.1.1
-      unplugin: 1.16.1
-    transitivePeerDependencies:
-      - rollup
 
   unimport@4.1.2:
     dependencies:
