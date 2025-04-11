@@ -144,6 +144,3 @@ http://localhost:8080/swagger/index.html
 └── traefik/              # Traefik設定
 ```
 
-## ライセンス
-
-MIT
