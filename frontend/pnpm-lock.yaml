@@ -21,8 +21,8 @@ importers:
         specifier: 0.10.1
         version: 0.10.1(magicast@0.3.5)(pinia@3.0.1(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2)))
       marked:
-        specifier: ^15.0.7
-        version: 15.0.7
+        specifier: ^15.0.8
+        version: 15.0.8
       nuxt:
         specifier: 3.16.2
         version: 3.16.2(@parcel/watcher@2.5.1)(@types/node@22.13.10)(better-sqlite3@11.9.1)(db0@0.3.1(better-sqlite3@11.9.1))(ioredis@5.6.0)(magicast@0.3.5)(rollup@4.39.0)(terser@5.39.0)(typescript@5.8.2)(vite@6.2.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)
@@ -2571,8 +2571,8 @@ packages:
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
 
-  marked@15.0.7:
-    resolution: {integrity: sha512-dgLIeKGLx5FwziAnsk4ONoGwHwGPJzselimvlVskE9XLN4Orv9u2VA3GWw/lYUqjfA0rUT/6fqKwfZJapP9BEg==}
+  marked@15.0.8:
+    resolution: {integrity: sha512-rli4l2LyZqpQuRve5C0rkn6pj3hT8EWPC+zkAxFTAJLxRbENfTAhEQq9itrmf1Y81QtAX5D/MYlGlIomNgj9lA==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -7473,7 +7473,7 @@ snapshots:
 
   markdown-table@3.0.4: {}
 
-  marked@15.0.7: {}
+  marked@15.0.8: {}
 
   math-intrinsics@1.1.0: {}
 
