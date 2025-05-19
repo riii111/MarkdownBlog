@@ -13,7 +13,7 @@
     "@nuxt/content": "^3.4.0",
     "@nuxt/image": "1.10.0",
     "@nuxt/ui": "^2.21.1",
-    "@pinia/nuxt": "0.10.1",
+    "@pinia/nuxt": "0.11.0",
     "marked": "^15.0.11",
     "nuxt": "3.16.2",
     "pinia": "^3.0.2",
